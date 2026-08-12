@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+uv.lock.bak
+
+# Node / frontend
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Data — raw sources are never committed, only their hashes/metadata in DB
+data/raw/**
+!data/raw/.gitkeep
+data/derived/
+
+# Generated reports
+reports/*.md
+!reports/.gitkeep
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Env
+.env
+.env.local

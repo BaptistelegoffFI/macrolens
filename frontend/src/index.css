@@ -1,0 +1,27 @@
+:root {
+  --bg-app: #ffffff;
+  --fg: #16191c;
+  --fg-secondary: #5a6169;
+  --rule: #d2d6db;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-app);
+  color: var(--fg);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 13px;
+}
+
+main {
+  padding: 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+code {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+}
