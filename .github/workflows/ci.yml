@@ -10,6 +10,22 @@ jobs:
   backend:
     name: backend (lint → types → tests → build)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: macrolens
+          POSTGRES_PASSWORD: macrolens
+          POSTGRES_DB: macrolens
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U macrolens"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg://macrolens:macrolens@localhost:5432/macrolens
     steps:
       - uses: actions/checkout@v4
 
@@ -32,6 +48,14 @@ jobs:
       - name: Types (mypy)
         working-directory: backend
         run: uv run mypy macrolens
+
+      - name: Migrate (alembic)
+        working-directory: backend
+        run: uv run alembic upgrade head
+
+      - name: Seed reference data
+        working-directory: backend
+        run: uv run macrolens seed
 
       - name: Tests (pytest)
         working-directory: backend

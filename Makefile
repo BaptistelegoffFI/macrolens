@@ -1,4 +1,4 @@
-.PHONY: check lint types test build dev etl
+.PHONY: check lint types test build dev migrate seed etl
 
 check: lint types test
 
@@ -20,6 +20,12 @@ build:
 
 dev:
 	docker compose up
+
+migrate:
+	cd backend && uv run alembic upgrade head
+
+seed:
+	cd backend && uv run macrolens seed
 
 etl:
 	cd backend && uv run macrolens etl run-all

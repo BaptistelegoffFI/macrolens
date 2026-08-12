@@ -1,0 +1,313 @@
+# Référentiel indicateurs — PLAN.md §2.4 (26 indicateurs, 4 rubriques du brief).
+#
+# `family` étend la liste d'exemples du DDL littéral (§6 : activity|prices|rates|
+# debt|external) à 7 valeurs — prices, activity, rates, debt, credit, markets,
+# external — pour correspondre exactement aux 7 familles de pondération du moteur
+# de similarité (§8.3 : Prix, Activité, Taux, Dette, Crédit, Marchés, Extérieur).
+# Il n'y a pas de contrainte CHECK sur cette colonne dans le DDL ; c'est un choix
+# de cohérence documenté dans docs/decisions/0001-ambiguites-plan-phase-1.md.
+
+# ── Activité ─────────────────────────────────────────────────────────────
+- code: gdp_real_pc
+  label_fr: PIB réel par habitant
+  label_en: Real GDP per capita
+  family: activity
+  unit: index / monnaie constante
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Produit intérieur brut en volume (prix constants), rapporté à la population.
+    Mesure le niveau de vie moyen indépendamment de l'inflation et de la taille
+    du pays.
+
+- code: gdp_real
+  label_fr: PIB réel
+  label_en: Real GDP
+  family: activity
+  unit: monnaie constante
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Produit intérieur brut à prix constants (volume), qui élimine l'effet de
+    l'inflation pour ne mesurer que l'évolution physique de la production.
+
+- code: gdp_nominal
+  label_fr: PIB nominal
+  label_en: Nominal GDP
+  family: activity
+  unit: monnaie courante
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Produit intérieur brut valorisé aux prix de l'année courante (monnaie
+    courante), sans correction de l'inflation. Sert de dénominateur commun aux
+    ratios / PIB (dette, crédit, investissement, etc.), toujours en monnaie
+    courante et même année (§7.2).
+
+- code: unemployment_rate
+  label_fr: Taux de chômage
+  label_en: Unemployment rate
+  family: activity
+  unit: "%"
+  is_derived: false
+  higher_is_worse: true
+  definition_fr: >
+    Part de la population active sans emploi et en recherche active d'un
+    emploi, exprimée en pourcentage de la population active.
+
+- code: population
+  label_fr: Population
+  label_en: Population
+  family: activity
+  unit: personnes
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Population totale résidente du pays, utilisée notamment pour calculer les
+    grandeurs par habitant (gdp_real_pc).
+
+- code: investment_gdp
+  label_fr: Investissement / PIB
+  label_en: Investment / GDP
+  family: activity
+  unit: "%"
+  is_derived: false
+  higher_is_worse: false
+  definition_fr: >
+    Formation brute de capital fixe (investissement productif et résidentiel),
+    rapportée au PIB nominal de la même année.
+
+- code: consumption_gdp
+  label_fr: Consommation / PIB
+  label_en: Consumption / GDP
+  family: activity
+  unit: "%"
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Consommation finale rapportée au PIB nominal de la même année. Ni un niveau
+    élevé ni un niveau faible n'est intrinsèquement favorable : dépend de la
+    contrepartie (investissement, solde extérieur).
+
+# ── Prix & monnaie ───────────────────────────────────────────────────────
+- code: cpi
+  label_fr: Indice des prix à la consommation
+  label_en: Consumer price index
+  family: prices
+  unit: index
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Indice mesurant l'évolution du niveau général des prix des biens et
+    services consommés par les ménages, base 100 à une année de référence.
+
+- code: inflation_yoy
+  label_fr: Inflation glissante
+  label_en: Year-on-year inflation
+  family: prices
+  unit: "% (dérivé)"
+  is_derived: true
+  derivation: "100 * (cpi[t] / cpi[t-1] - 1)"
+  higher_is_worse: null
+  definition_fr: >
+    Variation en pourcentage de l'indice des prix à la consommation par
+    rapport à la même période de l'année précédente. Ni une inflation très
+    forte ni une déflation ne sont souhaitables : la relation n'est pas
+    monotone, d'où l'absence de higher_is_worse tranché.
+
+- code: money_broad
+  label_fr: Masse monétaire large (M2/M3)
+  label_en: Broad money (M2/M3)
+  family: prices
+  unit: monnaie courante
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Agrégat monétaire large (dépôts à vue, épargne et quasi-monnaie inclus),
+    reflet du volume de monnaie en circulation dans l'économie.
+
+- code: wages_nominal
+  label_fr: Salaires nominaux
+  label_en: Nominal wages
+  family: prices
+  unit: index
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Indice des salaires nominaux (non corrigés de l'inflation), base 100 à une
+    année de référence.
+
+# ── Taux ─────────────────────────────────────────────────────────────────
+- code: rate_short
+  label_fr: Taux court terme
+  label_en: Short-term interest rate
+  family: rates
+  unit: "%"
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Taux d'intérêt nominal à court terme (typiquement interbancaire ou bons du
+    Trésor à 3 mois), reflet des conditions monétaires immédiates.
+
+- code: rate_long
+  label_fr: Rendement souverain long (10 ans)
+  label_en: Long-term government bond yield (10y)
+  family: rates
+  unit: "%"
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Rendement nominal des emprunts d'État à long terme (proxy 10 ans), reflet
+    des anticipations d'inflation et de croissance à long terme.
+
+- code: policy_rate
+  label_fr: Taux directeur
+  label_en: Policy rate
+  family: rates
+  unit: "%"
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Taux d'intérêt de référence fixé par la banque centrale pour piloter les
+    conditions monétaires.
+
+# ── Marchés ──────────────────────────────────────────────────────────────
+- code: equity_index_nominal
+  label_fr: Indice actions total return
+  label_en: Equity total return index
+  family: markets
+  unit: index
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Indice boursier total return (dividendes réinvestis), en monnaie
+    nominale, base 100 à une année de référence.
+
+- code: equity_capgain_index
+  label_fr: Indice actions prix seul
+  label_en: Equity price (capital gain) index
+  family: markets
+  unit: index
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Indice boursier prix seul (hors réinvestissement des dividendes), en
+    monnaie nominale, base 100 à une année de référence.
+
+- code: dividend_yield
+  label_fr: Rendement du dividende
+  label_en: Dividend yield
+  family: markets
+  unit: "%"
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Dividendes versés sur douze mois rapportés au niveau de l'indice actions,
+    en pourcentage.
+
+- code: house_price_index
+  label_fr: Prix immobilier
+  label_en: House price index
+  family: markets
+  unit: index
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Indice des prix de l'immobilier résidentiel, base 100 à une année de
+    référence.
+
+- code: exchange_rate_usd
+  label_fr: Change vs USD
+  label_en: Exchange rate vs USD
+  family: markets
+  unit: unités/USD
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Taux de change de la monnaie nationale contre le dollar américain,
+    exprimé en unités de monnaie nationale par dollar.
+
+# ── Dette ────────────────────────────────────────────────────────────────
+- code: debt_public_gdp
+  label_fr: Dette publique / PIB
+  label_en: Public debt / GDP
+  family: debt
+  unit: "%"
+  is_derived: false
+  higher_is_worse: true
+  definition_fr: >
+    Dette publique brute des administrations publiques, rapportée au PIB
+    nominal de la même année.
+
+- code: revenue_public_gdp
+  label_fr: Recettes publiques / PIB
+  label_en: Public revenue / GDP
+  family: debt
+  unit: "%"
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Recettes publiques totales des administrations publiques, rapportées au
+    PIB nominal de la même année.
+
+- code: expenditure_public_gdp
+  label_fr: Dépenses publiques / PIB
+  label_en: Public expenditure / GDP
+  family: debt
+  unit: "%"
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Dépenses publiques totales des administrations publiques, rapportées au
+    PIB nominal de la même année.
+
+# ── Crédit ───────────────────────────────────────────────────────────────
+- code: credit_private_gdp
+  label_fr: Crédit bancaire au privé / PIB
+  label_en: Private credit / GDP
+  family: credit
+  unit: "%"
+  is_derived: false
+  higher_is_worse: true
+  definition_fr: >
+    Encours de crédit bancaire au secteur privé non financier, rapporté au
+    PIB nominal de la même année. Un niveau élevé et une progression rapide
+    sont des signaux de risque financier robustes dans la littérature
+    (Schularick-Taylor).
+
+- code: mortgage_credit_gdp
+  label_fr: Crédit hypothécaire / PIB
+  label_en: Mortgage credit / GDP
+  family: credit
+  unit: "%"
+  is_derived: false
+  higher_is_worse: true
+  definition_fr: >
+    Encours de crédit hypothécaire (prêts immobiliers résidentiels), rapporté
+    au PIB nominal de la même année.
+
+- code: bank_capital_ratio
+  label_fr: Ratio de capital bancaire
+  label_en: Bank capital ratio
+  family: credit
+  unit: "%"
+  is_derived: false
+  higher_is_worse: false
+  definition_fr: >
+    Ratio de capital du secteur bancaire (fonds propres rapportés aux actifs
+    ou aux actifs pondérés des risques, selon la source) : un ratio plus élevé
+    indique un système bancaire mieux capitalisé.
+
+# ── Extérieur ────────────────────────────────────────────────────────────
+- code: current_account_gdp
+  label_fr: Balance courante / PIB
+  label_en: Current account / GDP
+  family: external
+  unit: "%"
+  is_derived: false
+  higher_is_worse: null
+  definition_fr: >
+    Solde du compte courant de la balance des paiements (biens, services,
+    revenus, transferts), rapporté au PIB nominal de la même année. Ni un
+    excédent ni un déficit important ne sont intrinsèquement favorables : les
+    deux peuvent signaler un déséquilibre.

@@ -19,6 +19,9 @@ services:
     build: ./backend
     environment:
       DATABASE_URL: postgresql+psycopg://macrolens:macrolens@db:5432/macrolens
+      MACROLENS_DATA_DIR: /app/data
+    volumes:
+      - ./data:/app/data:ro
     ports:
       - "8000:8000"
     depends_on:

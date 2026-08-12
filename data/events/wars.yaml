@@ -1,0 +1,64 @@
+# Guerres majeures affectant les pays du périmètre (§7.4 : flag `wartime`
+# dérivé de cette table). country: null = événement global (concerne tous les
+# pays du pool). Dates de notoriété publique bien établie — chaque entrée
+# porte sa propre source_url vérifiable.
+
+- country: null
+  date_start: 1914-07-28
+  date_end: 1918-11-11
+  kind: war
+  label_fr: "Première Guerre mondiale"
+  label_en: "World War I"
+  severity: 5
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/World_War_I"
+  notes_fr: >
+    Dates de déclaration de guerre (28 juillet 1914) et d'armistice
+    (11 novembre 1918). Concerne directement FRA, DEU, ITA ; affecte
+    l'ensemble du pool via le commerce, la dette de guerre et l'inflation.
+
+- country: null
+  date_start: 1939-09-01
+  date_end: 1945-09-02
+  kind: war
+  label_fr: "Seconde Guerre mondiale"
+  label_en: "World War II"
+  severity: 5
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/World_War_II"
+  notes_fr: >
+    Invasion de la Pologne (1er septembre 1939) à la capitulation japonaise
+    (2 septembre 1945). SWE est restée neutre durant tout le conflit.
+
+- country: FIN
+  date_start: 1939-11-30
+  date_end: 1940-03-13
+  kind: war
+  label_fr: "Guerre d'Hiver (Finlande - URSS)"
+  label_en: "Winter War"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Winter_War"
+  notes_fr: "Traité de paix de Moscou, 13 mars 1940."
+
+- country: FIN
+  date_start: 1941-06-25
+  date_end: 1944-09-19
+  kind: war
+  label_fr: "Guerre de Continuation (Finlande - URSS)"
+  label_en: "Continuation War"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Continuation_War"
+  notes_fr: "Armistice de Moscou, 19 septembre 1944."
+
+- country: NOR
+  date_start: 1940-04-09
+  date_end: 1945-05-08
+  kind: war
+  label_fr: "Occupation allemande de la Norvège"
+  label_en: "German occupation of Norway"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/German_occupation_of_Norway"
+  notes_fr: "Invasion du 9 avril 1940 à la capitulation allemande du 8 mai 1945."

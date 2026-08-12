@@ -1,0 +1,17 @@
+# Chronologie des crises bancaires — VOLONTAIREMENT VIDE en Phase 1.
+#
+# §13 Phase 1 liste "crises bancaires JST" parmi les fichiers YAML à créer,
+# mais §13 Phase 2 précise : "Extraction de la chronologie des crises
+# bancaires vers events" — à partir du fichier JST réellement téléchargé et
+# vérifié (source_id=jst, hash SHA-256 enregistré dans raw_files).
+#
+# Écrire ici à la main une liste d'années de crise en citant source_id=jst
+# reviendrait à fabriquer une citation vers des données que le projet n'a pas
+# encore ingérées (règle 2, CLAUDE.md — zéro chiffre non sourcé). Ce fichier
+# reste vide jusqu'à la Phase 2, où le loader JST (etl/sources/jst.py)
+# écrira directement les crises bancaires codées dans le dataset JST vers la
+# table `events`, avec locator et raw_file_id.
+#
+# Voir docs/decisions/0001-ambiguites-plan-phase-1.md.
+
+[]

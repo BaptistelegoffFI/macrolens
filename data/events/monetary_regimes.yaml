@@ -1,0 +1,192 @@
+# Changements de régime monétaire (§8.2.3 : sert de base à reference_frame=era).
+# Portée volontairement limitée en Phase 1 aux sorties de l'étalon-or (années
+# vérifiées par recherche le 2026-08-12) et aux régimes du XXe siècle bien
+# documentés. L'adoption de l'étalon-or (1870s-1880s, précision au jour
+# incertaine pour plusieurs pays) est laissée à data/reference/monetary_regimes.yaml
+# (Phase 4, §8.2.3) plutôt que fabriquée ici sans source vérifiée — voir
+# docs/decisions/0001-ambiguites-plan-phase-1.md.
+
+- country: DEU
+  date_start: 1931-07-15
+  kind: monetary_regime
+  label_fr: "Sortie de fait de l'étalon-or (crise du Danat Bank, contrôle des changes)"
+  label_en: "De facto exit from the gold standard"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://cepr.org/voxeu/columns/scylla-and-charybdis-what-europes-exit-gold-1930s-says-about-euro"
+  notes_fr: >
+    Année confirmée par recherche (2026-08-12, CEPR/VoxEU). Le jour exact
+    (déclenché par la faillite du Danat Bank le 13 juillet 1931 et les
+    accords de moratoire qui suivent) est approximatif.
+
+- country: SWE
+  date_start: 1931-09-27
+  kind: monetary_regime
+  label_fr: "Sortie de l'étalon-or"
+  label_en: "Exit from the gold standard"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://cepr.org/voxeu/columns/scylla-and-charybdis-what-europes-exit-gold-1930s-says-about-euro"
+  notes_fr: "Année confirmée par recherche (2026-08-12) ; suit de quelques jours la sortie du Royaume-Uni (21 septembre 1931)."
+
+- country: NOR
+  date_start: 1931-09-28
+  kind: monetary_regime
+  label_fr: "Sortie de l'étalon-or"
+  label_en: "Exit from the gold standard"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://cepr.org/voxeu/columns/scylla-and-charybdis-what-europes-exit-gold-1930s-says-about-euro"
+  notes_fr: "Année confirmée par recherche (2026-08-12) ; jour précis à confirmer lors de l'ingestion JST."
+
+- country: FIN
+  date_start: 1931-10-12
+  kind: monetary_regime
+  label_fr: "Sortie de l'étalon-or"
+  label_en: "Exit from the gold standard"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://cepr.org/voxeu/columns/scylla-and-charybdis-what-europes-exit-gold-1930s-says-about-euro"
+  notes_fr: "Année confirmée par recherche (2026-08-12) ; jour précis à confirmer lors de l'ingestion JST."
+
+- country: ITA
+  date_start: 1934-01-01
+  kind: monetary_regime
+  label_fr: "Sortie de l'étalon-or (contrôle des changes)"
+  label_en: "Exit from the gold standard"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://cepr.org/voxeu/columns/scylla-and-charybdis-what-europes-exit-gold-1930s-says-about-euro"
+  notes_fr: >
+    Année confirmée par recherche (2026-08-12) ; jour non déterminé avec
+    certitude, date placeholder au 1er janvier — à corriger lors de
+    l'ingestion JST (Phase 2).
+
+- country: FRA
+  date_start: 1936-09-25
+  kind: monetary_regime
+  label_fr: "Sortie de l'étalon-or (fin du bloc-or, accord tripartite)"
+  label_en: "Exit from the gold standard (Tripartite Agreement)"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Tripartite_Agreement_of_1936"
+  notes_fr: "Dernier pays du « bloc-or » à sortir de l'étalon-or, avec la Suisse et les Pays-Bas."
+
+- country: null
+  date_start: 1944-07-22
+  date_end: 1971-08-15
+  kind: monetary_regime
+  label_fr: "Système de Bretton Woods"
+  label_en: "Bretton Woods system"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Bretton_Woods_system"
+  notes_fr: "Accords signés le 22 juillet 1944 ; convertibilité-or du dollar suspendue le 15 août 1971 (Nixon Shock)."
+
+- country: null
+  date_start: 1971-08-15
+  kind: monetary_regime
+  label_fr: "Nixon Shock — fin de la convertibilité-or du dollar"
+  label_en: "Nixon Shock"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Nixon_shock"
+  notes_fr: "Marque la fin de facto de Bretton Woods et le passage aux changes flottants (§8.2.3)."
+
+- country: null
+  date_start: 1979-03-13
+  kind: monetary_regime
+  label_fr: "Création du Système Monétaire Européen (SME)"
+  label_en: "European Monetary System"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/European_Monetary_System"
+  notes_fr: "Concerne notamment FRA, DEU, ITA, NLD, BEL parmi le pool d'analogues."
+
+- country: FRA
+  date_start: 1999-01-01
+  date_end: 2002-02-28
+  kind: monetary_regime
+  label_fr: "Passage à l'euro"
+  label_en: "Euro adoption"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Euro"
+  notes_fr: "Monnaie scripturale au 1er janvier 1999, monnaie fiduciaire au 1er janvier 2002, fin de la double circulation le 28 février 2002."
+
+- country: DEU
+  date_start: 1999-01-01
+  date_end: 2002-02-28
+  kind: monetary_regime
+  label_fr: "Passage à l'euro"
+  label_en: "Euro adoption"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Euro"
+  notes_fr: "Monnaie scripturale au 1er janvier 1999, monnaie fiduciaire au 1er janvier 2002."
+
+- country: ITA
+  date_start: 1999-01-01
+  date_end: 2002-02-28
+  kind: monetary_regime
+  label_fr: "Passage à l'euro"
+  label_en: "Euro adoption"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Euro"
+  notes_fr: "Monnaie scripturale au 1er janvier 1999, monnaie fiduciaire au 1er janvier 2002."
+
+- country: FIN
+  date_start: 1999-01-01
+  date_end: 2002-02-28
+  kind: monetary_regime
+  label_fr: "Passage à l'euro"
+  label_en: "Euro adoption"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Euro"
+  notes_fr: "Monnaie scripturale au 1er janvier 1999, monnaie fiduciaire au 1er janvier 2002."
+
+- country: ESP
+  date_start: 1999-01-01
+  date_end: 2002-02-28
+  kind: monetary_regime
+  label_fr: "Passage à l'euro"
+  label_en: "Euro adoption"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Euro"
+  notes_fr: "Monnaie scripturale au 1er janvier 1999, monnaie fiduciaire au 1er janvier 2002."
+
+- country: NLD
+  date_start: 1999-01-01
+  date_end: 2002-02-28
+  kind: monetary_regime
+  label_fr: "Passage à l'euro"
+  label_en: "Euro adoption"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Euro"
+  notes_fr: "Monnaie scripturale au 1er janvier 1999, monnaie fiduciaire au 1er janvier 2002."
+
+- country: BEL
+  date_start: 1999-01-01
+  date_end: 2002-02-28
+  kind: monetary_regime
+  label_fr: "Passage à l'euro"
+  label_en: "Euro adoption"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Euro"
+  notes_fr: "Monnaie scripturale au 1er janvier 1999, monnaie fiduciaire au 1er janvier 2002."
+
+- country: PRT
+  date_start: 1999-01-01
+  date_end: 2002-02-28
+  kind: monetary_regime
+  label_fr: "Passage à l'euro"
+  label_en: "Euro adoption"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Euro"
+  notes_fr: "Monnaie scripturale au 1er janvier 1999, monnaie fiduciaire au 1er janvier 2002."

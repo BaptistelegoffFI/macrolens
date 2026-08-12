@@ -1,0 +1,171 @@
+# Référentiel sources — PLAN.md §5.2 et §5.3 (priorité de résolution des conflits).
+#
+# retrieved_at : date à laquelle l'URL et la citation ci-dessous ont été
+# vérifiées (recherche web, 2026-08-12) — PAS la date de téléchargement d'un
+# fichier de données, qui n'a pas encore eu lieu à ce stade du projet (Phase 2+).
+# `raw_files.downloaded_at` portera la date réelle de récupération de chaque
+# fichier. Voir docs/decisions/0001-ambiguites-plan-phase-1.md.
+
+- id: jst
+  full_name: Jordà-Schularick-Taylor Macrohistory Database
+  url: "https://www.macrohistory.net/database/"
+  citation: >
+    Jordà, Ò., Schularick, M., Taylor, A. M. (2017). "Macrofinancial History
+    and the New Business Cycle Facts." NBER Macroeconomics Annual 2016,
+    vol. 31, 213-263. Release 6 (2022), 18 économies avancées depuis 1870.
+  licence: "Usage non commercial, attribution obligatoire, partage à l'identique (CC BY-NC-SA)."
+  priority: 100
+  retrieved_at: 2026-08-12
+  notes: "Source primaire du socle 1870→ (§5.1). ~80% du socle §2.4, 18 pays."
+
+- id: maddison
+  full_name: Maddison Project Database
+  url: "https://www.rug.nl/ggdc/historicaldevelopment/maddison/"
+  citation: >
+    Bolt, J. and van Zanden, J. L. Maddison Project Database, Groningen
+    Growth and Development Centre, University of Groningen.
+  licence: "Réutilisation libre avec attribution (CC BY 4.0)."
+  priority: 50
+  retrieved_at: 2026-08-12
+  notes: "PIB/hab réel avant 1870 ; extension best-effort 1850-1869 (§2.2)."
+
+- id: bis_cbpol
+  full_name: "BIS — Central bank policy rates"
+  url: "https://data.bis.org/topics/CBPOL"
+  citation: "Bank for International Settlements, Central bank policy rates statistics."
+  licence: "Réutilisation avec attribution, conditions BIS Data Portal."
+  priority: 80
+  retrieved_at: 2026-08-12
+  notes: "policy_rate mensuel, historique variable selon pays."
+
+- id: bis_credit
+  full_name: "BIS — Credit to the non-financial sector"
+  url: "https://www.bis.org/statistics/totcredit.htm"
+  citation: "Bank for International Settlements, Total credit statistics."
+  licence: "Réutilisation avec attribution, conditions BIS Data Portal."
+  priority: 80
+  retrieved_at: 2026-08-12
+  notes: "Crédit privé trimestriel, post-1940/1970 selon pays."
+
+- id: bis_pp
+  full_name: "BIS — Property prices statistics"
+  url: "https://www.bis.org/statistics/pp.htm"
+  citation: "Bank for International Settlements, Property price statistics."
+  licence: "Réutilisation avec attribution, conditions BIS Data Portal."
+  priority: 80
+  retrieved_at: 2026-08-12
+  notes: "house_price_index, historique long."
+
+- id: imf_ifs
+  full_name: "IMF — International Financial Statistics"
+  url: "https://data.imf.org"
+  citation: "International Monetary Fund, International Financial Statistics."
+  licence: "Réutilisation avec attribution, conditions IMF Data."
+  priority: 70
+  retrieved_at: 2026-08-12
+  notes: "Change, taux, IPC post-1948."
+
+- id: imf_weo
+  full_name: "IMF — World Economic Outlook Database"
+  url: "https://www.imf.org/en/Publications/WEO"
+  citation: "International Monetary Fund, World Economic Outlook Database."
+  licence: "Réutilisation avec attribution, conditions IMF Data."
+  priority: 70
+  retrieved_at: 2026-08-12
+  notes: "Dette, solde public, PIB — données récentes."
+
+- id: imf_ghd
+  full_name: "IMF — Global Debt Database / Historical Public Debt Database"
+  url: "https://www.imf.org/external/datamapper/datasets/GDD"
+  citation: >
+    International Monetary Fund, Global Debt Database ; Abbas, S. M. A. et
+    al. (2010), "A Historical Public Debt Database", IMF Working Paper 10/245.
+  licence: "Réutilisation avec attribution, conditions IMF Data."
+  priority: 70
+  retrieved_at: 2026-08-12
+  notes: "debt_public_gdp, historique long."
+
+- id: oecd_mei
+  full_name: "OECD — Main Economic Indicators"
+  url: "https://www.oecd.org/en/data/datasets/main-economic-indicators.html"
+  citation: "OECD, Main Economic Indicators."
+  licence: "Réutilisation avec attribution, conditions OECD Data."
+  priority: 60
+  retrieved_at: 2026-08-12
+  notes: "IPC / chômage / taux mensuels post-1955."
+
+- id: eurostat
+  full_name: Eurostat
+  url: "https://ec.europa.eu/eurostat"
+  citation: "Eurostat, base de données statistiques européennes."
+  licence: "Réutilisation avec attribution, politique de licence Eurostat."
+  priority: 60
+  retrieved_at: 2026-08-12
+  notes: "Trimestriel harmonisé UE post-1995."
+
+- id: riksbank_hms
+  full_name: "Historical Monetary and Financial Statistics for Sweden"
+  url: "https://www.riksbank.se/en-gb/about-the-riksbank/the-tasks-of-the-riksbank/research/historical-monetary-statistics-of-sweden/volume-i-exchange-rates-prices-and-wages-1277-2008/"
+  citation: >
+    Sveriges Riksbank, Historical Monetary and Financial Statistics for
+    Sweden, Volumes I-III (2010, 2014, 2022).
+  licence: "Publication de banque centrale, réutilisation avec attribution."
+  priority: 90
+  retrieved_at: 2026-08-12
+  notes: "Suède, extension pré-1870 et contrôle qualité."
+
+- id: norges_hms
+  full_name: "Historical Monetary Statistics for Norway 1819-2003"
+  url: "https://www.norges-bank.no/en/topics/Statistics/Historical-monetary-statistics/"
+  citation: >
+    Norges Bank, Historical Monetary Statistics for Norway 1819-2003,
+    Occasional Papers No. 35.
+  licence: "Publication de banque centrale, réutilisation avec attribution."
+  priority: 90
+  retrieved_at: 2026-08-12
+  notes: "Norvège, extension pré-1870."
+
+- id: boe_millennium
+  full_name: "A Millennium of Macroeconomic Data"
+  url: "https://www.bankofengland.co.uk/statistics/research-datasets"
+  citation: >
+    Thomas, R. and Dimsdale, N., "A Millennium of Macroeconomic Data",
+    Bank of England.
+  licence: "Publication de banque centrale, réutilisation avec attribution."
+  priority: 90
+  retrieved_at: 2026-08-12
+  notes: "Contrôle qualité pour GBR (pays du pool d'analogues, §2.1)."
+
+- id: owid
+  full_name: Our World in Data
+  url: "https://ourworldindata.org"
+  citation: "Our World in Data, Global Change Data Lab."
+  licence: "Réutilisation libre avec attribution (CC BY 4.0)."
+  priority: 30
+  retrieved_at: 2026-08-12
+  notes: "Population, contexte, vérification croisée."
+
+- id: rr_crises
+  full_name: "Reinhart & Rogoff — chronologie des crises"
+  url: "https://rogoff.scholars.harvard.edu/time-different-data-files"
+  citation: >
+    Reinhart, C. M. and Rogoff, K. S. (2009). This Time Is Different: Eight
+    Centuries of Financial Folly. Données associées.
+  licence: "Données de recherche académique, réutilisation avec attribution."
+  priority: 20
+  retrieved_at: 2026-08-12
+  notes: "Recoupement des dates de crise, jamais source primaire de valeurs."
+
+- id: events_manual
+  full_name: "Fichiers YAML du dépôt — événements curés manuellement"
+  url: "https://en.wikipedia.org"
+  citation: >
+    Curation interne MacroLens à partir de faits historiques largement
+    établis (guerres, régimes monétaires, chocs pétroliers). Chaque
+    événement individuel porte sa propre source_url vérifiée — voir
+    data/events/*.yaml. Ne sert jamais de source pour une valeur numérique
+    dans `observations` (règle 2, CLAUDE.md).
+  licence: "N/A — curation interne, pas de données tierces redistribuées."
+  priority: 0
+  retrieved_at: 2026-08-12
+  notes: "Guerres, régimes, chocs pétroliers, changements monétaires (§5.2)."

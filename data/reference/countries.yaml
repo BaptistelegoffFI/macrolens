@@ -1,0 +1,160 @@
+# Référentiel pays — PLAN.md §2.1.
+# is_core: les 6 pays cibles du brief (affichés comme pays principaux dans l'UI).
+# in_analog_pool: entre dans la recherche d'analogues (tous les 17, cœur + contrôle).
+# currency_hist: historique simplifié des monnaies (année de début, année de fin —
+# null = monnaie actuelle). Métadonnée contextuelle d'affichage, distincte des taux
+# de conversion sourcés de data/reference/currency_changes.yaml (§7.3, Phase 3).
+
+- iso3: FRA
+  name_en: France
+  name_fr: France
+  is_core: true
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Franc français", from: 1870, to: 1999 }
+    - { currency: "Euro", from: 1999, to: null }
+
+- iso3: DEU
+  name_en: Germany
+  name_fr: Allemagne
+  is_core: true
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Mark (Empire allemand)", from: 1873, to: 1914 }
+    - { currency: "Mark / Papiermark (hyperinflation)", from: 1914, to: 1923 }
+    - { currency: "Rentenmark puis Reichsmark", from: 1923, to: 1948 }
+    - { currency: "Deutsche Mark (RFA) / Ostmark (RDA)", from: 1948, to: 1990 }
+    - { currency: "Deutsche Mark (Allemagne réunifiée)", from: 1990, to: 1999 }
+    - { currency: "Euro", from: 1999, to: null }
+  note: >
+    Ruptures territoriales et statistiques 1914-1924, 1939-1949, 1990 (§7.4) —
+    observations flaguées is_break=true, exclues du pool par défaut.
+
+- iso3: ITA
+  name_en: Italy
+  name_fr: Italie
+  is_core: true
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Lire italienne", from: 1870, to: 1999 }
+    - { currency: "Euro", from: 1999, to: null }
+
+- iso3: SWE
+  name_en: Sweden
+  name_fr: Suède
+  is_core: true
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Couronne suédoise", from: 1873, to: null }
+
+- iso3: FIN
+  name_en: Finland
+  name_fr: Finlande
+  is_core: true
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Mark finlandais", from: 1870, to: 1999 }
+    - { currency: "Euro", from: 1999, to: null }
+  note: >
+    Indépendance 1917 et guerre civile 1918 (§7.4) — observation is_break=true.
+
+- iso3: NOR
+  name_en: Norway
+  name_fr: Norvège
+  is_core: true
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Couronne norvégienne", from: 1875, to: null }
+
+- iso3: USA
+  name_en: United States
+  name_fr: États-Unis
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Dollar américain", from: 1870, to: null }
+
+- iso3: GBR
+  name_en: United Kingdom
+  name_fr: Royaume-Uni
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Livre sterling", from: 1870, to: null }
+
+- iso3: JPN
+  name_en: Japan
+  name_fr: Japon
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Yen", from: 1871, to: null }
+
+- iso3: ESP
+  name_en: Spain
+  name_fr: Espagne
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Peseta", from: 1870, to: 1999 }
+    - { currency: "Euro", from: 1999, to: null }
+
+- iso3: NLD
+  name_en: Netherlands
+  name_fr: Pays-Bas
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Florin néerlandais (gulden)", from: 1870, to: 1999 }
+    - { currency: "Euro", from: 1999, to: null }
+
+- iso3: CHE
+  name_en: Switzerland
+  name_fr: Suisse
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Franc suisse", from: 1870, to: null }
+
+- iso3: DNK
+  name_en: Denmark
+  name_fr: Danemark
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Couronne danoise", from: 1873, to: null }
+
+- iso3: BEL
+  name_en: Belgium
+  name_fr: Belgique
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Franc belge", from: 1870, to: 1999 }
+    - { currency: "Euro", from: 1999, to: null }
+
+- iso3: PRT
+  name_en: Portugal
+  name_fr: Portugal
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Escudo portugais", from: 1911, to: 1999 }
+    - { currency: "Euro", from: 1999, to: null }
+
+- iso3: AUS
+  name_en: Australia
+  name_fr: Australie
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Livre australienne", from: 1870, to: 1966 }
+    - { currency: "Dollar australien", from: 1966, to: null }
+
+- iso3: CAN
+  name_en: Canada
+  name_fr: Canada
+  is_core: false
+  in_analog_pool: true
+  currency_hist:
+    - { currency: "Dollar canadien", from: 1870, to: null }

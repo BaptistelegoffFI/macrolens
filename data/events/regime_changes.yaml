@@ -1,0 +1,128 @@
+# Changements de régime politique (kind=regime_change) et chocs pétroliers
+# (kind=oil_shock) — regroupés dans ce fichier faute de fichier dédié aux
+# chocs pétroliers dans l'arborescence §14 du plan.
+
+# ── Chocs pétroliers ─────────────────────────────────────────────────────
+- country: null
+  date_start: 1973-10-17
+  date_end: 1974-03-18
+  kind: oil_shock
+  label_fr: "Premier choc pétrolier"
+  label_en: "1973 oil crisis"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/1973_oil_crisis"
+  notes_fr: "Embargo de l'OAPEC : 17 octobre 1973 - 18 mars 1974."
+
+- country: null
+  date_start: 1979-01-01
+  date_end: 1980-12-31
+  kind: oil_shock
+  label_fr: "Second choc pétrolier"
+  label_en: "1979 oil crisis"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/1979_oil_crisis"
+  notes_fr: >
+    Bornes approximatives (année complète) : choc en deux vagues, révolution
+    iranienne (1979) puis guerre Iran-Irak (à partir de septembre 1980).
+
+# ── Changements de régime politique ──────────────────────────────────────
+- country: FRA
+  date_start: 1940-07-10
+  date_end: 1944-08-25
+  kind: regime_change
+  label_fr: "Régime de Vichy"
+  label_en: "Vichy France"
+  severity: 5
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Vichy_France"
+  notes_fr: "Pleins pouvoirs votés au maréchal Pétain le 10 juillet 1940 ; Libération de Paris le 25 août 1944."
+
+- country: FRA
+  date_start: 1958-10-04
+  kind: regime_change
+  label_fr: "Fondation de la Ve République"
+  label_en: "Founding of the Fifth Republic"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/French_Fifth_Republic"
+  notes_fr: "Adoption de la constitution par référendum, 4 octobre 1958."
+
+- country: DEU
+  date_start: 1918-11-09
+  date_end: 1933-01-30
+  kind: regime_change
+  label_fr: "République de Weimar"
+  label_en: "Weimar Republic"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Weimar_Republic"
+  notes_fr: "Proclamation de la république le 9 novembre 1918 ; nomination d'Hitler comme chancelier le 30 janvier 1933."
+
+- country: DEU
+  date_start: 1933-01-30
+  date_end: 1945-05-08
+  kind: regime_change
+  label_fr: "Troisième Reich"
+  label_en: "Nazi Germany"
+  severity: 5
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Nazi_Germany"
+  notes_fr: "Capitulation sans conditions le 8 mai 1945."
+
+- country: DEU
+  date_start: 1949-05-23
+  date_end: 1990-10-03
+  kind: regime_change
+  label_fr: "Allemagne divisée (RFA / RDA)"
+  label_en: "Divided Germany (FRG / GDR)"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/German_reunification"
+  notes_fr: >
+    RFA fondée le 23 mai 1949, RDA le 7 octobre 1949, réunification le
+    3 octobre 1990. Rupture statistique (§7.4) : observations is_break=true
+    autour de 1990-1991.
+
+- country: ITA
+  date_start: 1922-10-31
+  date_end: 1946-06-02
+  kind: regime_change
+  label_fr: "Régime fasciste"
+  label_en: "Fascist Italy"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Italian_Fascism"
+  notes_fr: "Mussolini nommé président du Conseil le 31 octobre 1922 ; référendum institutionnel abolissant la monarchie le 2 juin 1946."
+
+- country: FIN
+  date_start: 1917-12-06
+  kind: regime_change
+  label_fr: "Indépendance de la Finlande"
+  label_en: "Finnish independence"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Independence_of_Finland"
+  notes_fr: "Déclaration d'indépendance du 6 décembre 1917, vis-à-vis de la Russie."
+
+- country: FIN
+  date_start: 1918-01-27
+  date_end: 1918-05-15
+  kind: regime_change
+  label_fr: "Guerre civile finlandaise"
+  label_en: "Finnish Civil War"
+  severity: 4
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Finnish_Civil_War"
+  notes_fr: "27 janvier - 15 mai 1918."
+
+- country: NOR
+  date_start: 1905-06-07
+  kind: regime_change
+  label_fr: "Dissolution de l'union avec la Suède"
+  label_en: "Dissolution of the union between Norway and Sweden"
+  severity: 3
+  source_id: events_manual
+  source_url: "https://en.wikipedia.org/wiki/Dissolution_of_the_union_between_Norway_and_Sweden"
+  notes_fr: "Déclaration du Storting le 7 juin 1905 ; reconnaissance formelle lors des accords de Karlstad, septembre 1905."
