@@ -57,6 +57,10 @@ jobs:
         working-directory: backend
         run: uv run macrolens seed
 
+      - name: Ingest JST (etl run-all)
+        working-directory: backend
+        run: uv run macrolens etl run-all
+
       - name: Tests (pytest)
         working-directory: backend
         run: uv run pytest

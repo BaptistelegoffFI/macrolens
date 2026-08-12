@@ -1,0 +1,24 @@
+# Ruptures territoriales/statistiques connues (§7.4) — utilisées pour flaguer
+# is_break=true sur les observations concernées, quelle que soit la source.
+
+- country: DEU
+  year_start: 1914
+  year_end: 1924
+  reason: >
+    Première Guerre mondiale, hyperinflation, changement de monnaie
+    (Mark -> Papiermark -> Rentenmark/Reichsmark).
+
+- country: DEU
+  year_start: 1939
+  year_end: 1949
+  reason: "Seconde Guerre mondiale, occupation, division RFA/RDA, changement de monnaie."
+
+- country: DEU
+  year_start: 1990
+  year_end: 1991
+  reason: "Réunification allemande, rupture de périmètre statistique."
+
+- country: FIN
+  year_start: 1917
+  year_end: 1918
+  reason: "Indépendance et guerre civile finlandaise."

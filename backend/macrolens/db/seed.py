@@ -3,7 +3,6 @@ et data/events/ vers PostgreSQL. Aucune valeur numérique n'est fabriquée ici :
 ce module ne fait que rejouer fidèlement le contenu des fichiers YAML.
 """
 
-import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -14,13 +13,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from macrolens.db.models import Country, Event, Indicator, Source
-
-REPO_ROOT = Path(__file__).resolve().parents[3]
-
-# En local (dépôt cloné), data/ est un dossier frère de backend/. En conteneur,
-# le contexte de build ne contient que backend/ : data/ est monté en volume
-# et son chemin fourni via MACROLENS_DATA_DIR (voir docker-compose.yml).
-DEFAULT_DATA_DIR = Path(os.environ.get("MACROLENS_DATA_DIR", str(REPO_ROOT / "data")))
+from macrolens.paths import DATA_DIR as DEFAULT_DATA_DIR
 
 
 @dataclass(frozen=True)

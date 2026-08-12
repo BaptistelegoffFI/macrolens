@@ -20,8 +20,10 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://macrolens:macrolens@db:5432/macrolens
       MACROLENS_DATA_DIR: /app/data
+      MACROLENS_REPORTS_DIR: /app/reports
     volumes:
-      - ./data:/app/data:ro
+      - ./data:/app/data
+      - ./reports:/app/reports
     ports:
       - "8000:8000"
     depends_on:

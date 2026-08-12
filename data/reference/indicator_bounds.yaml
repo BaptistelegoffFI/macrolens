@@ -1,0 +1,41 @@
+# Bornes de validation bloquantes à l'ingestion (§12.1). Marges volontairement
+# larges : ce sont des garde-fous contre des erreurs de parsing (signe
+# inversé, décimale mal placée, unité confondue), pas des hypothèses
+# économiques. L'hyperinflation allemande de 1923 (§7.4) doit rester dans les
+# bornes de inflation_yoy sans déclencher de rejet.
+
+gdp_real_pc: { min: 0 }
+gdp_real: { min: 0 }
+gdp_nominal: { min: 0 }
+unemployment_rate: { min: 0, max: 100 }
+population: { min: 0 }
+investment_gdp: { min: 0, max: 100 }
+consumption_gdp: { min: 0, max: 200 }
+
+cpi: { min: 0 }
+inflation_yoy: { min: -100, max: 1e10 }
+money_broad: { min: 0 }
+wages_nominal: { min: 0 }
+
+rate_short: { min: -20, max: 100 }
+rate_long: { min: -20, max: 100 }
+policy_rate: { min: -20, max: 100 }
+
+equity_index_nominal: { min: 0 }
+equity_capgain_index: { min: 0 }
+dividend_yield: { min: 0, max: 100 }
+house_price_index: { min: 0 }
+exchange_rate_usd: { min: 0 }
+
+debt_public_gdp: { min: 0, max: 500 }
+revenue_public_gdp: { min: 0, max: 100 }
+# max relevé à 150 : Pays-Bas 1945 (Libération, PIB effondré, dépenses de
+# guerre) atteint 105,7% dans JST R6 — un vrai point historique (§7.4), pas
+# une erreur de parsing. Vérifié le 2026-08-12.
+expenditure_public_gdp: { min: 0, max: 150 }
+
+credit_private_gdp: { min: 0, max: 500 }
+mortgage_credit_gdp: { min: 0, max: 500 }
+bank_capital_ratio: { min: 0, max: 100 }
+
+current_account_gdp: { min: -100, max: 100 }

@@ -1,0 +1,139 @@
+# Mapping colonnes JST (release 6) → indicator_code (§2.4).
+#
+# Colonne = nom exact tel que lu depuis JSTdatasetR6.dta. Vérifié contre le
+# codebook officiel (JST_documentationR6.pdf, section "VARIABLE NAMES AND
+# DESCRIPTIVE LABELS IN STATA", p.5-6) — jamais deviné depuis le seul nom de
+# variable. `transform` référence une fonction nommée de
+# backend/macrolens/etl/derive.py, appliquée aux `source_columns` dans
+# l'ordre indiqué.
+#
+# unemp, stir, ltrate, lev sont déjà en pourcentage dans JST malgré l'absence
+# de mention explicite "(in %)" pour unemp/stir/ltrate — vérifié empiriquement
+# sur l'échantillon FRA 2019 (unemp=8.41, cohérent avec le chômage réel
+# français de cette année-là) plutôt que supposé depuis le seul libellé.
+
+indicators:
+  population:
+    source_columns: [pop]
+    transform: multiply_1000
+    jst_label: "Population (milliers)"
+
+  gdp_real_pc:
+    source_columns: [rgdpmad]
+    transform: parse_dta_float
+    jst_label: "Real GDP per capita (PPP, 1990 Int$, Maddison)"
+
+  gdp_real:
+    source_columns: [rgdpmad, pop]
+    transform: gdp_real_from_percapita_and_pop
+    jst_label: "Dérivé : rgdpmad × pop × 1000"
+
+  gdp_nominal:
+    source_columns: [gdp]
+    transform: parse_dta_float
+    jst_label: "GDP (nominal, local currency)"
+
+  investment_gdp:
+    source_columns: [iy]
+    transform: fraction_to_percent
+    jst_label: "Investment-to-GDP ratio (fraction 0-1 dans JST)"
+
+  cpi:
+    source_columns: [cpi]
+    transform: parse_dta_float
+    jst_label: "Consumer prices (index, 1990=100)"
+
+  money_broad:
+    source_columns: [money]
+    transform: parse_dta_float
+    jst_label: "Broad money (nominal, local currency)"
+
+  rate_short:
+    source_columns: [stir]
+    transform: parse_dta_float
+    jst_label: "Short-term interest rate (nominal, percent per year)"
+
+  rate_long:
+    source_columns: [ltrate]
+    transform: parse_dta_float
+    jst_label: "Long-term interest rate (nominal, percent per year)"
+
+  house_price_index:
+    source_columns: [hpnom]
+    transform: parse_dta_float
+    jst_label: "House prices (nominal index, 1990=100)"
+
+  unemployment_rate:
+    source_columns: [unemp]
+    transform: parse_dta_float
+    jst_label: "Unemployment rate (percent)"
+
+  wages_nominal:
+    source_columns: [wage]
+    transform: parse_dta_float
+    jst_label: "Wages (index, 1990=100)"
+
+  debt_public_gdp:
+    source_columns: [debtgdp]
+    transform: fraction_to_percent
+    jst_label: "Public debt-to-GDP ratio (fraction 0-1 dans JST)"
+
+  exchange_rate_usd:
+    source_columns: [xrusd]
+    transform: parse_dta_float
+    jst_label: "USD exchange rate (local currency/USD)"
+
+  dividend_yield:
+    source_columns: [eq_dp]
+    transform: fraction_to_percent
+    jst_label: "Equity dividend yield dp[t]=dividend[t]/p[t] (fraction 0-1 dans JST)"
+
+  bank_capital_ratio:
+    source_columns: [lev]
+    transform: parse_dta_float
+    jst_label: "Banks, capital ratio (in %)"
+
+  current_account_gdp:
+    source_columns: [ca, gdp]
+    transform: ratio_to_gdp_pct
+    jst_label: "Current account (nominal, local currency) / gdp"
+
+  revenue_public_gdp:
+    source_columns: [revenue, gdp]
+    transform: ratio_to_gdp_pct
+    jst_label: "Government revenues (nominal, local currency) / gdp"
+
+  expenditure_public_gdp:
+    source_columns: [expenditure, gdp]
+    transform: ratio_to_gdp_pct
+    jst_label: "Government expenditure (nominal, local currency) / gdp"
+
+  credit_private_gdp:
+    source_columns: [tloans, gdp]
+    transform: ratio_to_gdp_pct
+    jst_label: "Total loans to non-financial private sector / gdp"
+
+  mortgage_credit_gdp:
+    source_columns: [tmort, gdp]
+    transform: ratio_to_gdp_pct
+    jst_label: "Mortgage loans to non-financial private sector / gdp"
+
+# Traitement séquentiel par pays (chaînage de rendements), géré à part dans
+# jst.py — pas un simple appel ligne à ligne comme les transforms ci-dessus.
+chained_indicators:
+  equity_index_nominal:
+    return_column: eq_tr
+    interp_flag_column: eq_tr_interp
+    jst_label: "Equity total return r[t]=[[p[t]+d[t]]/p[t-1]]-1, chaîné base 100"
+
+  equity_capgain_index:
+    return_column: eq_capgain
+    interp_flag_column: eq_capgain_interp
+    jst_label: "Equity capital gain cg[t]=[p[t]/p[t-1]]-1, chaîné base 100"
+
+# Indicateurs du socle (§2.4) sans équivalent direct dans JST R6 — laissés
+# vides jusqu'à une source complémentaire (Phase 3).
+not_mapped:
+  - consumption_gdp   # rconsbarro est un indice (base 2006=100), pas un niveau nominal ratioable au PIB
+  - inflation_yoy      # dérivé de cpi, calculé en Phase 4 (core/features.py), pas ingéré depuis une source
+  - policy_rate         # JST ne distingue pas taux directeur / taux court ; source dédiée en Phase 3 (BIS)
