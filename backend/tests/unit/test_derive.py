@@ -4,9 +4,11 @@
 import pytest
 
 from macrolens.etl.derive import (
+    apply_splice_ratio,
     chain_link_returns,
     fraction_to_percent,
     gdp_real_from_percapita_and_pop,
+    monthly_to_annual_mean,
     multiply_1000,
     parse_dta_float,
     ratio_to_gdp_pct,
@@ -34,6 +36,20 @@ def test_ratio_to_gdp_pct() -> None:
     assert ratio_to_gdp_pct(100.0, 0.0) is None  # dénominateur nul : pas de division par zéro
     assert ratio_to_gdp_pct(None, 100.0) is None
     assert ratio_to_gdp_pct(100.0, None) is None
+
+
+def test_apply_splice_ratio() -> None:
+    # DEU 1870 : JST rgdpmad=1839.079503, Maddison gdppc=2931 -> ratio ~0.6275
+    ratio = 1839.079503 / 2931
+    assert apply_splice_ratio(2931.0, ratio) == pytest.approx(1839.079503)
+    assert apply_splice_ratio(None, ratio) is None
+
+
+def test_monthly_to_annual_mean() -> None:
+    # 12 relevés mensuels à taux constant 3.5% -> moyenne annuelle 3.5%.
+    assert monthly_to_annual_mean([3.5] * 12) == pytest.approx(3.5)
+    # Année incomplète (arrivée en cours d'année) : moyenne sur les mois disponibles.
+    assert monthly_to_annual_mean([1.0, 2.0, 3.0]) == pytest.approx(2.0)
 
 
 def test_gdp_real_from_percapita_and_pop() -> None:

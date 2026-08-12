@@ -5,7 +5,9 @@ from collections.abc import Sequence
 from macrolens.db.seed import run_seed
 from macrolens.db.session import session_scope
 from macrolens.etl import pipeline
-from macrolens.etl.sources import jst
+from macrolens.etl.sources import bis_cbpol, jst, maddison
+
+_DOWNLOADERS = {"jst": jst, "bis_cbpol": bis_cbpol, "maddison": maddison}
 
 
 def _cmd_seed(_args: argparse.Namespace) -> int:
@@ -19,11 +21,12 @@ def _cmd_seed(_args: argparse.Namespace) -> int:
 
 
 def _cmd_etl_download(args: argparse.Namespace) -> int:
-    if args.source != "jst":
-        print(f"Source inconnue : {args.source!r} (seule 'jst' est disponible en Phase 2).")
+    module = _DOWNLOADERS.get(args.source)
+    if module is None:
+        print(f"Source inconnue : {args.source!r} (disponibles : {sorted(_DOWNLOADERS)}).")
         return 1
-    raw_dir = pipeline.DEFAULT_DATA_DIR / "raw" / "jst" / jst.VINTAGE
-    files = jst.download(raw_dir, force=args.force)
+    raw_dir = pipeline.DEFAULT_DATA_DIR / "raw" / args.source / module.VINTAGE
+    files = module.download(raw_dir, force=args.force)
     for f in files:
         print(f"{f.filename}  sha256={f.sha256}  {f.size_bytes} octets")
     return 0
@@ -32,9 +35,16 @@ def _cmd_etl_download(args: argparse.Namespace) -> int:
 def _cmd_etl_run_all(_args: argparse.Namespace) -> int:
     with session_scope() as session:
         report = pipeline.run_all(session)
+    for s in report.sources:
+        r = s.reconcile
+        print(
+            f"{s.source_id}: nouvelles={r.inserted_new} "
+            f"remplacées={r.replaced_by_higher_priority} "
+            f"écartées={r.rejected_lower_priority} conflits={len(r.conflicts)}"
+        )
     print(
-        f"observations={report.n_observations} events={report.n_events} "
-        f"coverage={report.coverage_report_path}"
+        f"total observations={report.n_observations} "
+        f"coverage={report.coverage_report_path} conflicts={report.conflicts_report_path}"
     )
     return 0
 

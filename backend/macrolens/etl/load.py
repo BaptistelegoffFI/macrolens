@@ -14,7 +14,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from macrolens.db.models import Event, Observation, RawFile, Source
-from macrolens.etl.sources.jst import DownloadedFile
+from macrolens.etl.common import DownloadedFile
 
 
 def register_raw_files(
@@ -63,10 +63,28 @@ def register_raw_files(
 # quand même comme paramètres dans un INSERT multi-lignes) ; 2000 lignes par
 # lot laisse une marge confortable (32000 paramètres) sans complexité inutile
 # à calculer un lot au plus juste.
-_BATCH_SIZE = 2000
+BATCH_SIZE = 2000
+
+
+def bulk_upsert_observations(session: Session, records: list[dict[str, Any]]) -> int:
+    """Upsert par lots, réutilisé par le chargement direct (une seule source,
+    Phase 2) et par le moteur de réconciliation (plusieurs sources, Phase 3+)."""
+    if not records:
+        return 0
+    pk_cols = ["country_iso3", "indicator_code", "period_start", "freq"]
+    for start in range(0, len(records), BATCH_SIZE):
+        batch = records[start : start + BATCH_SIZE]
+        stmt = insert(Observation).values(batch)
+        update_cols = {c.name: c for c in stmt.excluded if c.name not in pk_cols}
+        stmt = stmt.on_conflict_do_update(index_elements=pk_cols, set_=update_cols)
+        session.execute(stmt)
+    return len(records)
 
 
 def load_observations(session: Session, df: pd.DataFrame, *, raw_file_id: int) -> int:
+    """Chargement direct sans réconciliation — uniquement pour une source
+    seule sans concurrent possible (JST, seule source de Phase 2). Toute
+    source ajoutée depuis Phase 3 passe par etl/reconcile.py."""
     if df.empty:
         return 0
     df = df.copy()
@@ -75,18 +93,7 @@ def load_observations(session: Session, df: pd.DataFrame, *, raw_file_id: int) -
     df["period_start"] = df["period_start"].dt.date
 
     records = cast("list[dict[str, Any]]", df.to_dict(orient="records"))
-    pk_cols = ["country_iso3", "indicator_code", "period_start", "freq"]
-
-    # PostgreSQL limite une requête à 65535 paramètres liés (§7 : le pipeline
-    # doit tenir sur ~250 000 observations, largement au-delà de cette limite
-    # en un seul INSERT multi-valeurs) — on upsert par lots.
-    for start in range(0, len(records), _BATCH_SIZE):
-        batch = records[start : start + _BATCH_SIZE]
-        stmt = insert(Observation).values(batch)
-        update_cols = {c.name: c for c in stmt.excluded if c.name not in pk_cols}
-        stmt = stmt.on_conflict_do_update(index_elements=pk_cols, set_=update_cols)
-        session.execute(stmt)
-    return len(records)
+    return bulk_upsert_observations(session, records)
 
 
 def load_source_events(session: Session, events: list[dict[str, Any]], *, source_id: str) -> int:

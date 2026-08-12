@@ -7,17 +7,15 @@ point 6).
 
 from __future__ import annotations
 
-import hashlib
-from dataclasses import dataclass
-from datetime import UTC, date, datetime
+from datetime import date
 from pathlib import Path
 from typing import Any, cast
 
-import httpx
 import pandas as pd
 import pyreadstat
 import yaml
 
+from macrolens.etl.common import DownloadedFile, download_targets
 from macrolens.etl.derive import (
     chain_link_returns,
     fraction_to_percent,
@@ -57,49 +55,8 @@ DOWNLOAD_TARGETS = [
 ]
 
 
-@dataclass(frozen=True)
-class DownloadedFile:
-    filename: str
-    path: Path
-    media_type: str
-    sha256: str
-    size_bytes: int
-    origin_url: str
-    downloaded_at: datetime
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as fh:
-        for chunk in iter(lambda: fh.read(1 << 20), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def download(dest_dir: Path, *, force: bool = False) -> list[DownloadedFile]:
-    """Idempotent : si le fichier existe déjà, ne retéléchargement pas (§7.1)."""
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    results = []
-    for filename, url, media_type in DOWNLOAD_TARGETS:
-        path = dest_dir / filename
-        if force or not path.exists():
-            with httpx.stream("GET", url, follow_redirects=True, timeout=120.0) as resp:
-                resp.raise_for_status()
-                with path.open("wb") as fh:
-                    for chunk in resp.iter_bytes():
-                        fh.write(chunk)
-        results.append(
-            DownloadedFile(
-                filename=filename,
-                path=path,
-                media_type=media_type,
-                sha256=_sha256(path),
-                size_bytes=path.stat().st_size,
-                origin_url=url,
-                downloaded_at=datetime.now(UTC),
-            )
-        )
-    return results
+    return download_targets(dest_dir, DOWNLOAD_TARGETS, force=force)
 
 
 def load_mapping() -> dict[str, Any]:

@@ -98,7 +98,7 @@ def render_report(session: Session) -> str:
     generated = dt.datetime.now(dt.UTC).isoformat(timespec="seconds")
 
     lines = [
-        "# Rapport de couverture — JST release 6",
+        "# Rapport de couverture",
         "",
         f"Généré le {generated}. {total:,} observations en base.".replace(",", " "),
         "",

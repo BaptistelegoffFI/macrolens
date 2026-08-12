@@ -1,0 +1,31 @@
+# Mapping pays -> code de zone BIS (REF_AREA) pour policy_rate (§5.2 : bis_cbpol).
+# Codes ISO2 de l'API BIS SDMX (stats.bis.org), vérifiés le 2026-08-12 par
+# requête directe à l'API — jamais devinés depuis le seul code ISO3.
+#
+# XM = zone euro (taux BCE), qui remplace la série nationale à partir de
+# l'adoption de l'euro — même date que data/events/monetary_regimes.yaml
+# (1999-01-01). La Finlande n'a AUCUNE série nationale dans BIS WS_CBPOL
+# (vérifié : la requête M.FI renvoie "No data for data query") : elle
+# n'a donc de policy_rate qu'à partir de 1999 (XM).
+
+euro_adoption_year: 1999
+euro_area_code: XM
+
+countries:
+  FRA: { national_area: FR, euro_adopter: true }
+  DEU: { national_area: DE, euro_adopter: true }
+  ITA: { national_area: IT, euro_adopter: true }
+  ESP: { national_area: ES, euro_adopter: true }
+  NLD: { national_area: NL, euro_adopter: true }
+  BEL: { national_area: BE, euro_adopter: true }
+  PRT: { national_area: PT, euro_adopter: true }
+  FIN: { national_area: null, euro_adopter: true }
+  SWE: { national_area: SE, euro_adopter: false }
+  NOR: { national_area: NO, euro_adopter: false }
+  USA: { national_area: US, euro_adopter: false }
+  GBR: { national_area: GB, euro_adopter: false }
+  JPN: { national_area: JP, euro_adopter: false }
+  CHE: { national_area: CH, euro_adopter: false }
+  DNK: { national_area: DK, euro_adopter: false }
+  AUS: { national_area: AU, euro_adopter: false }
+  CAN: { national_area: CA, euro_adopter: false }

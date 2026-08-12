@@ -43,6 +43,21 @@ def gdp_real_from_percapita_and_pop(
     return rgdpmad * pop_thousands * 1000.0
 
 
+def apply_splice_ratio(value: float | None, ratio: float) -> float | None:
+    """Raccord par ratio de chevauchement (§7.3) : rebase une valeur sur la
+    base d'une autre série au point où les deux se recouvrent, plutôt qu'une
+    simple concaténation qui créerait une rupture de niveau à la jointure."""
+    if value is None:
+        return None
+    return value * ratio
+
+
+def monthly_to_annual_mean(monthly_values: list[float]) -> float:
+    """Agrège une série mensuelle en une valeur annuelle (§2.3 : le socle est
+    annuel, la couche mensuelle native est une extension v1.1)."""
+    return sum(monthly_values) / len(monthly_values)
+
+
 def chain_link_returns(returns: list[float | None], base: float = 100.0) -> list[float | None]:
     """Convertit une série de rendements période-à-période en indice chaîné,
     base 100 à la première observation disponible. Rétrospectif uniquement :
