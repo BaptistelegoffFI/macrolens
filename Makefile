@@ -1,6 +1,9 @@
-.PHONY: check lint types test build dev migrate seed etl
+.PHONY: check lint types test build dev migrate seed etl build-features setup refresh
 
 check: lint types test
+
+# Chaîne complète, base vide → panel prêt à interroger (voir README).
+setup: migrate seed etl build-features
 
 lint:
 	cd backend && uv run ruff check .
@@ -29,3 +32,10 @@ seed:
 
 etl:
 	cd backend && uv run macrolens etl run-all
+
+build-features:
+	cd backend && uv run macrolens build-features
+
+# Rafraîchissement annuel des données — voir docs/data-refresh.md.
+refresh:
+	./scripts/refresh_annual.sh

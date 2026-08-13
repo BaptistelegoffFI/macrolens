@@ -21,7 +21,17 @@ def register_raw_files(
     session: Session, files: list[DownloadedFile], *, source_id: str, vintage: str
 ) -> dict[str, int]:
     """Upsert par sha256 (§14 : data/raw/ n'est jamais réécrit sans que le
-    hash change). Retourne {filename: raw_file_id}."""
+    hash change). Retourne {filename: raw_file_id}.
+
+    Si le hash existe déjà, la ligne n'est PAS mise à jour : `relpath` et
+    `downloaded_at` restent ceux du premier enregistrement. Rejouer
+    l'ingestion depuis un autre environnement (conteneur vs hôte) ne doit
+    jamais faire pointer un `raw_file` déjà connu vers un chemin absolu
+    différent — sinon le test de retour à la source (§18.8) casse dès que
+    l'environnement d'exécution des tests diffère de celui de la dernière
+    ingestion, alors que le contenu du fichier n'a pas changé. On force
+    quand même une écriture no-op (`sha256` réécrit sur lui-même) pour que
+    `RETURNING` renvoie la ligne existante."""
     ids: dict[str, int] = {}
     for f in files:
         stmt = (
@@ -39,10 +49,7 @@ def register_raw_files(
             )
             .on_conflict_do_update(
                 index_elements=["sha256"],
-                set_={
-                    "relpath": str(f.path),
-                    "downloaded_at": f.downloaded_at,
-                },
+                set_={"sha256": f.sha256},
             )
             .returning(RawFile.id)
         )
