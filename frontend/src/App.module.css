@@ -49,6 +49,21 @@
   background: var(--bg-app);
 }
 
+/* §8.2.6/§9.4 : avertissements déterministes du moteur (écart d'époque,
+   n faible, concentration) — jamais silencieux. */
+.warningBanner {
+  margin: 8px;
+  padding: 6px 8px;
+  border-left: 2px solid var(--flag);
+  color: var(--fg);
+  font-size: 11px;
+  background: var(--bg-app);
+}
+
+.warningBanner + .warningBanner {
+  margin-top: -4px;
+}
+
 .rank {
   color: var(--fg-muted);
 }

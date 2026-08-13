@@ -70,7 +70,12 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
                 {data.state.features.map((f) => (
                   <div key={f.feature_code} className={styles.stateRow}>
                     <span>{f.feature_code}</span>
-                    <Num value={f.raw_value} decimals={2} />
+                    <span className={styles.stateRowValues}>
+                      <Num value={f.raw_value} decimals={2} />
+                      <span className={styles.stateRank}>
+                        r=<Num value={f.pct_rank} decimals={2} />
+                      </span>
+                    </span>
                   </div>
                 ))}
               </div>

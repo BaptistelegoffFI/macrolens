@@ -78,3 +78,15 @@
   font-size: 11px;
   border-bottom: 1px solid var(--rule-light);
 }
+
+/* §8.2.5 : double affichage obligatoire — valeur brute + rang percentile. */
+.featureValues {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.featureRank {
+  color: var(--fg-muted);
+  font-size: 10px;
+}

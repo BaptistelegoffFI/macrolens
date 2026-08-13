@@ -104,7 +104,12 @@ export function CompareView({ externalPairs }: CompareViewProps) {
                 ep.state.features.map((f) => (
                   <div key={f.feature_code} className={styles.featureRow}>
                     <span>{f.feature_code}</span>
-                    <Num value={f.raw_value} decimals={2} />
+                    <span className={styles.featureValues}>
+                      <Num value={f.raw_value} decimals={2} />
+                      <span className={styles.featureRank}>
+                        r=<Num value={f.pct_rank} decimals={2} />
+                      </span>
+                    </span>
                   </div>
                 ))
               ) : (

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
-import type { AnalogOut, AnalogsSearchRequest } from "./api/types";
+import { getState } from "./api/endpoints";
+import type { AnalogOut, AnalogsSearchRequest, StateVectorOut } from "./api/types";
 import styles from "./App.module.css";
 import { FanChart } from "./components/charts/FanChart";
 import { Timeline } from "./components/charts/Timeline";
@@ -23,7 +24,7 @@ import { Table } from "./components/table/Table";
 import { useAnalogsSearch } from "./hooks/useAnalogsSearch";
 import { useProvenanceReceipt } from "./hooks/useProvenanceReceipt";
 import type { ParsedCommand } from "./lib/commandParser";
-import { FAMILY_LABELS, FEATURE_FAMILIES } from "./lib/features";
+import { FAMILY_LABELS, FEATURE_FAMILIES, featuresByFamily } from "./lib/features";
 import type { FeatureFamily } from "./lib/features";
 import { readPermalinkParam, setPermalinkParam } from "./lib/permalink";
 import { keysForAnalogsSearch } from "./lib/provenanceKeys";
@@ -74,6 +75,22 @@ function ScenarioView({
   const { data, loading, error } = search;
   const horizons = toolbar.horizons;
   const lastHorizon = horizons[horizons.length - 1];
+
+  // §8.2.5 : double affichage obligatoire — le panneau Scénario montre le
+  // vecteur d'état (brut + rang) de la requête elle-même, pas seulement des
+  // champs de saisie. Recalculé depuis query_echo (la requête normalisée
+  // par le serveur), pas depuis l'état local du formulaire, qui a pu
+  // changer depuis la dernière recherche exécutée.
+  const [queryState, setQueryState] = useState<StateVectorOut | null>(null);
+  useEffect(() => {
+    if (data?.query_echo.mode === "anchor" && data.query_echo.anchor) {
+      getState(data.query_echo.anchor.country, data.query_echo.anchor.year, data.query_echo.reference_frame)
+        .then(setQueryState)
+        .catch(() => setQueryState(null));
+    } else {
+      setQueryState(null);
+    }
+  }, [data]);
 
   const columns: ColumnDef<AnalogOut>[] = useMemo(() => {
     const base: ColumnDef<AnalogOut>[] = [
@@ -145,6 +162,27 @@ function ScenarioView({
             <FeatureValueInputs values={shockDeltas} onChange={onShockChange} />
           )}
 
+          {queryState &&
+            featuresByFamily().map((group) => (
+              <div key={group.family} className={styles.fieldGroup}>
+                <div className={styles.fieldGroupTitle}>{group.label}</div>
+                {group.features.map((f) => {
+                  const sv = queryState.features.find((x) => x.feature_code === f.code);
+                  return (
+                    <div key={f.code} className={styles.field}>
+                      <span className={styles.fieldLabel}>{f.label}</span>
+                      <span style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                        <Num value={sv?.raw_value} decimals={2} />
+                        <span className={styles.rank}>
+                          r=<Num value={sv?.pct_rank} decimals={2} />
+                        </span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+
           <div className={styles.fieldGroup}>
             <div className={styles.fieldGroupTitle}>Poids</div>
             {FEATURE_FAMILIES.map((family) => (
@@ -163,6 +201,11 @@ function ScenarioView({
         <ResizableRows storageKey="ml.scenario.rows" defaultHeights={[240, 240]}>
           <div>
             {error && <div className={styles.errorBanner}>{error}</div>}
+            {data?.warnings.map((w, i) => (
+              <div key={i} className={styles.warningBanner}>
+                ⚑ {w}
+              </div>
+            ))}
             {loading && <EmptyState>Recherche en cours…</EmptyState>}
             {!loading && !error && !data && (
               <EmptyState>
