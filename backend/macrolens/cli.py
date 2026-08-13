@@ -6,6 +6,7 @@ from macrolens.db.seed import run_seed
 from macrolens.db.session import session_scope
 from macrolens.etl import pipeline
 from macrolens.etl.sources import bis_cbpol, jst, maddison
+from macrolens.panel import build_pool, persist_state_vectors
 
 _DOWNLOADERS = {"jst": jst, "bis_cbpol": bis_cbpol, "maddison": maddison}
 
@@ -49,6 +50,18 @@ def _cmd_etl_run_all(_args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_build_features(args: argparse.Namespace) -> int:
+    with session_scope() as session:
+        built = build_pool(session, reference_frame=args.reference_frame)
+        n_written = persist_state_vectors(session, built)
+    n_complete = sum(1 for sv in built.state_vectors if sv.is_complete)
+    print(
+        f"build_id={built.build_id} points={len(built.state_vectors)} "
+        f"complets={n_complete} lignes_ecrites={n_written}"
+    )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="macrolens")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -66,6 +79,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     run_all_parser = etl_subparsers.add_parser("run-all", help="Rejoue le pipeline complet")
     run_all_parser.set_defaults(func=_cmd_etl_run_all)
+
+    build_features_parser = subparsers.add_parser(
+        "build-features", help="Calcule et persiste les vecteurs d'état (§8, feature store)"
+    )
+    build_features_parser.add_argument("--reference-frame", default="rolling30")
+    build_features_parser.set_defaults(func=_cmd_build_features)
 
     return parser
 

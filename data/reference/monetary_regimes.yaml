@@ -1,0 +1,42 @@
+# Régimes monétaires par pays (§8.2.3), pour reference_frame=era.
+#
+# Bornes globales par défaut = tableau §8.2.3 du plan. Remplacées par une
+# borne pays-par-pays vérifiée quand elle est connue (Phase 1 : sortie de
+# l'étalon-or 1931-1936, recherche web du 2026-08-12 — voir
+# docs/decisions/0001-ambiguites-plan-phase-1.md point 7, et data/events/
+# monetary_regimes.yaml pour les événements correspondants).
+#
+# Honnêteté assumée : pour les 8 pays du pool sans date de sortie de
+# l'étalon-or vérifiée à ce niveau de précision (ESP, PRT, AUS, CAN — DNK,
+# BEL, NLD, CHE le sont), la borne globale par défaut est utilisée
+# textuellement, PAS une date inventée à leur place.
+
+default_regimes:
+  - { label: "Étalon-or classique", start: 1870, end: 1913 }
+  - { label: "Première Guerre mondiale et suites", start: 1914, end: 1918 }
+  - { label: "Entre-deux-guerres / retour à l'or", start: 1919, end: 1939 }
+  - { label: "Seconde Guerre mondiale", start: 1940, end: 1945 }
+  - { label: "Bretton Woods", start: 1946, end: 1971 }
+  - { label: "Flottement, forte inflation", start: 1972, end: 1985 }
+  - { label: "Désinflation, ciblage d'inflation", start: 1986, end: 2007 }
+  - { label: "Post-crise, taux zéro", start: 2008, end: 2021 }
+  - { label: "Resserrement, inflation de retour", start: 2022, end: null }
+
+# Une entrée par pays où une borne connue diffère du tableau global.
+# `gold_exit_year` : dernière année de "Étalon-or classique" avant de
+# basculer vers "Entre-deux-guerres / retour à l'or" (borne réajustée).
+country_overrides:
+  DEU: { gold_exit_year: 1931 }  # vérifié Phase 1 (Danat Bank, juillet 1931)
+  SWE: { gold_exit_year: 1931 }  # vérifié Phase 1 (27 sept. 1931)
+  NOR: { gold_exit_year: 1931 }  # vérifié Phase 1 (28 sept. 1931)
+  FIN: { gold_exit_year: 1931 }  # vérifié Phase 1 (12 oct. 1931)
+  ITA: { gold_exit_year: 1934 }  # vérifié Phase 1
+  FRA: { gold_exit_year: 1936 }  # vérifié Phase 1 (accord tripartite, sept. 1936)
+  GBR: { gold_exit_year: 1931 }  # 21 septembre 1931, notoriété historique très élevée
+  USA: { gold_exit_year: 1933 }  # convertibilité domestique suspendue (Executive Order 6102)
+  JPN: { gold_exit_year: 1931 }  # décembre 1931
+  NLD: { gold_exit_year: 1936 }  # "bloc-or", accord tripartite sept. 1936 (même date que FRA)
+  CHE: { gold_exit_year: 1936 }  # "bloc-or", accord tripartite sept. 1936 (même date que FRA)
+  BEL: { gold_exit_year: 1935 }  # dévaluation belge, mars 1935 — sortie distincte du bloc-or
+  # ESP, PRT, AUS, CAN, DNK : pas de date vérifiée au niveau de rigueur des
+  # entrées ci-dessus -> bornes globales par défaut appliquées telles quelles.

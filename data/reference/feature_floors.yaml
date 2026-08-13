@@ -1,0 +1,15 @@
+# Planchers de volatilité locale (§8.2.1b) : évitent l'explosion du score z
+# quand une variable a été quasi immobile pendant 30 ans. Valeurs de départ
+# raisonnables dans l'unité de chaque feature (points de pourcentage) — à
+# recalibrer en Phase 6 une fois la distribution empirique observée sur le
+# panel complet, ce n'est pas un réglage qui affecte la correction du calcul,
+# seulement sa sensibilité dans les cas de très faible volatilité historique.
+
+infl_accel: 0.3
+growth_gap: 0.5
+rate_short_delta: 0.1
+debt_delta5: 1.0
+credit_gap5: 1.0
+equity_real_3y: 2.0
+house_real_3y: 2.0
+unemp_gap: 0.5
