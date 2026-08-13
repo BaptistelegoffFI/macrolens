@@ -6,6 +6,7 @@ import { SeriesSparkline } from "../components/charts/SeriesSparkline";
 import { EmptyState } from "../components/shell/EmptyState";
 import { Panel } from "../components/shell/Panel";
 import { ResizableColumns } from "../components/shell/ResizableColumns";
+import { Num } from "../components/table/Num";
 import { useEpisode } from "../hooks/useEpisode";
 import { RAW_INDICATORS } from "../lib/indicators";
 import styles from "./EpisodeView.module.css";
@@ -69,7 +70,7 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
                 {data.state.features.map((f) => (
                   <div key={f.feature_code} className={styles.stateRow}>
                     <span>{f.feature_code}</span>
-                    <span className="num">{f.raw_value?.toFixed(2) ?? "—"}</span>
+                    <Num value={f.raw_value} decimals={2} />
                   </div>
                 ))}
               </div>

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { meta } from "../api/endpoints";
 import type { CountryOut, CoverageCellOut, IndicatorOut } from "../api/types";
 import { EmptyState } from "../components/shell/EmptyState";
+import { Num } from "../components/table/Num";
 import styles from "./CoverageView.module.css";
 
 /** §11.3 Vue Couverture (F7) : matrice pays × indicateur × décennie. */
@@ -63,7 +64,7 @@ export function CoverageView() {
             <th className={styles.rowHeader}>Indicateur</th>
             {decades.map((d) => (
               <th key={d} className={styles.colHeader}>
-                {d}
+                <Num value={d} decimals={0} />
               </th>
             ))}
           </tr>
@@ -84,7 +85,7 @@ export function CoverageView() {
                     style={{ background: pct > 0 ? `rgba(11, 95, 165, ${pct / 100})` : undefined }}
                     title={cell ? `${cell.n_observed}/${cell.n_possible} (${pct.toFixed(0)}%)` : "aucune donnée"}
                   >
-                    {cell ? Math.round(pct) : "—"}
+                    <Num value={cell ? pct : null} decimals={0} />
                   </td>
                 );
               })}

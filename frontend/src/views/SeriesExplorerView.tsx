@@ -7,6 +7,7 @@ import { axisNumericStyle, baseChartOption, tokens } from "../charts/theme";
 import type { EChartHandle } from "../components/charts/EChart";
 import { EChart } from "../components/charts/EChart";
 import { EmptyState } from "../components/shell/EmptyState";
+import { Num } from "../components/table/Num";
 import { downloadDataUrl, downloadText, toDelimited } from "../lib/csv";
 import styles from "./SeriesExplorerView.module.css";
 
@@ -166,10 +167,10 @@ export function SeriesExplorerView() {
                       {r.country}
                     </td>
                     <td className={`${styles.legendCell} ${styles.legendNum}`}>
-                      {r.last?.value?.toFixed(2) ?? "—"}
+                      <Num value={r.last?.value ?? null} decimals={2} />
                     </td>
                     <td className={`${styles.legendCell} ${styles.legendNum}`}>
-                      {r.variation !== null ? `${r.variation >= 0 ? "+" : ""}${r.variation.toFixed(1)}%` : "—"}
+                      <Num value={r.variation} decimals={1} unit="%" sign tone="auto" />
                     </td>
                   </tr>
                 ))}

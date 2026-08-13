@@ -28,13 +28,7 @@ export function BordereauPanel({ data, loading, error }: BordereauPanelProps) {
     { key: "country", label: "Pays", accessor: (r) => r.country },
     { key: "indicator", label: "Indicateur", accessor: (r) => r.indicator },
     { key: "period", label: "Période", accessor: (r) => r.period },
-    {
-      key: "value",
-      label: "Valeur",
-      numeric: true,
-      accessor: (r) => r.value,
-      format: (v) => (v as number).toFixed(2),
-    },
+    { key: "value", label: "Valeur", numeric: true, decimals: 2, accessor: (r) => r.value },
     { key: "source", label: "Source", accessor: (r) => r.source.id },
     { key: "file", label: "Fichier", accessor: (r) => r.raw_file?.filename ?? null },
     {

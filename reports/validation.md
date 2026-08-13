@@ -353,6 +353,35 @@ Données/Fenêtre/Aide sont actuellement des libellés inertes), le rendu de pag
 documenté en Phase 5, `docs/limitations.md`), et `GET /export/{search_id}` (dépend du permalien,
 livré ici).
 
+## 5bis. Retrofit post-validation : rendu numérique centralisé (§12.4bis)
+
+Une seconde lecture de §12.4bis, après la validation initiale ci-dessus, a trouvé un critère non
+couvert : « toute valeur numérique passe obligatoirement par `<Num value unit indicator />` […]
+un nombre écrit en dur dans du JSX est un échec de revue ». L'implémentation initiale utilisait
+`.toFixed()`/`Math.round()` dispersés et une classe CSS `.num` — visuellement conforme (chasse
+fixe, alignement) mais pas centralisée dans un composant unique, contrairement à la lettre de
+l'exigence.
+
+Ajout de `components/table/Num.tsx` (valeur, décimales fixes, unité, signe, teinte pos/nég/auto,
+tiret pour valeur manquante) et retrofit de tous les points de rendu numérique identifiés : `Table`
+(colonnes numériques passent maintenant par `<Num>` plutôt que par une chaîne formatée à la main),
+`StatusBar`, `WeightSlider`, `Toolbar` (puces d'horizon), et les vues Coverage/Episode/Compare/
+Series Explorer/Sources.
+
+Exceptions documentées, pas des oublis : les libellés `<text>` SVG de `Timeline`/`EventFrieze`
+(`<Num>` produit un `<span>` HTML, invalide en contenu SVG) ; les formatters ECharts (rendu canvas
+interne, jamais du JSX React) ; l'attribut HTML `title=""` de Coverage (chaîne native, ne peut pas
+contenir un composant) ; le texte presse-papiers TSV de `Table` (nécessairement une chaîne, pas du
+JSX). Le plan demande une règle ESLint dédiée sur `<Num>` ; écrire une règle ESLint correcte au
+niveau AST (distinguant position JSX vs attribut vs callback) est un petit projet d'analyse
+statique en soi — remplacé ici par `tests/numeric-rendering.test.ts`, qui scanne `.toFixed()`/
+`Math.round()` hors de `Num.tsx` avec une liste d'exceptions nommément justifiées, sur le même
+principe que `tests/vocabulary.test.ts` et `tests/contrast.test.ts` déjà en place.
+
+104 tests frontend passent après ce retrofit (contre 83 dans la validation initiale), `tsc`/
+`eslint` restent propres, et le rendu a été revérifié dans le navigateur (Scénario, Couverture) —
+aucune régression visuelle.
+
 ## 6. Conclusion (Phase 6)
 
 Les onze critères d'acceptation Phase 6 passent, cinq d'entre eux après correction pendant cette

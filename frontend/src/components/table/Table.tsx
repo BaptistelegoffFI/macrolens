@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 
+import { Num } from "./Num";
 import styles from "./Table.module.css";
 
 export interface ColumnDef<T> {
@@ -10,10 +11,16 @@ export interface ColumnDef<T> {
   width?: number;
   accessor: (row: T) => unknown;
   render?: (row: T) => ReactNode;
+  /** Formatage non numérique (ex. code pays). Pour une colonne `numeric`,
+   * préférer `decimals`/`unit`/`sign` — la cellule passe alors par <Num>
+   * (§12.4bis) plutôt que par une chaîne construite à la main. */
   format?: (value: unknown) => string;
+  decimals?: number;
+  unit?: string;
+  sign?: boolean;
   isFlagged?: (row: T) => boolean;
   flagReason?: (row: T) => string;
-  tone?: (row: T) => "pos" | "neg" | undefined;
+  tone?: (row: T) => "pos" | "neg" | "auto" | undefined;
 }
 
 export interface TableProps<T> {
@@ -117,17 +124,33 @@ export function Table<T>({ columns, rows, getRowKey, onRowActivate }: TableProps
                 const tone = c.tone?.(row);
                 const raw = c.accessor(row);
                 const isMissing = raw === null || raw === undefined;
+                // §12.4bis : une colonne numérique sans rendu personnalisé
+                // passe par <Num> — la couleur/le tiret manquant y sont déjà
+                // gérés, donc pas de classe de teinte redondante côté <td>.
+                const usesNum = c.numeric && !c.render;
                 const cellClass = [
                   styles.td,
                   c.numeric ? styles.tdNum : "",
                   flagged ? styles.tdFlagged : "",
-                  isMissing ? styles.muted : tone === "neg" ? styles.neg : tone === "pos" ? styles.pos : "",
+                  usesNum ? "" : isMissing ? styles.muted : tone === "neg" ? styles.neg : tone === "pos" ? styles.pos : "",
                 ]
                   .filter(Boolean)
                   .join(" ");
                 return (
                   <td key={c.key} className={cellClass} title={flagged ? c.flagReason?.(row) : undefined}>
-                    {c.render ? c.render(row) : formatCell(c, row)}
+                    {c.render ? (
+                      c.render(row)
+                    ) : usesNum ? (
+                      <Num
+                        value={raw as number | null}
+                        decimals={c.decimals}
+                        unit={c.unit}
+                        sign={c.sign}
+                        tone={tone ?? "none"}
+                      />
+                    ) : (
+                      formatCell(c, row)
+                    )}
                   </td>
                 );
               })}
@@ -142,5 +165,9 @@ export function Table<T>({ columns, rows, getRowKey, onRowActivate }: TableProps
 function formatCell<T>(col: ColumnDef<T>, row: T): string {
   const value = col.accessor(row);
   if (value === null || value === undefined) return "—";
+  if (col.numeric && typeof value === "number") {
+    const sign = col.sign && value >= 0 ? "+" : "";
+    return `${sign}${value.toFixed(col.decimals ?? 1)}${col.unit ?? ""}`;
+  }
   return col.format ? col.format(value) : String(value);
 }

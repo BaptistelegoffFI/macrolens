@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { SeriesSparkline } from "../components/charts/SeriesSparkline";
 import { EmptyState } from "../components/shell/EmptyState";
+import { Num } from "../components/table/Num";
 import { useCompare } from "../hooks/useCompare";
 import { RAW_INDICATORS } from "../lib/indicators";
 import styles from "./CompareView.module.css";
@@ -97,13 +98,13 @@ export function CompareView({ externalPairs }: CompareViewProps) {
           {data.episodes.map((ep) => (
             <div key={`${ep.country}-${ep.year}`} className={styles.column}>
               <div className={styles.columnHeader}>
-                {ep.country} {ep.year}
+                {ep.country} <Num value={ep.year} decimals={0} />
               </div>
               {ep.state ? (
                 ep.state.features.map((f) => (
                   <div key={f.feature_code} className={styles.featureRow}>
                     <span>{f.feature_code}</span>
-                    <span className="num">{f.raw_value?.toFixed(2) ?? "—"}</span>
+                    <Num value={f.raw_value} decimals={2} />
                   </div>
                 ))
               ) : (

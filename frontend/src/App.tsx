@@ -17,6 +17,7 @@ import { Toolbar } from "./components/shell/Toolbar";
 import { useToolbarState } from "./components/shell/useToolbarState";
 import type { ToolbarState } from "./components/shell/useToolbarState";
 import { WindowShell } from "./components/shell/WindowShell";
+import { Num } from "./components/table/Num";
 import type { ColumnDef } from "./components/table/Table";
 import { Table } from "./components/table/Table";
 import { useAnalogsSearch } from "./hooks/useAnalogsSearch";
@@ -77,26 +78,17 @@ function ScenarioView({
   const columns: ColumnDef<AnalogOut>[] = useMemo(() => {
     const base: ColumnDef<AnalogOut>[] = [
       { key: "country", label: "Pays", accessor: (r) => r.country },
-      { key: "year", label: "Année", numeric: true, accessor: (r) => r.year, format: (v) => String(v) },
-      {
-        key: "similarity",
-        label: "Sim.",
-        numeric: true,
-        accessor: (r) => r.similarity,
-        format: (v) => (v as number).toFixed(1),
-      },
+      { key: "year", label: "Année", numeric: true, decimals: 0, accessor: (r) => r.year },
+      { key: "similarity", label: "Sim.", numeric: true, decimals: 1, accessor: (r) => r.similarity },
     ];
     const growthCols: ColumnDef<AnalogOut>[] = horizons.map((h) => ({
       key: `growth_${h}`,
       label: `ΔPIB ${h}a`,
       numeric: true,
+      decimals: 1,
+      sign: true,
       accessor: (r) => r.outcomes[String(h)]?.out_growth_cum ?? null,
-      format: (v) => (v as number).toFixed(1),
-      tone: (r) => {
-        const v = r.outcomes[String(h)]?.out_growth_cum;
-        if (typeof v !== "number") return undefined;
-        return v < 0 ? "neg" : "pos";
-      },
+      tone: () => "auto",
     }));
     const crisisCol: ColumnDef<AnalogOut> | null = lastHorizon
       ? {
@@ -219,7 +211,8 @@ function ScenarioBordereau({ data }: { data: ReturnType<typeof useAnalogsSearch>
     return (
       <div style={{ padding: 8 }}>
         <div style={{ fontSize: 11, color: "var(--fg-muted)", marginBottom: 8 }}>
-          {data.sources_summary.map((s) => s.id).join(", ") || "aucune source"} — {data.pool_size} candidats
+          {data.sources_summary.map((s) => s.id).join(", ") || "aucune source"} —{" "}
+          <Num value={data.pool_size} decimals={0} /> candidats
         </div>
         <button
           type="button"

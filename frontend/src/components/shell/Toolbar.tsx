@@ -1,3 +1,4 @@
+import { Num } from "../table/Num";
 import styles from "./Toolbar.module.css";
 import type { ScenarioMode, ToolbarState } from "./useToolbarState";
 
@@ -65,7 +66,7 @@ export function Toolbar({ value, onChange, onRun, onCopyPermalink }: ToolbarProp
                 })
               }
             >
-              {h}
+              <Num value={h} decimals={0} />
             </button>
           );
         })}

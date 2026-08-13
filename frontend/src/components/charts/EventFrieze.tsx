@@ -51,6 +51,8 @@ export function EventFrieze({ events, anchorYear, rangeStart, rangeEnd }: EventF
               </g>
             );
           })}
+          {/* §12.4bis : exception structurelle — <Num> rend un <span> HTML,
+              invalide dans <text> SVG. styles.label porte déjà la fonte mono. */}
           <text x={padding} y={height - 4} className={styles.label}>
             {rangeStart}
           </text>

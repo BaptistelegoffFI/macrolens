@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { meta } from "../api/endpoints";
 import type { SourceOut } from "../api/types";
 import { EmptyState } from "../components/shell/EmptyState";
+import { Num } from "../components/table/Num";
 import styles from "./SourcesView.module.css";
 
 /** §11.3 Vue Sources & méthode (F8). La page méthodologie complète (§8
@@ -40,7 +41,7 @@ export function SourcesView() {
             <div key={s.id} className={styles.card}>
               <div className={styles.cardTitle}>{s.full_name}</div>
               <div className={styles.cardMeta}>
-                {s.url} · priorité {s.priority} · récupéré le {s.retrieved_at}
+                {s.url} · priorité <Num value={s.priority} decimals={0} /> · récupéré le {s.retrieved_at}
                 {s.file_sha256 && ` · sha256 ${s.file_sha256.slice(0, 12)}…`}
               </div>
               <div className={styles.cardCitation}>{s.citation}</div>

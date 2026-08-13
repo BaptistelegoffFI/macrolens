@@ -1,3 +1,4 @@
+import { Num } from "../table/Num";
 import styles from "./WeightSlider.module.css";
 
 export interface WeightSliderProps {
@@ -23,7 +24,9 @@ export function WeightSlider({ label, value, onChange }: WeightSliderProps) {
           aria-label={`Poids ${label}`}
         />
       </div>
-      <span className={`${styles.value} num`}>{value.toFixed(2)}</span>
+      <span className={styles.value}>
+        <Num value={value} decimals={2} />
+      </span>
     </div>
   );
 }
