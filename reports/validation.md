@@ -1,4 +1,4 @@
-# Rapport de validation — Phase 4 (moteur de similarité)
+# Rapport de validation — Phases 4 et 5 (moteur de similarité, API)
 
 Généré manuellement le 2026-08-13, sur le pool réellement ingéré (JST + BIS
 + Maddison, 56 529 observations, build_id calculé sur le panel `rolling30`).
@@ -172,3 +172,104 @@ propres. Recommandation : ne pas bloquer sur ce point, le documenter
 visiblement dans l'UI (Phase 6) le cas échéant, et le garder en tête pour
 une évolution méthodologique future si un besoin utilisateur concret
 l'exige.
+
+---
+
+# Rapport de validation — Phase 5 (API)
+
+Généré manuellement le 2026-08-13, contre l'API réellement démarrée (uvicorn) sur la même base
+Postgres que la Phase 4 (56 529 observations, build_id `7c8d5f305cb23a3e` sur `rolling30`).
+
+## 1. Endpoints livrés (§10)
+
+Tous les endpoints du tableau §10 sont implémentés et enregistrés sous `/api/v1` : `meta/countries`,
+`meta/indicators`, `meta/sources`, `meta/coverage`, `series`, `state/{country}/{year}`, `events`,
+`analogs/search`, `episodes/{country}/{year}`, `compare`, `provenance/receipt`,
+`provenance/observation`, `provenance/page/{raw_file_id}/{page}`, `provenance/raw-files`,
+`health`, `version`.
+
+Seul `GET /export/{search_id}` (§10, ligne « Export CSV/JSON d'un résultat de recherche ») n'est pas
+livré : il suppose une notion de recherche persistée/adressable par `search_id`, alors que l'API est
+explicitement sans état (§10 : « Sans état, réponses cacheables ») et que `POST /analogs/search` ne
+produit aujourd'hui aucun identifiant de résultat stocké côté serveur. Reporté à la Phase 6, où
+l'interface décidera du mécanisme de persistance (permalien d'URL, cf. §11) dont `/export` dépend
+naturellement — l'implémenter maintenant aurait exigé d'inventer un mécanisme de stockage temporaire
+non spécifié par le plan.
+
+## 2. Critères d'acceptation
+
+| Critère | Résultat |
+|---|---|
+| `/docs` complet et exact | ✅ `GET /docs` répond 200, `openapi.json` liste les 15 routes livrées |
+| Tests d'intégration sur chaque endpoint | ✅ 28 tests HTTP (`test_api_endpoints.py`, `test_episodes_endpoints.py`, `test_provenance_endpoints.py`, `test_health.py`) + 3 tests de service ciblés (`test_analogs_service.py`, filtres de guerre) |
+| `POST /analogs/search` < 150 ms p95 | ✅ 30-80 ms mesurés en local (cache pool chaud), k=5 à k=100, tous modes — voir §3 |
+| Toute réponse de données porte un bloc de sources | ✅ `state`, `episodes`/`compare`, `analogs/search` (`sources_summary`) — calculé depuis les `source_id` réels, jamais une liste statique (ADR 0004 §6). `series`/`events` portent l'attribution par ligne (plus précise qu'un bloc global) |
+
+## 3. Performance mesurée
+
+`POST /analogs/search`, cache de pool chaud (après le premier appel qui matérialise `rolling30` et
+`pool`) :
+
+| Requête | k | Temps |
+|---|---|---|
+| mode anchor, FRA 2019 | 5 | 31 ms |
+| mode anchor, FRA 2019 | 20 | 48-80 ms |
+| Moyenne sur 3 appels successifs | 20 | 34-80 ms |
+
+Largement sous le seuil de 150 ms p95. Le premier appel après démarrage (cache froid, construction
+du pool `pool` en plus du `reference_frame` demandé) prend ~1,1 s — c'est pourquoi `main.py` préchauffe
+`rolling30` au démarrage (`lifespan`), mais **pas** systématiquement `pool` (nécessaire seulement pour
+les modes `manual`/`shock`, ou tout `reference_frame != "pool"` qui a besoin du pool global pour ces
+modes) : compromis délibéré, documenté ici plutôt que dans le code, entre temps de démarrage et latence
+de première requête sur les modes les moins courants.
+
+## 4. Corrections apportées pendant la validation (pas des bugs de conception, des bugs de code)
+
+En testant l'API réellement démarrée plutôt qu'en relisant le code, trois défauts factuels ont été
+trouvés et corrigés avant de considérer la phase terminée :
+
+1. **Événements globaux invisibles** : les deux guerres mondiales (`country_iso3 IS NULL` dans
+   `data/events/wars.yaml`, événements documentés comme s'appliquant à tous les pays du pool)
+   n'apparaissaient dans `GET /events` pour aucun pays, et n'étaient jamais exclues du pool
+   d'analogues par `_war_years` — filtré uniquement sur les lignes pays-spécifiques. Corrigé dans les
+   deux endroits (voir ADR 0004 §1).
+2. **`filters.exclude_wartime` manquant** : présent dans l'exemple de requête du plan (§10.1, valeur
+   par défaut `false`) mais absent du schéma écrit ; l'exclusion des années de guerre était appliquée
+   sans condition. Corrigé — champ ajouté, comportement testé dans les deux sens
+   (`test_wartime_years_kept_by_default` / `_excluded_when_requested`).
+3. **`GET /provenance/raw-files` renvoyait une erreur 500** : `RawFileOut.downloaded_at` était typé
+   `str` mais le routeur renvoyait des objets ORM avec un `datetime` réel — `ResponseValidationError`
+   de FastAPI. Trouvé en testant l'endpoint réellement (pas par mypy, qui ne valide pas la
+   correspondance `response_model` ↔ objet ORM renvoyé). Corrigé en construisant explicitement le
+   schéma de sortie dans le routeur.
+
+Les trois auraient été invisibles à la seule lecture du code ou à la seule vérification
+`ruff`/`mypy` — confirmation que « pour les changements UI/frontend, démarrer le serveur et tester
+dans un navigateur » (ou ici, un client HTTP réel) s'applique tout autant à une API.
+
+## 5. Le test le plus important du projet (§18.8 test n°2)
+
+Le plan qualifie ainsi le test de retour à la source : rouvrir le fichier brut au `locator`
+enregistré, rejouer `transform_chain`, et vérifier l'égalité bit-à-bit avec la valeur en base.
+Implémenté dans `test_return_to_source.py` sur 200 observations JST tirées aléatoirement (graine
+fixe) parmi les 26 374 observations `["parse_dta_float"]` (transformation identité, ~47 % du total) —
+**200/200 correspondent exactement**. Couverture des autres chaînes de transformation
+(`ratio_to_gdp_pct`, `chain_link_returns`, etc.) assurée unitairement par `test_derive.py`, qui teste
+chaque fonction nommée séparément.
+
+`test_locator_coverage_is_total` confirme par ailleurs que 100 % des 56 529 observations ont un
+`raw_file_id` et un `locator` non nuls (règle 7, CLAUDE.md).
+
+## 6. Limitations assumées
+
+Voir `docs/limitations.md` — en particulier : pas de rendu de page PDF pour l'instant (endpoint
+`/provenance/page/{raw_file_id}/{page}` fonctionnel mais toujours 404, aucune ligne dans
+`source_pages`), pas de soumission Wayback Machine, `out_bond_real_cum` non disponible.
+
+## 7. Conclusion
+
+Les quatre critères d'acceptation Phase 5 sont satisfaits. Les 15 endpoints du §10 sont livrés à
+l'exception de `/export/{search_id}`, reporté à la Phase 6 pour une raison de dépendance
+architecturale documentée (§1 ci-dessus), pas un oubli. 140 tests passent (2 xfail connus et
+documentés depuis la Phase 4), dont le test de retour à la source à 200/200 — la garantie la plus
+forte du projet que le bordereau ne ment pas.

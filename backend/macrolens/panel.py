@@ -254,6 +254,35 @@ def build_pool(
     )
 
 
+def rank_hypothetical_state(
+    pool_frame_built: BuiltPool, raw_features: dict[str, float]
+) -> dict[str, float]:
+    """Classe un état hypothétique (modes "manual"/"shock" de §10.1) contre
+    la distribution `reference_frame="pool"` — il n'y a pas de pays/30 ans
+    d'historique propre à un état qui n'appartient à aucune année réelle,
+    donc `rolling30` ne s'applique pas ; le pool complet est le choix le
+    moins arbitraire (interprétation documentée, le plan ne spécifie pas ce
+    cas). Ne modifie pas `pool_frame_built` : construit un Pool augmenté
+    d'un point supplémentaire par feature et lit son rang."""
+    countries = np.array([sv.country for sv in pool_frame_built.state_vectors] + ["__QUERY__"])
+    years = np.array([sv.year for sv in pool_frame_built.state_vectors] + [0])
+
+    out: dict[str, float] = {}
+    for name, value in raw_features.items():
+        if name not in FEATURE_NAMES:
+            continue
+        existing = [raw.get(name, float("nan")) for raw in pool_frame_built.raw_values]
+        values = np.array([*existing, value])
+        pool = Pool(countries=countries, years=years, values=values)
+        ranks = (
+            rank_level(pool, reference_frame="pool")
+            if FEATURE_KIND[name] == "level"
+            else rank_variation(pool, reference_frame="pool")
+        )
+        out[name] = float(ranks[-1])
+    return out
+
+
 def persist_state_vectors(session: Session, built: BuiltPool) -> int:
     """Écrit le panel construit dans la table state_vectors (§3, feature
     store). Upsert par lot sur la clé (pays, année, feature, build_id)."""
