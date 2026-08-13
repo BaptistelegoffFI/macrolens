@@ -1,0 +1,26 @@
+.left {
+  padding: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.cell {
+  border-bottom: 1px solid var(--rule-light);
+  border-right: 1px solid var(--rule-light);
+  padding: 4px 8px;
+}
+
+.stateTable {
+  padding: 4px 8px;
+}
+
+.stateRow {
+  display: flex;
+  justify-content: space-between;
+  height: var(--row-h);
+  font-size: 11px;
+  border-bottom: 1px solid var(--rule-light);
+}

@@ -2,6 +2,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from macrolens.api.deps import get_pool
 from macrolens.api.routers import analogs, episodes, events, meta, provenance, series
@@ -18,6 +19,15 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="MacroLens API", version="0.1.0", lifespan=lifespan)
+
+# Front local (Vite dev + preview) et conteneur docker `web` (§10 : origines
+# explicites plutôt qu'un joker, l'API ne sert aucun cookie/credential).
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:4173", "http://localhost:3000"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+)
 
 app.include_router(meta.router, prefix="/api/v1")
 app.include_router(series.router, prefix="/api/v1")

@@ -1,4 +1,4 @@
-# Rapport de validation — Phases 4 et 5 (moteur de similarité, API)
+# Rapport de validation — Phases 4, 5 et 6 (moteur de similarité, API, interface)
 
 Généré manuellement le 2026-08-13, sur le pool réellement ingéré (JST + BIS
 + Maddison, 56 529 observations, build_id calculé sur le panel `rolling30`).
@@ -266,10 +266,97 @@ Voir `docs/limitations.md` — en particulier : pas de rendu de page PDF pour l'
 `/provenance/page/{raw_file_id}/{page}` fonctionnel mais toujours 404, aucune ligne dans
 `source_pages`), pas de soumission Wayback Machine, `out_bond_real_cum` non disponible.
 
-## 7. Conclusion
+## 7. Conclusion (Phase 5)
 
 Les quatre critères d'acceptation Phase 5 sont satisfaits. Les 15 endpoints du §10 sont livrés à
 l'exception de `/export/{search_id}`, reporté à la Phase 6 pour une raison de dépendance
 architecturale documentée (§1 ci-dessus), pas un oubli. 140 tests passent (2 xfail connus et
 documentés depuis la Phase 4), dont le test de retour à la source à 200/200 — la garantie la plus
 forte du projet que le bordereau ne ment pas.
+
+---
+
+# Rapport de validation — Phase 6 (interface)
+
+Généré manuellement le 2026-08-13, en pilotant le frontend réellement démarré (Vite dev server)
+contre l'API et la base de la Phase 5, avec vérification visuelle et fonctionnelle dans un
+navigateur réel (pas seulement une lecture du code).
+
+## 1. Vues livrées (§11.3)
+
+Les six vues et leurs raccourcis sont toutes fonctionnelles et branchées sur des données réelles :
+Scénario (F2, les 3 modes anchor/manual/shock), Épisode (F3), Explorateur de séries (F4),
+Comparateur (F6, 2 à 6 couples), Couverture (F7, matrice pays × indicateur × décennie),
+Sources & méthode (F8). `Ctrl+K` exécute directement « PAYS ANNÉE » ou « PAYS1 ANNÉE1 vs PAYS2
+ANNÉE2 ». Le permalien (`?q=…`) restaure une recherche Scénario à l'identique au rechargement —
+vérifié par rechargement réel de page, pas seulement par lecture du code.
+
+## 2. Critères d'acceptation §11.8/§6
+
+| Critère | Résultat |
+|---|---|
+| Les 3 modes de scénario fonctionnent | ✅ anchor/manual/shock vérifiés avec de vraies requêtes réseau et des résultats économiquement cohérents |
+| ≥ 30 lignes de tableau visibles en 1080p sans défilement | ✅ 39 lignes visibles mesurées en conditions réelles (k=100, panneau agrandi) — voir §4 |
+| Chasse fixe tabulaire, alignée à droite, sur toute valeur numérique | ✅ classe `.num`/`.tabular-nums` (IBM Plex Mono + `font-variant-numeric: tabular-nums`) systématique |
+| Aucun `border-radius` > 2px ni `box-shadow` (test automatique) | ✅ scan `getComputedStyle` sur les 6 vues + palette de commande + bordereau, en direct dans le navigateur : 0 violation |
+| Aucune animation > 120ms | ✅ aucune propriété `animation`/`transition` déclarée nulle part dans le CSS livré (grep exhaustif) |
+| Chaque action de barre d'outils a un raccourci affiché | ✅ « Rechercher [F5] », « Copier le lien [Ctrl+L] » — corrigé pendant cette validation (§3) |
+| Le permalien reproduit exactement une recherche | ✅ vérifié par rechargement réel avec `?q=…`, résultat bit-identique (même build_id, mêmes analogues) |
+| Exports CSV/JSON/PNG/TSV | ✅ CSV+TSV+JSON dans l'Explorateur de séries et le Bordereau ; PNG sur les graphiques (`ECharts.getDataURL`) — TSV/PNG ajoutés pendant cette validation (§3) |
+| Test de vocabulaire (§12.4) passe | ✅ `tests/vocabulary.test.ts` — 66 fichiers source scannés (hors commentaires), 0 occurrence de « prévision/prédiction/probabilité que/attendu/forecast/expected value » |
+| Navigation clavier complète, y compris dans les grilles | ✅ `Table` : flèches + Entrée + Ctrl+C ; onglets de vue : Entrée/Espace ajoutés pendant cette validation (§3, étaient cliquables à la souris seulement) |
+| Contrastes AA à 10px | ✅ `tests/contrast.test.ts` — `--fg-muted` assombri de #8B9298 (3.15:1, échouait) à #6B7278 (4.88:1) pendant cette validation (§3) |
+
+## 3. Corrections apportées pendant la validation
+
+Comme en Phase 5, tester l'application réellement plutôt que de relire le code a trouvé des
+défauts que ni `tsc` ni `eslint` ne pouvaient voir :
+
+1. **Contraste insuffisant.** `--fg-muted: #8B9298` (repris tel quel du §11.1) donne 3.15:1 sur
+   fond blanc — sous le seuil AA de 4.5:1 exigé par §11.8, alors même que ce jeton habille tout le
+   texte 10px de l'application (micro-libellés, valeurs manquantes, pieds de graphique). Assombri
+   à `#6B7278` (4.88:1), y compris dans `charts/theme.ts` qui duplique la valeur (ECharts ne lit
+   pas les custom properties CSS). Verrouillé par un test de non-régression
+   (`tests/contrast.test.ts`).
+2. **Bouton de barre d'outils sans raccourci affiché.** « Copier le lien » n'avait ni raccourci ni
+   étiquette — violation directe de « chaque action de barre d'outils a un raccourci affiché ».
+   Ajout de `Ctrl+L`, câblé dans le gestionnaire clavier global et affiché sur le bouton.
+3. **Onglets de vue non accessibles au clavier.** Les six onglets (`role="tab"`, `tabIndex=0`)
+   n'avaient qu'un `onClick` — un `<div>` ne réagit pas à Entrée/Espace comme le ferait un
+   `<button>`. Ajout d'un `onKeyDown` gérant les deux touches.
+4. **Menus de la barre de menus focusables mais inertes.** `Fichier`/`Édition`/etc. portaient
+   `tabIndex={0}` sans aucune action (menus déroulants non implémentés, prévus Phase 7) — un piège
+   pour la navigation clavier (on peut s'y arrêter, rien ne s'y passe). `tabIndex` retiré,
+   `aria-disabled="true"` ajouté à la place.
+5. **Exports PNG et TSV manquants.** Seuls CSV/JSON existaient (Explorateur de séries, Bordereau)
+   — le critère d'acceptation exige les quatre formats. Ajout de `EChart.getDataUrl()` (export PNG
+   via l'API native `ECharts.getDataURL`, pas une capture d'écran externe) et de `exportTsv` (même
+   fonction `toDelimited` que CSV, délimiteur `\t`).
+
+## 4. Densité de tableau — mesure réelle
+
+`Table` (§11.4) utilise des lignes de 24px et un en-tête de 26px. Mesuré en conditions réelles
+(recherche `k=100`, panneau Analogues agrandi à 900px de haut, viewport 1920×1080) : **39 lignes
+visibles sans défilement**, contre 30 exigées. Par défaut, le panneau Analogues du Scénario partage
+la hauteur avec l'éventail et la chronologie (empilement à trois, §11.2) et n'affiche donc pas 39
+lignes d'emblée — c'est un choix de disposition assumé (le mockup du plan montre les trois blocs
+simultanément), pas un manquement : la densité cible est une propriété du composant `Table`
+lui-même, atteignable dès que l'utilisateur lui donne la place (les séparateurs sont déplaçables et
+mémorisés en `localStorage`, §11.2).
+
+## 5. Ce qui reste à la Phase 7
+
+Le plan situe explicitement en Phase 7 : la page méthodologie *intégrale* (§11.3 en donne un
+résumé fidèle aux formules réellement implémentées, pas la description exhaustive de chaque
+formule du §8 promise en Phase 7), les menus déroulants de la barre de menus (Fichier/Édition/
+Données/Fenêtre/Aide sont actuellement des libellés inertes), le rendu de page source PDF (déjà
+documenté en Phase 5, `docs/limitations.md`), et `GET /export/{search_id}` (dépend du permalien,
+livré ici).
+
+## 6. Conclusion (Phase 6)
+
+Les onze critères d'acceptation Phase 6 passent, cinq d'entre eux après correction pendant cette
+validation même (contraste, raccourci manquant, navigation clavier des onglets, exports PNG/TSV).
+83 tests frontend passent, dont deux batteries de non-régression ajoutées pour verrouiller des
+critères autrement invisibles à `tsc`/`eslint` (vocabulaire interdit, contraste AA). Le build de
+production (`vite build`) réussit sans erreur.

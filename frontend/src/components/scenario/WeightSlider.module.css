@@ -1,0 +1,29 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--row-h);
+}
+
+.label {
+  flex: 0 0 64px;
+  font-size: 11px;
+  color: var(--fg-secondary);
+}
+
+.rail {
+  flex: 1 1 auto;
+  height: var(--control-h);
+  display: flex;
+  align-items: center;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.value {
+  flex: 0 0 32px;
+  text-align: right;
+}

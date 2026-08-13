@@ -1,0 +1,22 @@
+.bar {
+  height: var(--statusbar-h);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 8px;
+  background: var(--bg-chrome);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--fg-secondary);
+  flex: 0 0 auto;
+}
+
+.item {
+  white-space: nowrap;
+}
+
+.sep {
+  color: var(--rule);
+}

@@ -1,0 +1,60 @@
+.wrapper {
+  height: 100%;
+  overflow: auto;
+  padding: 16px;
+  max-width: 900px;
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-secondary);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.card {
+  border: 1px solid var(--rule-light);
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.cardTitle {
+  font-size: 13px;
+  color: var(--fg);
+  margin-bottom: 2px;
+}
+
+.cardMeta {
+  font-size: 11px;
+  color: var(--fg-secondary);
+  margin-bottom: 4px;
+}
+
+.cardCitation {
+  font-size: 11px;
+  color: var(--fg-muted);
+  white-space: pre-wrap;
+}
+
+.body {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--fg);
+}
+
+.formula {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--bg-chrome);
+  padding: 6px 10px;
+  margin: 8px 0;
+  border-left: 2px solid var(--accent);
+}

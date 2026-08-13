@@ -1,0 +1,41 @@
+.shell {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tabs {
+  height: var(--panel-title-h);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 4px;
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--rule);
+  flex: 0 0 auto;
+}
+
+.tab {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 11px;
+  color: var(--fg-secondary);
+  border-right: 1px solid var(--rule-light);
+  cursor: pointer;
+}
+
+.tab[data-active="true"] {
+  background: var(--bg-app);
+  color: var(--fg);
+  border-bottom: 1px solid var(--bg-app);
+}
+
+.shortcut {
+  color: var(--fg-muted);
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}

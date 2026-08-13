@@ -1,0 +1,79 @@
+/* Réinitialisation + règles globales (§11.0, §11.8). Interdits bloquants :
+   border-radius > 2px, box-shadow, dégradés, animation > 120ms. */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-app);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--text-chrome);
+  line-height: var(--text-chrome-line);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* §11.1 : toute valeur numérique en chasse fixe tabulaire, sans exception. */
+.num,
+.tabular-nums {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-num);
+}
+
+.micro-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-micro);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-secondary);
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+  font-size: var(--text-chrome);
+}
+
+/* §11.8 : le focus clavier ne se supprime jamais. */
+:focus-visible {
+  outline: var(--focus-ring) solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* §11.8 : pas de responsive mobile — poste de travail, largeur mini 1280px. */
+.mobile-gate {
+  display: none;
+}
+
+@media (max-width: 1279px) {
+  #root {
+    display: none;
+  }
+
+  .mobile-gate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 32px;
+    text-align: center;
+    font-family: var(--font-sans);
+    color: var(--fg-secondary);
+  }
+}

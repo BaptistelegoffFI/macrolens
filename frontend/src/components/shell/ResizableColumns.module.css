@@ -1,0 +1,35 @@
+.wrapper {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.column {
+  min-width: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.gutter {
+  width: var(--gutter);
+  background: var(--rule);
+  flex: 0 0 auto;
+  position: relative;
+  cursor: col-resize;
+}
+
+.gutter::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -2px;
+  right: -2px;
+}
+
+.gutter:hover,
+.gutter[data-dragging="true"] {
+  background: var(--accent);
+}

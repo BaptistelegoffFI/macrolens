@@ -1,0 +1,36 @@
+.wrapper {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.row {
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.gutter {
+  height: var(--gutter);
+  background: var(--rule);
+  flex: 0 0 auto;
+  position: relative;
+  cursor: row-resize;
+}
+
+.gutter::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2px;
+  bottom: -2px;
+}
+
+.gutter:hover,
+.gutter[data-dragging="true"] {
+  background: var(--accent);
+}

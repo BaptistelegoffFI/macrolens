@@ -1,0 +1,59 @@
+.scenarioLeft {
+  padding: 8px;
+}
+
+.fieldGroup {
+  margin-bottom: 12px;
+}
+
+.fieldGroupTitle {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  border-bottom: 1px solid var(--rule-light);
+  padding-bottom: 2px;
+  margin-bottom: 4px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--row-h);
+  font-size: 11px;
+}
+
+.fieldLabel {
+  color: var(--fg-secondary);
+}
+
+.textInput {
+  width: 88px;
+  height: var(--control-h);
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  text-align: right;
+}
+
+.errorBanner {
+  margin: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--neg);
+  color: var(--neg);
+  font-size: 11px;
+  background: var(--bg-app);
+}
+
+.rank {
+  color: var(--fg-muted);
+}
+
+.crisisMarker {
+  color: var(--crisis);
+  font-family: var(--font-mono);
+}

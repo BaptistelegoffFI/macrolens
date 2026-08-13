@@ -1,0 +1,11 @@
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 80px;
+  padding: 16px;
+  text-align: center;
+  color: var(--fg-muted);
+  font-size: 12px;
+}

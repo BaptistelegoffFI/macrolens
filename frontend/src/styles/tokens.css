@@ -1,0 +1,68 @@
+/* Jetons de conception (PLAN.md §11.1) — figés avant tout composant.
+   Fond blanc, densité maximale, structure portée par des filets 1px. */
+:root {
+  /* Surfaces */
+  --bg-app: #ffffff;
+  --bg-chrome: #f4f5f6;
+  --bg-row-alt: #fafbfc;
+  --bg-selected: #e4eef7;
+  --bg-hover: #f0f4f8;
+
+  /* Filets */
+  --rule: #d2d6db;
+  --rule-light: #e6e9ec;
+  --grid-chart: #eaecef;
+  --axis: #8b9298;
+
+  /* Texte */
+  --fg: #16191c;
+  --fg-secondary: #5a6169;
+  /* §11.8 : contraste AA (4.5:1) exigé même à 10px. #8B9298 du §11.1
+     donne 3.15:1 sur blanc — insuffisant pour du texte. Assombri à
+     #6B7278 (4.88:1) ; --axis garde la valeur d'origine (élément non
+     textuel, seuil 3:1 seulement). */
+  --fg-muted: #6b7278;
+
+  /* Sémantique — bleu/rouge, jamais vert/rouge */
+  --pos: #0b5fa5;
+  --neg: #b3242b;
+  --accent: #0b5fa5;
+  --flag: #b26b00;
+  --crisis: #b3242b;
+
+  /* Séries de graphiques — 8 teintes désaturées */
+  --s1: #1f4e79;
+  --s2: #b3242b;
+  --s3: #4c7a34;
+  --s4: #7a5195;
+  --s5: #00707c;
+  --s6: #a85b00;
+  --s7: #5a6169;
+  --s8: #8c3a6b;
+
+  /* Typographie */
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+  --text-chrome: 12px;
+  --text-chrome-line: 16px;
+  --text-micro: 10px;
+  --text-num: 12px;
+  --text-body: 13px;
+  --text-body-line: 20px;
+
+  /* Grille et densité (§11.1) */
+  --unit: 4px;
+  --row-h: 24px;
+  --table-header-h: 26px;
+  --menubar-h: 28px;
+  --toolbar-h: 32px;
+  --statusbar-h: 22px;
+  --panel-title-h: 24px;
+  --gutter: 1px;
+  --cell-pad-x: 6px;
+  --cell-pad-y: 3px;
+
+  /* Contrôles (§11.6) */
+  --control-h: 24px;
+  --focus-ring: 2px;
+}

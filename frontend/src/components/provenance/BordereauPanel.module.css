@@ -1,0 +1,72 @@
+.wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg-chrome);
+  flex: 0 0 auto;
+}
+
+.tab {
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--fg-secondary);
+  cursor: pointer;
+  border-right: 1px solid var(--rule-light);
+}
+
+.tab[data-active="true"] {
+  background: var(--bg-app);
+  color: var(--fg);
+}
+
+.body {
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.card {
+  border: 1px solid var(--rule-light);
+  padding: 6px 8px;
+  margin: 6px;
+  font-size: 11px;
+}
+
+.cardTitle {
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.cardMeta {
+  color: var(--fg-muted);
+}
+
+.checksum {
+  padding: 4px 8px;
+  font-size: 10px;
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  border-top: 1px solid var(--rule-light);
+}
+
+.exportRow {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border-top: 1px solid var(--rule);
+}
+
+.exportBtn {
+  height: var(--control-h);
+  padding: 0 8px;
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  color: var(--accent);
+  font-size: 11px;
+  cursor: pointer;
+}

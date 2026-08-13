@@ -1,0 +1,64 @@
+.wrapper {
+  height: 100%;
+  overflow: auto;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg-chrome);
+}
+
+.select {
+  height: var(--control-h);
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  font-size: 11px;
+  padding: 0 4px;
+}
+
+.table {
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.rowHeader {
+  position: sticky;
+  left: 0;
+  background: var(--bg-chrome);
+  border-right: 1px solid var(--rule);
+  padding: 2px 8px;
+  text-align: left;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.colHeader {
+  position: sticky;
+  top: 0;
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--rule);
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  z-index: 1;
+}
+
+.cell {
+  width: 44px;
+  height: 22px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--rule-light);
+  color: var(--fg-secondary);
+}
+
+.legend {
+  padding: 8px;
+  font-size: 10px;
+  color: var(--fg-muted);
+}

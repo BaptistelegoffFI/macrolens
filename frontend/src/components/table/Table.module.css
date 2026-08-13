@@ -1,0 +1,87 @@
+.wrapper {
+  height: 100%;
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.th {
+  height: var(--table-header-h);
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--rule);
+  padding: 0 var(--cell-pad-x);
+  font-size: var(--text-micro);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-secondary);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.thNum {
+  text-align: right;
+}
+
+.sortIndicator {
+  margin-left: 4px;
+  color: var(--fg-muted);
+}
+
+.tr {
+  height: var(--row-h);
+}
+
+.tr:nth-child(even) {
+  background: var(--bg-row-alt);
+}
+
+.tr[data-selected="true"] {
+  background: var(--bg-selected);
+}
+
+.tr:hover {
+  background: var(--bg-hover);
+}
+
+.td {
+  padding: var(--cell-pad-y) var(--cell-pad-x);
+  border-bottom: 1px solid var(--rule-light);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.tdNum {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* §11.4 : filet vertical 2px en bord gauche — border-left, jamais box-shadow
+   (interdit bloquant §11.0, testé automatiquement en §11.8). */
+.tdFlagged {
+  border-left: 2px solid var(--flag);
+  padding-left: calc(var(--cell-pad-x) - 2px);
+}
+
+.muted {
+  color: var(--fg-muted);
+}
+
+.neg {
+  color: var(--neg);
+}
+
+.pos {
+  color: var(--pos);
+}

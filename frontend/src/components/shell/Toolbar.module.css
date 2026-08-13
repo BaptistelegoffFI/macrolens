@@ -1,0 +1,99 @@
+.bar {
+  height: var(--toolbar-h);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--rule);
+  flex: 0 0 auto;
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--rule);
+  height: var(--control-h);
+}
+
+.segmentedBtn {
+  padding: 0 8px;
+  border: none;
+  border-right: 1px solid var(--rule);
+  background: var(--bg-app);
+  color: var(--fg);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.segmentedBtn:last-child {
+  border-right: none;
+}
+
+.segmentedBtn[data-active="true"] {
+  background: var(--bg-selected);
+  color: var(--accent);
+}
+
+.label {
+  font-size: 11px;
+  color: var(--fg-secondary);
+}
+
+.numInput {
+  width: 44px;
+  height: var(--control-h);
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  text-align: right;
+}
+
+.select {
+  height: var(--control-h);
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  color: var(--fg);
+  font-size: 11px;
+  padding: 0 4px;
+}
+
+.chip {
+  padding: 0 6px;
+  height: var(--control-h);
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  color: var(--fg-secondary);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.chip[data-active="true"] {
+  background: var(--bg-selected);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.runBtn {
+  height: var(--control-h);
+  padding: 0 10px;
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  color: var(--accent);
+  font-size: 11px;
+  cursor: pointer;
+}

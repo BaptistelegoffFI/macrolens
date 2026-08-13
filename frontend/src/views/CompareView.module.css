@@ -1,0 +1,80 @@
+.wrapper {
+  height: 100%;
+  overflow: auto;
+}
+
+.pairsBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg-chrome);
+  flex-wrap: wrap;
+}
+
+.pairInput {
+  width: 56px;
+  height: var(--control-h);
+  border: 1px solid var(--rule);
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-align: center;
+}
+
+.pairGroup {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--rule-light);
+  padding: 2px;
+}
+
+.removeBtn {
+  border: none;
+  background: transparent;
+  color: var(--neg);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.addBtn,
+.runBtn {
+  height: var(--control-h);
+  padding: 0 8px;
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  color: var(--accent);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(200px, 1fr);
+}
+
+.column {
+  border-right: 1px solid var(--rule-light);
+}
+
+.columnHeader {
+  height: var(--panel-title-h);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--rule);
+  font-size: 12px;
+}
+
+.featureRow {
+  display: flex;
+  justify-content: space-between;
+  height: var(--row-h);
+  padding: 0 8px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--rule-light);
+}
