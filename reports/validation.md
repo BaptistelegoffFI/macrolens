@@ -389,3 +389,54 @@ validation même (contraste, raccourci manquant, navigation clavier des onglets,
 83 tests frontend passent, dont deux batteries de non-régression ajoutées pour verrouiller des
 critères autrement invisibles à `tsc`/`eslint` (vocabulaire interdit, contraste AA). Le build de
 production (`vite build`) réussit sans erreur.
+
+# Rapport de validation — Phase 7 (durcissement et documentation)
+
+## 1. Livrables (§13)
+
+`docs/methodology.md` (chaque formule du §8, formule par formule), `docs/data-sources.md` (une
+fiche par source déclarée dans `sources.yaml`, statut réel d'ingestion), `docs/data-refresh.md`
++ `scripts/refresh_annual.sh` (procédure de rafraîchissement annuel), `docs/limitations.md`
+étendu, `docs/decisions/0005-ambiguites-plan-phase-6.md` (décisions techniques du retrofit
+Phase 6), README réécrit pour un installeur externe.
+
+## 2. Test de fraîche installation — critère d'acceptation le plus concret de cette phase
+
+Le plan demande explicitement qu'« une personne extérieure installe et lance le projet en
+suivant le seul README ». Plutôt que de se fier à la lecture du README, la commande qu'il
+documente a été exécutée pour de vrai (`docker compose up --build`, conteneurs `db`/`api`/`web`)
+et l'application a été pilotée dans un navigateur réel jusqu'à un résultat complet (recherche
+FRA 2019 → 20 analogues, éventail, chronologie, bordereau, avertissements moteur affichés). Ce
+test a trouvé deux défauts réels, corrigés dans cette même phase plutôt que documentés comme
+limitation :
+
+- **Images Docker périmées silencieusement réutilisées.** `docker compose up` (sans `--build`)
+  réutilise une image locale déjà construite même si le code source a changé depuis — sans
+  erreur, sans avertissement. Un rebuild de `web` a d'abord servi la page statique de la Phase 0
+  (« Aucune logique métier n'est encore implémentée »). Le README recommande maintenant
+  `docker compose up --build` ; documenté explicitement (voir README, section « Voie rapide »).
+  Ne concerne pas un tout premier clone (aucune image à réutiliser dans ce cas) mais concerne
+  quiconque relance la commande après un `git pull`.
+- **`raw_files.relpath` non stable entre environnements (§18.7/§18.8).** `register_raw_files`
+  (`backend/macrolens/etl/load.py`) réécrivait `relpath`/`downloaded_at` sur la ligne existante
+  à *chaque* rejeu de l'ingestion d'un fichier déjà connu (même hash), y compris depuis un
+  environnement différent (conteneur vs hôte). Un `raw_file` déjà enregistré finissait par
+  pointer vers le chemin absolu de la dernière ingestion, cassant silencieusement
+  `test_return_to_source.py` — qualifié dans ce même rapport (§5, Phase 5) de « test le plus
+  important du projet » — dès que ce test tournait dans un environnement autre que celui de la
+  dernière ingestion. Corrigé : l'upsert sur `sha256` ne touche plus `relpath`/`downloaded_at`
+  quand la ligne existe déjà ; seul un nouveau hash crée une nouvelle ligne. Détail dans
+  `docs/limitations.md` §1.
+
+## 3. `make check` après correction
+
+140 tests backend (2 xfailed documentés, batterie §12.3 et test de structure), 104 tests
+frontend — tous verts, `ruff`/`mypy`/`eslint`/`tsc` propres.
+
+## 4. Conclusion (Phase 7 — et clôture v1)
+
+Les trois volets du critère d'acceptation Phase 7 sont vérifiés en pratique, pas seulement
+rédigés : (1) installation et lancement via le seul README, testés dans un navigateur réel
+jusqu'à un résultat de recherche complet ; (2) `docs/methodology.md` couvre chaque formule du
+§8 ; (3) `docs/limitations.md` liste les manques connus, y compris ceux découverts pendant cette
+phase. Les sept phases du plan (§13) sont closes ; `phase-7` tague ce commit.
