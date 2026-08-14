@@ -2,7 +2,7 @@ import type { EChartsOption } from "echarts";
 import { useMemo } from "react";
 
 import type { ObservationOut } from "../../api/types";
-import { axisNumericStyle, baseChartOption, tokens } from "../../charts/theme";
+import { axisNumericStyle, baseChartOption, formatAxisNumber, tokens } from "../../charts/theme";
 import { EChart } from "./EChart";
 
 export interface SeriesSparklineProps {
@@ -49,11 +49,7 @@ export function SeriesSparkline({ label, unit, observations, anchorYear }: Serie
         ...axisNumericStyle.y,
         type: "value" as const,
         splitNumber: 3,
-        axisLabel: {
-          ...axisNumericStyle.y.axisLabel,
-          fontSize: 9,
-          formatter: (v: number) => (Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(0)}k` : v.toFixed(0)),
-        },
+        axisLabel: { ...axisNumericStyle.y.axisLabel, fontSize: 9, formatter: formatAxisNumber },
       },
       series: [
         {

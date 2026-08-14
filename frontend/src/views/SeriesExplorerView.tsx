@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { getSeries, meta } from "../api/endpoints";
 import type { CountryOut, IndicatorOut, ObservationOut } from "../api/types";
-import { axisNumericStyle, baseChartOption, tokens } from "../charts/theme";
+import { axisNumericStyle, baseChartOption, formatAxisNumber, tokens } from "../charts/theme";
 import type { EChartHandle } from "../components/charts/EChart";
 import { EChart } from "../components/charts/EChart";
 import { EmptyState } from "../components/shell/EmptyState";
@@ -75,11 +75,31 @@ export function SeriesExplorerView() {
     }));
     return {
       ...baseChartOption,
-      grid: { left: 56, right: 16, top: 16, bottom: 32 },
+      // containLabel: true — la boîte grid inclut les libellés d'axe, donc
+      // les marges ci-dessous sont une garantie de respiration minimale
+      // plutôt qu'un calcul manuel de la largeur des libellés (fragile dès
+      // qu'un indicateur produit des valeurs à forte amplitude, ex. un
+      // indice actions nominal en période d'hyperinflation).
+      grid: { left: 16, right: 24, top: 16, bottom: 16, containLabel: true },
       legend: { show: false },
       tooltip: { ...baseChartOption.tooltip, trigger: "axis" as const },
-      xAxis: { ...axisNumericStyle.x, type: "value" as const, axisLabel: { ...axisNumericStyle.x.axisLabel, formatter: (v: number) => String(Math.round(v)) } },
-      yAxis: { ...axisNumericStyle.y, type: "value" as const },
+      xAxis: {
+        ...axisNumericStyle.x,
+        type: "value" as const,
+        // scale: true — un axe de valeur inclut 0 par défaut ; pour des
+        // années (jamais proches de 0), ça compressait toute la série
+        // réelle dans un coin du graphique. §8.2 : jamais d'extrapolation,
+        // mais ici il s'agit strictement d'un réglage d'affichage, pas
+        // d'une transformation de donnée.
+        scale: true,
+        axisLabel: { ...axisNumericStyle.x.axisLabel, formatter: (v: number) => String(Math.round(v)) },
+      },
+      yAxis: {
+        ...axisNumericStyle.y,
+        type: "value" as const,
+        scale: true,
+        axisLabel: { ...axisNumericStyle.y.axisLabel, formatter: formatAxisNumber, margin: 10 },
+      },
       series,
     };
   }, [selectedCountries, seriesByCountry]);
@@ -115,70 +135,74 @@ export function SeriesExplorerView() {
   }
 
   return (
-    <div style={{ display: "flex", height: "100%" }}>
-      <div className={styles.left} style={{ width: 220, borderRight: "1px solid var(--rule)" }}>
-        <div className="micro-label" style={{ marginBottom: 4 }}>
-          {t(S.seriesExplorer.indicatorLabel)}
+    <div className={styles.layout}>
+      <div className={styles.controls}>
+        <div className={styles.card}>
+          <div className={styles.cardTitle}>{t(S.seriesExplorer.indicatorLabel)}</div>
+          <select className={styles.select} value={indicator} onChange={(e) => setIndicator(e.target.value)}>
+            {indicators.map((i) => (
+              <option key={i.code} value={i.code}>
+                {pick(i.label_fr, i.label_en)}
+              </option>
+            ))}
+          </select>
         </div>
-        <select
-          style={{ width: "100%", height: "var(--control-h)", border: "1px solid var(--rule)", fontSize: 11, marginBottom: 12 }}
-          value={indicator}
-          onChange={(e) => setIndicator(e.target.value)}
-        >
-          {indicators.map((i) => (
-            <option key={i.code} value={i.code}>
-              {pick(i.label_fr, i.label_en)}
-            </option>
-          ))}
-        </select>
 
-        <div className="micro-label" style={{ marginBottom: 4 }}>
-          {t(S.seriesExplorer.countriesLabel)(selectedCountries.length)}
-        </div>
-        <div className={styles.countryList}>
-          {countries.map((c) => (
-            <label key={c.iso3} className={styles.countryRow}>
-              <input
-                type="checkbox"
-                checked={selectedCountries.includes(c.iso3)}
-                onChange={() => toggleCountry(c.iso3)}
-              />
-              {c.iso3} — {pick(c.name_fr, c.name_en)}
-            </label>
-          ))}
+        <div className={styles.card}>
+          <div className={styles.cardTitle}>{t(S.seriesExplorer.countriesLabel)(selectedCountries.length)}</div>
+          <div className={styles.countryList}>
+            {countries.map((c) => (
+              <label key={c.iso3} className={styles.countryRow}>
+                <input
+                  type="checkbox"
+                  checked={selectedCountries.includes(c.iso3)}
+                  onChange={() => toggleCountry(c.iso3)}
+                />
+                {c.iso3} — {pick(c.name_fr, c.name_en)}
+              </label>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className={styles.main}>
+      <div className={styles.content}>
         {error && <div style={{ color: "var(--neg)", padding: 8, fontSize: 11 }}>{error}</div>}
         {loading && <EmptyState>{t(S.common.loading)}</EmptyState>}
         {!loading && (
           <>
-            <div className={styles.chartArea}>
-              <div style={{ fontSize: 11, textTransform: "uppercase", color: "var(--fg-secondary)", marginBottom: 4 }}>
-                {pick(indicatorMeta?.label_fr ?? indicator, indicatorMeta?.label_en ?? indicator)}
-                <span style={{ color: "var(--fg-muted)", marginLeft: 8 }}>{indicatorMeta?.unit}</span>
+            <div className={styles.chartCard}>
+              <div className={styles.chartHeader}>
+                <span className={styles.chartTitle}>
+                  {pick(indicatorMeta?.label_fr ?? indicator, indicatorMeta?.label_en ?? indicator)}
+                </span>
+                {indicatorMeta?.unit && <span className={styles.unitBadge}>{indicatorMeta.unit}</span>}
               </div>
-              <EChart ref={chartRef} option={option} height={280} />
+              <div className={styles.chartBody}>
+                <EChart ref={chartRef} option={option} height={280} />
+              </div>
             </div>
-            <table className={styles.legend}>
-              <tbody>
-                {legendRows.map((r) => (
-                  <tr key={r.country}>
-                    <td className={styles.legendCell}>
-                      <span className={styles.swatch} style={{ background: r.color }} />
-                      {r.country}
-                    </td>
-                    <td className={`${styles.legendCell} ${styles.legendNum}`}>
-                      <Num value={r.last?.value ?? null} decimals={2} />
-                    </td>
-                    <td className={`${styles.legendCell} ${styles.legendNum}`}>
-                      <Num value={r.variation} decimals={1} unit="%" sign tone="auto" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+            <div className={styles.card}>
+              <table className={styles.legend}>
+                <tbody>
+                  {legendRows.map((r) => (
+                    <tr key={r.country}>
+                      <td className={styles.legendCell}>
+                        <span className={styles.swatch} style={{ background: r.color }} />
+                        {r.country}
+                      </td>
+                      <td className={`${styles.legendCell} ${styles.legendNum}`}>
+                        <Num value={r.last?.value ?? null} decimals={2} />
+                      </td>
+                      <td className={`${styles.legendCell} ${styles.legendNum}`}>
+                        <Num value={r.variation} decimals={1} unit="%" sign tone="auto" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
             <div className={styles.exportBar}>
               <button type="button" className={styles.exportBtn} onClick={exportCsv}>
                 {t(S.seriesExplorer.exportCsv)}

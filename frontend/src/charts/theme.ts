@@ -65,6 +65,21 @@ export const axisNumericStyle = {
   },
 } as const;
 
+/** Abrège un nombre pour un libellé d'axe (k/M/B/T) — évite que des valeurs à
+ * fort écart d'échelle (ex. un indice actions nominal en hyperinflation) ne
+ * produisent des chaînes trop longues pour l'espace alloué à l'axe, cause la
+ * plus fréquente de chevauchement de libellés. Ne change jamais la valeur
+ * affichée ailleurs (tableaux, <Num>) — seulement les ticks d'axe, où la
+ * précision exacte importe moins que la lisibilité. */
+export function formatAxisNumber(v: number): string {
+  const abs = Math.abs(v);
+  if (abs >= 1e12) return `${(v / 1e12).toFixed(1)}T`;
+  if (abs >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
+  if (abs >= 1e6) return `${(v / 1e6).toFixed(1)}M`;
+  if (abs >= 1e3) return `${(v / 1e3).toFixed(0)}k`;
+  return v.toFixed(0);
+}
+
 /** Éventail des analogues (§11.5) : traits fins, bande Q1-Q3 en aplat, médiane épaisse. */
 export const fanChartSeriesStyle = {
   analogLine: { color: tokens.fanLine, width: 0.75, opacity: 1 },
