@@ -1,3 +1,5 @@
+import { useLanguage } from "../../i18n/LanguageContext";
+import { S } from "../../i18n/strings";
 import { Num } from "../table/Num";
 import styles from "./WeightSlider.module.css";
 
@@ -9,6 +11,7 @@ export interface WeightSliderProps {
 
 /** §11.6 : rail 2px + poignée carrée, valeur numérique éditable au clavier. */
 export function WeightSlider({ label, value, onChange }: WeightSliderProps) {
+  const { t } = useLanguage();
   return (
     <div className={styles.row}>
       <span className={styles.label}>{label}</span>
@@ -21,7 +24,7 @@ export function WeightSlider({ label, value, onChange }: WeightSliderProps) {
           step={0.05}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          aria-label={`Poids ${label}`}
+          aria-label={t(S.weightSlider.ariaLabel)(label)}
         />
       </div>
       <span className={styles.value}>

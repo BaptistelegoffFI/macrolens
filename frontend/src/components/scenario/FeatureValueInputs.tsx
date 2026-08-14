@@ -1,4 +1,5 @@
 import styles from "../../App.module.css";
+import { useLanguage } from "../../i18n/LanguageContext";
 import { featuresByFamily } from "../../lib/features";
 
 export interface FeatureValueInputsProps {
@@ -9,9 +10,10 @@ export interface FeatureValueInputsProps {
 /** Saisie manuelle des 14 features (§10.1, modes "manual"/"shock") — un champ
  * non renseigné n'entre pas dans la requête (pas de 0 fabriqué). */
 export function FeatureValueInputs({ values, onChange }: FeatureValueInputsProps) {
+  const { lang } = useLanguage();
   return (
     <>
-      {featuresByFamily().map((group) => (
+      {featuresByFamily(lang).map((group) => (
         <div key={group.family} className={styles.fieldGroup}>
           <div className={styles.fieldGroupTitle}>{group.label}</div>
           {group.features.map((f) => (

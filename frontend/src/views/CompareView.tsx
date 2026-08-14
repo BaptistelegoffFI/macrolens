@@ -4,7 +4,9 @@ import { SeriesSparkline } from "../components/charts/SeriesSparkline";
 import { EmptyState } from "../components/shell/EmptyState";
 import { Num } from "../components/table/Num";
 import { useCompare } from "../hooks/useCompare";
-import { RAW_INDICATORS } from "../lib/indicators";
+import { useLanguage } from "../i18n/LanguageContext";
+import { S } from "../i18n/strings";
+import { rawIndicators } from "../lib/indicators";
 import styles from "./CompareView.module.css";
 
 interface PairInput {
@@ -26,6 +28,7 @@ export interface CompareViewProps {
 /** §11.3 Vue Comparateur (F6) : 2 à 6 épisodes en colonnes, tableau +
  * petits multiples. */
 export function CompareView({ externalPairs }: CompareViewProps) {
+  const { t, lang } = useLanguage();
   const [pairs, setPairs] = useState<PairInput[]>(DEFAULT_PAIRS);
   const { data, loading, error, run } = useCompare();
 
@@ -74,25 +77,28 @@ export function CompareView({ externalPairs }: CompareViewProps) {
               onChange={(e) => updatePair(i, "year", e.target.value)}
             />
             {pairs.length > 2 && (
-              <button type="button" className={styles.removeBtn} onClick={() => removePair(i)} title="Retirer">
+              <button
+                type="button"
+                className={styles.removeBtn}
+                onClick={() => removePair(i)}
+                title={t(S.compare.removeTitle)}
+              >
                 ×
               </button>
             )}
           </div>
         ))}
         <button type="button" className={styles.addBtn} onClick={addPair} disabled={pairs.length >= 6}>
-          + Ajouter
+          {t(S.compare.add)}
         </button>
         <button type="button" className={styles.runBtn} onClick={() => void run(pairs)}>
-          Comparer
+          {t(S.compare.run)}
         </button>
       </div>
 
       {error && <div style={{ color: "var(--neg)", padding: 8, fontSize: 11 }}>{error}</div>}
-      {loading && <EmptyState>Chargement…</EmptyState>}
-      {!loading && !data && !error && (
-        <EmptyState>Choisissez 2 à 6 couples (pays, année) et lancez « Comparer ».</EmptyState>
-      )}
+      {loading && <EmptyState>{t(S.common.loading)}</EmptyState>}
+      {!loading && !data && !error && <EmptyState>{t(S.compare.emptyPrompt)}</EmptyState>}
       {!loading && data && (
         <div className={styles.grid}>
           {data.episodes.map((ep) => (
@@ -114,11 +120,11 @@ export function CompareView({ externalPairs }: CompareViewProps) {
                 ))
               ) : (
                 <div className={styles.featureRow}>
-                  <span style={{ color: "var(--fg-muted)" }}>Vecteur d'état indisponible</span>
+                  <span style={{ color: "var(--fg-muted)" }}>{t(S.compare.stateUnavailable)}</span>
                 </div>
               )}
               {["gdp_real_pc", "cpi"].map((code) => {
-                const ind = RAW_INDICATORS.find((r) => r.code === code);
+                const ind = rawIndicators(lang).find((r) => r.code === code);
                 if (!ind) return null;
                 return (
                   <SeriesSparkline

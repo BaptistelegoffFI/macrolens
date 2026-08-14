@@ -4,10 +4,15 @@ import { meta } from "../api/endpoints";
 import type { CountryOut, CoverageCellOut, IndicatorOut } from "../api/types";
 import { EmptyState } from "../components/shell/EmptyState";
 import { Num } from "../components/table/Num";
+import { useLanguage } from "../i18n/LanguageContext";
+import { S } from "../i18n/strings";
 import styles from "./CoverageView.module.css";
 
-/** §11.3 Vue Couverture (F7) : matrice pays × indicateur × décennie. */
+/** §11.3 Vue Couverture (F7) : matrice pays × indicateur × décennie.
+ * L'infobulle de définition (`ind.definition_fr`) reste en français quel que
+ * soit `lang` — il n'existe pas de `definition_en` en base (docs/limitations.md). */
 export function CoverageView() {
+  const { t, pick } = useLanguage();
   const [countries, setCountries] = useState<CountryOut[]>([]);
   const [indicators, setIndicators] = useState<IndicatorOut[]>([]);
   const [coverage, setCoverage] = useState<CoverageCellOut[]>([]);
@@ -25,9 +30,11 @@ export function CoverageView() {
         setLoading(false);
       })
       .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : "Erreur inconnue");
+        setError(err instanceof Error ? err.message : t(S.common.unknownError));
         setLoading(false);
       });
+    // Un seul chargement initial.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const decades = useMemo(() => {
@@ -43,17 +50,17 @@ export function CoverageView() {
     return map;
   }, [coverage, country]);
 
-  if (loading) return <EmptyState>Chargement…</EmptyState>;
+  if (loading) return <EmptyState>{t(S.common.loading)}</EmptyState>;
   if (error) return <EmptyState>{error}</EmptyState>;
 
   return (
     <div className={styles.wrapper}>
       <div className={styles.toolbar}>
-        <span className="micro-label">Pays</span>
+        <span className="micro-label">{t(S.coverage.country)}</span>
         <select className={styles.select} value={country} onChange={(e) => setCountry(e.target.value)}>
           {countries.map((c) => (
             <option key={c.iso3} value={c.iso3}>
-              {c.iso3} — {c.name_fr}
+              {c.iso3} — {pick(c.name_fr, c.name_en)}
             </option>
           ))}
         </select>
@@ -61,7 +68,7 @@ export function CoverageView() {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th className={styles.rowHeader}>Indicateur</th>
+            <th className={styles.rowHeader}>{t(S.coverage.indicator)}</th>
             {decades.map((d) => (
               <th key={d} className={styles.colHeader}>
                 <Num value={d} decimals={0} />
@@ -73,7 +80,7 @@ export function CoverageView() {
           {indicators.map((ind) => (
             <tr key={ind.code}>
               <th className={styles.rowHeader} title={ind.definition_fr}>
-                {ind.label_fr}
+                {pick(ind.label_fr, ind.label_en)}
               </th>
               {decades.map((d) => {
                 const cell = cellByKey.get(`${ind.code}-${d}`);
@@ -83,7 +90,7 @@ export function CoverageView() {
                     key={d}
                     className={styles.cell}
                     style={{ background: pct > 0 ? `rgba(11, 95, 165, ${pct / 100})` : undefined }}
-                    title={cell ? `${cell.n_observed}/${cell.n_possible} (${pct.toFixed(0)}%)` : "aucune donnée"}
+                    title={cell ? `${cell.n_observed}/${cell.n_possible} (${pct.toFixed(0)}%)` : t(S.coverage.noData)}
                   >
                     <Num value={cell ? pct : null} decimals={0} />
                   </td>
@@ -93,9 +100,7 @@ export function CoverageView() {
           ))}
         </tbody>
       </table>
-      <div className={styles.legend}>
-        Complétude (%) des années observées par décennie. Case vide = aucune observation.
-      </div>
+      <div className={styles.legend}>{t(S.coverage.legend)}</div>
     </div>
   );
 }

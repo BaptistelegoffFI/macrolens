@@ -23,6 +23,8 @@ import type { ColumnDef } from "./components/table/Table";
 import { Table } from "./components/table/Table";
 import { useAnalogsSearch } from "./hooks/useAnalogsSearch";
 import { useProvenanceReceipt } from "./hooks/useProvenanceReceipt";
+import { useLanguage } from "./i18n/LanguageContext";
+import { S } from "./i18n/strings";
 import type { ParsedCommand } from "./lib/commandParser";
 import { FAMILY_LABELS, FEATURE_FAMILIES, featuresByFamily } from "./lib/features";
 import type { FeatureFamily } from "./lib/features";
@@ -72,6 +74,7 @@ function ScenarioView({
   onWeightChange,
   search,
 }: ScenarioViewProps) {
+  const { t, lang } = useLanguage();
   const { data, loading, error } = search;
   const horizons = toolbar.horizons;
   const lastHorizon = horizons[horizons.length - 1];
@@ -94,13 +97,13 @@ function ScenarioView({
 
   const columns: ColumnDef<AnalogOut>[] = useMemo(() => {
     const base: ColumnDef<AnalogOut>[] = [
-      { key: "country", label: "Pays", accessor: (r) => r.country },
-      { key: "year", label: "Année", numeric: true, decimals: 0, accessor: (r) => r.year },
-      { key: "similarity", label: "Sim.", numeric: true, decimals: 1, accessor: (r) => r.similarity },
+      { key: "country", label: t(S.scenario.tableCountry), accessor: (r) => r.country },
+      { key: "year", label: t(S.scenario.tableYear), numeric: true, decimals: 0, accessor: (r) => r.year },
+      { key: "similarity", label: t(S.scenario.tableSimilarity), numeric: true, decimals: 1, accessor: (r) => r.similarity },
     ];
     const growthCols: ColumnDef<AnalogOut>[] = horizons.map((h) => ({
       key: `growth_${h}`,
-      label: `ΔPIB ${h}a`,
+      label: t(S.scenario.growthColumn)(h),
       numeric: true,
       decimals: 1,
       sign: true,
@@ -110,7 +113,7 @@ function ScenarioView({
     const crisisCol: ColumnDef<AnalogOut> | null = lastHorizon
       ? {
           key: "crisis",
-          label: `CB ${lastHorizon}a`,
+          label: t(S.scenario.crisisColumn)(lastHorizon),
           accessor: (r) => r.outcomes[String(lastHorizon)]?.out_banking_crisis ?? null,
           render: (r) => {
             const v = r.outcomes[String(lastHorizon)]?.out_banking_crisis;
@@ -125,17 +128,19 @@ function ScenarioView({
         }
       : null;
     return crisisCol ? [...base, ...growthCols, crisisCol] : [...base, ...growthCols];
-  }, [horizons, lastHorizon]);
+  }, [horizons, lastHorizon, t]);
 
   return (
     <ResizableColumns storageKey="ml.scenario.cols" defaultWidths={[220, 760]}>
-      <Panel title="Scénario">
+      <Panel title={t(S.scenario.panelTitle)}>
         <div className={styles.scenarioLeft}>
           {(toolbar.mode === "anchor" || toolbar.mode === "shock") && (
             <div className={styles.fieldGroup}>
-              <div className={styles.fieldGroupTitle}>{toolbar.mode === "shock" ? "Base du choc" : "Ancre"}</div>
+              <div className={styles.fieldGroupTitle}>
+                {toolbar.mode === "shock" ? t(S.scenario.shockGroupTitle) : t(S.scenario.anchorGroupTitle)}
+              </div>
               <div className={styles.field}>
-                <span className={styles.fieldLabel}>Pays</span>
+                <span className={styles.fieldLabel}>{t(S.common.country)}</span>
                 <input
                   className={styles.textInput}
                   value={country}
@@ -144,7 +149,7 @@ function ScenarioView({
                 />
               </div>
               <div className={styles.field}>
-                <span className={styles.fieldLabel}>Année</span>
+                <span className={styles.fieldLabel}>{t(S.common.year)}</span>
                 <input
                   className={styles.textInput}
                   type="number"
@@ -163,7 +168,7 @@ function ScenarioView({
           )}
 
           {queryState &&
-            featuresByFamily().map((group) => (
+            featuresByFamily(lang).map((group) => (
               <div key={group.family} className={styles.fieldGroup}>
                 <div className={styles.fieldGroupTitle}>{group.label}</div>
                 {group.features.map((f) => {
@@ -184,11 +189,11 @@ function ScenarioView({
             ))}
 
           <div className={styles.fieldGroup}>
-            <div className={styles.fieldGroupTitle}>Poids</div>
+            <div className={styles.fieldGroupTitle}>{t(S.common.weights)}</div>
             {FEATURE_FAMILIES.map((family) => (
               <WeightSlider
                 key={family}
-                label={FAMILY_LABELS[family]}
+                label={FAMILY_LABELS[family][lang]}
                 value={weights?.[family] ?? 1 / 7}
                 onChange={(v) => onWeightChange(family, v)}
               />
@@ -197,7 +202,7 @@ function ScenarioView({
         </div>
       </Panel>
 
-      <Panel title="Analogues" meta={data ? String(data.analogs.length) : "0"}>
+      <Panel title={t(S.scenario.analoguesPanelTitle)} meta={data ? String(data.analogs.length) : "0"}>
         <ResizableRows storageKey="ml.scenario.rows" defaultHeights={[240, 240]}>
           <div>
             {error && <div className={styles.errorBanner}>{error}</div>}
@@ -206,33 +211,29 @@ function ScenarioView({
                 ⚑ {w}
               </div>
             ))}
-            {loading && <EmptyState>Recherche en cours…</EmptyState>}
-            {!loading && !error && !data && (
-              <EmptyState>
-                Aucune recherche exécutée — choisissez une ancre (pays, année) et lancez [F5].
-              </EmptyState>
-            )}
+            {loading && <EmptyState>{t(S.scenario.searching)}</EmptyState>}
+            {!loading && !error && !data && <EmptyState>{t(S.scenario.noSearchYet)}</EmptyState>}
             {!loading && data && data.analogs.length === 0 && (
-              <EmptyState>Aucun analogue trouvé pour cette requête après exclusions.</EmptyState>
+              <EmptyState>{t(S.scenario.noAnalogFound)}</EmptyState>
             )}
             {!loading && data && data.analogs.length > 0 && (
               <Table columns={columns} rows={data.analogs} getRowKey={(r) => `${r.country}-${r.year}`} />
             )}
           </div>
           {data && data.analogs.length > 0 ? (
-            <FanChart data={data} variable="out_growth_cum" variableLabel="ΔPIB cumulé, %" />
+            <FanChart data={data} variable="out_growth_cum" variableLabel={t(S.scenario.fanChartVariableLabel)} />
           ) : (
-            <EmptyState>Éventail des réalisations — apparaît après une recherche.</EmptyState>
+            <EmptyState>{t(S.scenario.fanChartPlaceholder)}</EmptyState>
           )}
           {data && data.analogs.length > 0 ? (
             <Timeline analogs={data.analogs} anchorYear={year} />
           ) : (
-            <EmptyState>Chronologie 1870-présent — apparaît après une recherche.</EmptyState>
+            <EmptyState>{t(S.scenario.timelinePlaceholder)}</EmptyState>
           )}
         </ResizableRows>
       </Panel>
 
-      <Panel title="Bordereau">
+      <Panel title={t(S.scenario.bordereauPanelTitle)}>
         <ScenarioBordereau data={data} />
       </Panel>
     </ResizableColumns>
@@ -243,19 +244,20 @@ function ScenarioView({
  * demande à partir des couples (pays, année) réellement affichés dans le
  * tableau des analogues, jamais un sur-ensemble deviné. */
 function ScenarioBordereau({ data }: { data: ReturnType<typeof useAnalogsSearch>["data"] }) {
+  const { t } = useLanguage();
   const receipt = useProvenanceReceipt();
   const [opened, setOpened] = useState(false);
 
   if (!data) {
-    return <EmptyState>Aucune donnée affichée — le bordereau se remplit avec la recherche.</EmptyState>;
+    return <EmptyState>{t(S.scenario.bordereauPlaceholder)}</EmptyState>;
   }
 
   if (!opened) {
     return (
       <div style={{ padding: 8 }}>
         <div style={{ fontSize: 11, color: "var(--fg-muted)", marginBottom: 8 }}>
-          {data.sources_summary.map((s) => s.id).join(", ") || "aucune source"} —{" "}
-          <Num value={data.pool_size} decimals={0} /> candidats
+          {data.sources_summary.map((s) => s.id).join(", ") || t(S.common.noSource)} —{" "}
+          <Num value={data.pool_size} decimals={0} /> {t(S.statusBar.candidates)}
         </div>
         <button
           type="button"
@@ -266,7 +268,7 @@ function ScenarioBordereau({ data }: { data: ReturnType<typeof useAnalogsSearch>
             void receipt.run({ build_id: data.build_id, keys: keysForAnalogsSearch(data) });
           }}
         >
-          Données utilisées ({data.analogs.length * 10})
+          {t(S.scenario.dataUsed)(data.analogs.length * 10)}
         </button>
       </div>
     );
@@ -276,6 +278,7 @@ function ScenarioBordereau({ data }: { data: ReturnType<typeof useAnalogsSearch>
 }
 
 export function App() {
+  const { t } = useLanguage();
   const [activeView, setActiveView] = useState("scenario");
   const [toolbar, setToolbar] = useToolbarState();
   const [country, setCountry] = useState("FRA");
@@ -429,9 +432,7 @@ export function App() {
 
   return (
     <>
-      <div className="mobile-gate">
-        MacroLens est un instrument de poste de travail — largeur minimale 1280px requise.
-      </div>
+      <div className="mobile-gate">{t(S.app.mobileGate)}</div>
       {paletteOpen && (
         <CommandPalette onClose={() => setPaletteOpen(false)} onExecute={handleCommand} />
       )}
@@ -482,7 +483,7 @@ export function App() {
         ) : activeView === "sources" ? (
           <SourcesView />
         ) : (
-          <EmptyState>Vue « {activeView} » — à venir.</EmptyState>
+          <EmptyState>{t(S.app.viewComingSoon)(activeView)}</EmptyState>
         )}
       </WindowShell>
     </>

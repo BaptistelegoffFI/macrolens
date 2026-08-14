@@ -1,4 +1,6 @@
 import type { EventOut } from "../../api/types";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { S } from "../../i18n/strings";
 import styles from "./EventFrieze.module.css";
 
 export interface EventFriezeProps {
@@ -11,6 +13,7 @@ export interface EventFriezeProps {
 /** §11.2 « Frise d'événements » — bandes pour les événements à plage
  * (guerres, régimes), repère pour les événements ponctuels (crises). */
 export function EventFrieze({ events, anchorYear, rangeStart, rangeEnd }: EventFriezeProps) {
+  const { t, pick } = useLanguage();
   const width = 900;
   const rowHeight = 16;
   const padding = 24;
@@ -24,9 +27,9 @@ export function EventFrieze({ events, anchorYear, rangeStart, rangeEnd }: EventF
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.title}>Frise d'événements</div>
+      <div className={styles.title}>{t(S.eventFrieze.title)}</div>
       {events.length === 0 ? (
-        <div className={styles.eventLabel}>Aucun événement recensé sur cette fenêtre.</div>
+        <div className={styles.eventLabel}>{t(S.eventFrieze.empty)}</div>
       ) : (
         <svg className={styles.svg} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMinYMin meet">
           <line x1={padding} y1={10} x2={width - padding} y2={10} className={styles.axisLine} />
@@ -46,7 +49,7 @@ export function EventFrieze({ events, anchorYear, rangeStart, rangeEnd }: EventF
                   className={isCrisis ? styles.crisisBand : styles.band}
                 />
                 <text x={x2 + 4} y={y + 9} className={styles.eventLabel}>
-                  {e.label_fr}
+                  {pick(e.label_fr, e.label_en)}
                 </text>
               </g>
             );

@@ -3,6 +3,8 @@ import { useMemo, useRef } from "react";
 
 import type { AnalogsSearchResponse } from "../../api/types";
 import { axisNumericStyle, baseChartOption, fanChartSeriesStyle } from "../../charts/theme";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { S } from "../../i18n/strings";
 import { downloadDataUrl } from "../../lib/csv";
 import { EChart } from "./EChart";
 import type { EChartHandle } from "./EChart";
@@ -22,6 +24,7 @@ export interface FanChartProps {
  * cumulée à l'horizon 0 vaut 0 par définition, pas par extrapolation.
  */
 export function FanChart({ data, variable, variableLabel }: FanChartProps) {
+  const { t } = useLanguage();
   const chartRef = useRef<EChartHandle>(null);
   const option = useMemo<EChartsOption>(() => {
     const horizons = Object.keys(data.aggregates)
@@ -83,7 +86,7 @@ export function FanChart({ data, variable, variableLabel }: FanChartProps) {
 
     const medianSeries = {
       type: "line" as const,
-      name: "Médiane",
+      name: t(S.fanChart.median),
       showSymbol: true,
       symbolSize: 4,
       lineStyle: { color: fanChartSeriesStyle.median.color, width: fanChartSeriesStyle.median.width },
@@ -96,12 +99,12 @@ export function FanChart({ data, variable, variableLabel }: FanChartProps) {
 
     return {
       ...baseChartOption,
-      title: { text: `ÉVENTAIL — ${variableLabel.toUpperCase()}`, left: 0, top: 0, textStyle: { fontSize: 11, fontWeight: "normal" } },
+      title: { text: t(S.fanChart.title)(variableLabel), left: 0, top: 0, textStyle: { fontSize: 11, fontWeight: "normal" } },
       grid: { left: 48, right: 16, top: 32, bottom: 32 },
       xAxis: {
         ...axisNumericStyle.x,
         type: "value" as const,
-        name: "t (années)",
+        name: t(S.fanChart.xAxisName),
         nameLocation: "middle" as const,
         nameGap: 20,
         min: 0,
@@ -110,7 +113,7 @@ export function FanChart({ data, variable, variableLabel }: FanChartProps) {
       legend: { show: false },
       series: [q1Series, q3MinusQ1Series, ...analogSeries, medianSeries],
     };
-  }, [data, variable, variableLabel]);
+  }, [data, variable, variableLabel, t]);
 
   function exportPng() {
     const url = chartRef.current?.getDataUrl();
@@ -131,7 +134,7 @@ export function FanChart({ data, variable, variableLabel }: FanChartProps) {
         }}
       >
         <span>
-          {data.sources_summary.map((s) => s.id).join(", ") || "aucune source"} · build{" "}
+          {data.sources_summary.map((s) => s.id).join(", ") || t(S.common.noSource)} · build{" "}
           {data.build_id.slice(0, 8)}
         </span>
         <button
@@ -139,7 +142,7 @@ export function FanChart({ data, variable, variableLabel }: FanChartProps) {
           onClick={exportPng}
           style={{ border: "none", background: "transparent", color: "var(--accent)", cursor: "pointer", fontSize: 9 }}
         >
-          Exporter PNG
+          {t(S.seriesExplorer.exportPng)}
         </button>
       </div>
     </div>

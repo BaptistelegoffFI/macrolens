@@ -8,6 +8,8 @@ import type { EChartHandle } from "../components/charts/EChart";
 import { EChart } from "../components/charts/EChart";
 import { EmptyState } from "../components/shell/EmptyState";
 import { Num } from "../components/table/Num";
+import { useLanguage } from "../i18n/LanguageContext";
+import { S } from "../i18n/strings";
 import { downloadDataUrl, downloadText, toDelimited } from "../lib/csv";
 import styles from "./SeriesExplorerView.module.css";
 
@@ -15,6 +17,7 @@ const DEFAULT_COUNTRIES = ["FRA", "DEU", "ITA", "SWE", "FIN", "NOR"];
 
 /** §11.3 Vue Explorateur de séries (F4) : pays × indicateurs, superposition, export. */
 export function SeriesExplorerView() {
+  const { t, pick } = useLanguage();
   const [countries, setCountries] = useState<CountryOut[]>([]);
   const [indicators, setIndicators] = useState<IndicatorOut[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>(DEFAULT_COUNTRIES);
@@ -48,10 +51,10 @@ export function SeriesExplorerView() {
         setLoading(false);
       })
       .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : "Erreur inconnue");
+        setError(err instanceof Error ? err.message : t(S.common.unknownError));
         setLoading(false);
       });
-  }, [selectedCountries, indicator]);
+  }, [selectedCountries, indicator, t]);
 
   function toggleCountry(iso3: string) {
     setSelectedCountries((prev) => (prev.includes(iso3) ? prev.filter((c) => c !== iso3) : [...prev, iso3]));
@@ -115,7 +118,7 @@ export function SeriesExplorerView() {
     <div style={{ display: "flex", height: "100%" }}>
       <div className={styles.left} style={{ width: 220, borderRight: "1px solid var(--rule)" }}>
         <div className="micro-label" style={{ marginBottom: 4 }}>
-          Indicateur
+          {t(S.seriesExplorer.indicatorLabel)}
         </div>
         <select
           style={{ width: "100%", height: "var(--control-h)", border: "1px solid var(--rule)", fontSize: 11, marginBottom: 12 }}
@@ -124,13 +127,13 @@ export function SeriesExplorerView() {
         >
           {indicators.map((i) => (
             <option key={i.code} value={i.code}>
-              {i.label_fr}
+              {pick(i.label_fr, i.label_en)}
             </option>
           ))}
         </select>
 
         <div className="micro-label" style={{ marginBottom: 4 }}>
-          Pays ({selectedCountries.length})
+          {t(S.seriesExplorer.countriesLabel)(selectedCountries.length)}
         </div>
         <div className={styles.countryList}>
           {countries.map((c) => (
@@ -140,7 +143,7 @@ export function SeriesExplorerView() {
                 checked={selectedCountries.includes(c.iso3)}
                 onChange={() => toggleCountry(c.iso3)}
               />
-              {c.iso3} — {c.name_fr}
+              {c.iso3} — {pick(c.name_fr, c.name_en)}
             </label>
           ))}
         </div>
@@ -148,12 +151,12 @@ export function SeriesExplorerView() {
 
       <div className={styles.main}>
         {error && <div style={{ color: "var(--neg)", padding: 8, fontSize: 11 }}>{error}</div>}
-        {loading && <EmptyState>Chargement…</EmptyState>}
+        {loading && <EmptyState>{t(S.common.loading)}</EmptyState>}
         {!loading && (
           <>
             <div className={styles.chartArea}>
               <div style={{ fontSize: 11, textTransform: "uppercase", color: "var(--fg-secondary)", marginBottom: 4 }}>
-                {indicatorMeta?.label_fr ?? indicator}
+                {pick(indicatorMeta?.label_fr ?? indicator, indicatorMeta?.label_en ?? indicator)}
                 <span style={{ color: "var(--fg-muted)", marginLeft: 8 }}>{indicatorMeta?.unit}</span>
               </div>
               <EChart ref={chartRef} option={option} height={280} />
@@ -178,13 +181,13 @@ export function SeriesExplorerView() {
             </table>
             <div className={styles.exportBar}>
               <button type="button" className={styles.exportBtn} onClick={exportCsv}>
-                Exporter CSV
+                {t(S.seriesExplorer.exportCsv)}
               </button>
               <button type="button" className={styles.exportBtn} onClick={exportTsv}>
-                Exporter TSV
+                {t(S.seriesExplorer.exportTsv)}
               </button>
               <button type="button" className={styles.exportBtn} onClick={exportJson}>
-                Exporter JSON
+                {t(S.seriesExplorer.exportJson)}
               </button>
               <button
                 type="button"
@@ -194,7 +197,7 @@ export function SeriesExplorerView() {
                   if (url) downloadDataUrl(`${indicator}.png`, url);
                 }}
               >
-                Exporter PNG
+                {t(S.seriesExplorer.exportPng)}
               </button>
             </div>
           </>

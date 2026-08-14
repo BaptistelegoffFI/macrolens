@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { useLanguage } from "../../i18n/LanguageContext";
+import { S } from "../../i18n/strings";
 import { Num } from "../table/Num";
 import styles from "./StatusBar.module.css";
 
@@ -15,19 +17,20 @@ export interface StatusBarProps {
 /** §11.2 : barre d'état toujours visible — la signature de l'application.
  * §12.4bis : chaque valeur numérique passe par <Num>, pas de littéral en dur. */
 export function StatusBar({ buildId, poolSize, excluded, n, hhiCountry, elapsedMs }: StatusBarProps) {
+  const { t } = useLanguage();
   const items: ReactNode[] = [];
-  items.push(buildId ? <>build {buildId}</> : "aucun build chargé");
+  items.push(buildId ? <>{t(S.statusBar.build)(buildId)}</> : t(S.statusBar.noBuild));
   if (poolSize !== undefined) {
     items.push(
       <>
-        <Num value={poolSize} decimals={0} /> candidats
+        <Num value={poolSize} decimals={0} /> {t(S.statusBar.candidates)}
       </>,
     );
   }
   if (excluded !== undefined) {
     items.push(
       <>
-        <Num value={excluded} decimals={0} /> exclus
+        <Num value={excluded} decimals={0} /> {t(S.statusBar.excluded)}
       </>,
     );
   }
@@ -41,7 +44,7 @@ export function StatusBar({ buildId, poolSize, excluded, n, hhiCountry, elapsedM
   if (hhiCountry !== undefined) {
     items.push(
       <>
-        HHI pays <Num value={hhiCountry} decimals={2} />
+        {t(S.statusBar.hhiCountry)} <Num value={hhiCountry} decimals={2} />
       </>,
     );
   }

@@ -1,4 +1,6 @@
 import type { AnalogOut } from "../../api/types";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { S } from "../../i18n/strings";
 import { Num } from "../table/Num";
 import styles from "./Timeline.module.css";
 
@@ -11,6 +13,7 @@ export interface TimelineProps {
 
 /** §11.2 « Chronologie » : un repère par analogue sur l'axe 1870-présent. */
 export function Timeline({ analogs, anchorYear, rangeStart = 1870, rangeEnd = new Date().getFullYear() }: TimelineProps) {
+  const { t } = useLanguage();
   const width = 900;
   const height = 60;
   const padding = 24;
@@ -24,7 +27,7 @@ export function Timeline({ analogs, anchorYear, rangeStart = 1870, rangeEnd = ne
   return (
     <div className={styles.wrapper}>
       <div className={styles.title}>
-        Chronologie <Num value={rangeStart} decimals={0} /> — <Num value={rangeEnd} decimals={0} />
+        {t(S.timeline.titlePrefix)} <Num value={rangeStart} decimals={0} /> — <Num value={rangeEnd} decimals={0} />
       </div>
       <svg className={styles.svg} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMinYMid meet">
         <line x1={padding} y1={30} x2={width - padding} y2={30} className={styles.axisLine} />
@@ -44,7 +47,7 @@ export function Timeline({ analogs, anchorYear, rangeStart = 1870, rangeEnd = ne
         ))}
         {anchorYear !== undefined && (
           <line x1={xFor(anchorYear)} y1={14} x2={xFor(anchorYear)} y2={46} className={styles.tickAnchor}>
-            <title>Ancre {anchorYear}</title>
+            <title>{t(S.timeline.anchorTooltip)(anchorYear)}</title>
           </line>
         )}
         {/* §12.4bis : <Num> rend un <span> HTML, invalide dans <text> SVG —

@@ -101,12 +101,19 @@ cacheables »). Reporté après le permalien (livré en Phase 6, qui résout le 
 partage/reproduction d'une recherche par un mécanisme différent — l'URL elle-même). Les exports
 CSV/TSV/JSON/PNG existent déjà par ailleurs (Explorateur de séries, Bordereau, graphiques).
 
-## Menus de la barre de menus non fonctionnels
+## Interface bilingue FR/EN — portée du chrome, pas de tout le texte affiché
 
-Fichier/Édition/Scénario/Données/Fenêtre/Aide (§11.2) sont des libellés de chrome sans menu
-déroulant — aucune acceptation de phase n'a jamais exigé leur fonctionnalité (seule leur
-présence visuelle est spécifiée par le mockup). `aria-disabled="true"` plutôt que focusables et
-inertes (piège clavier), voir `reports/validation.md` §3.
+Retirée en Phase 7 (voir `docs/decisions/0006-menu-retrait-et-bilinguisme-fr-en.md`) : la barre
+de menus Fichier/Édition/Scénario/Données/Fenêtre/Aide (§11.2), qui n'a jamais eu de menu
+déroulant fonctionnel, remplacée par une barre de titre portant le sélecteur de langue FR/EN.
+
+Le chrome applicatif, les 14 features/7 familles, les 10 indicateurs bruts, le résumé
+méthodologique et les noms de pays/indicateurs/événements (déjà bilingues côté backend) sont
+traduits. Restent en français dans les deux langues, documenté dans l'ADR 0006 : les messages
+d'erreur et avertissements renvoyés par l'API (backend non internationalisé), la `definition_fr`
+des indicateurs (pas de `definition_en` en base), les citations/licences bibliographiques des
+sources, les en-têtes de colonnes des exports CSV/TSV/JSON, et le formatage numérique
+(`<Num>`, séparateur décimal `.` dans les deux langues).
 
 ## Pas de version responsive / mobile
 

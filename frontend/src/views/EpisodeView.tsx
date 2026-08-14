@@ -8,7 +8,9 @@ import { Panel } from "../components/shell/Panel";
 import { ResizableColumns } from "../components/shell/ResizableColumns";
 import { Num } from "../components/table/Num";
 import { useEpisode } from "../hooks/useEpisode";
-import { RAW_INDICATORS } from "../lib/indicators";
+import { useLanguage } from "../i18n/LanguageContext";
+import { S } from "../i18n/strings";
+import { rawIndicators } from "../lib/indicators";
 import styles from "./EpisodeView.module.css";
 
 export interface EpisodeViewProps {
@@ -19,6 +21,7 @@ export interface EpisodeViewProps {
 /** §11.3 Vue Épisode (F3) : toutes les séries autour d'une année, frise
  * d'événements, ce qui a suivi. */
 export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: EpisodeViewProps) {
+  const { t, lang } = useLanguage();
   const [country, setCountry] = useState(initialCountry);
   const [year, setYear] = useState(initialYear);
   const { data, loading, error, run } = useEpisode();
@@ -31,12 +34,12 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
 
   return (
     <ResizableColumns storageKey="ml.episode.cols" defaultWidths={[220]}>
-      <Panel title="Épisode">
+      <Panel title={t(S.episode.panelTitle)}>
         <div className={styles.left}>
           <div className={appStyles.fieldGroup}>
-            <div className={appStyles.fieldGroupTitle}>Recherche</div>
+            <div className={appStyles.fieldGroupTitle}>{t(S.episode.searchGroupTitle)}</div>
             <div className={appStyles.field}>
-              <span className={appStyles.fieldLabel}>Pays</span>
+              <span className={appStyles.fieldLabel}>{t(S.common.country)}</span>
               <input
                 className={appStyles.textInput}
                 value={country}
@@ -45,7 +48,7 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
               />
             </div>
             <div className={appStyles.field}>
-              <span className={appStyles.fieldLabel}>Année</span>
+              <span className={appStyles.fieldLabel}>{t(S.common.year)}</span>
               <input
                 className={appStyles.textInput}
                 type="number"
@@ -59,13 +62,13 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
               style={{ width: "100%", marginTop: 8, cursor: "pointer" }}
               onClick={() => void run(country, year)}
             >
-              Charger
+              {t(S.episode.loadButton)}
             </button>
           </div>
 
           {data?.state && (
             <div className={appStyles.fieldGroup}>
-              <div className={appStyles.fieldGroupTitle}>Vecteur d'état</div>
+              <div className={appStyles.fieldGroupTitle}>{t(S.common.stateVector)}</div>
               <div className={styles.stateTable}>
                 {data.state.features.map((f) => (
                   <div key={f.feature_code} className={styles.stateRow}>
@@ -86,11 +89,11 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
 
       <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "auto" }}>
         {error && <div className={appStyles.errorBanner}>{error}</div>}
-        {loading && <EmptyState>Chargement…</EmptyState>}
+        {loading && <EmptyState>{t(S.common.loading)}</EmptyState>}
         {!loading && data && (
           <>
             <div className={styles.grid}>
-              {RAW_INDICATORS.map((ind) => (
+              {rawIndicators(lang).map((ind) => (
                 <div key={ind.code} className={styles.cell}>
                   <SeriesSparkline
                     label={ind.label}
@@ -109,7 +112,7 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
             />
             {data.sources.length > 0 && (
               <div style={{ padding: "8px 16px", fontSize: 11, color: "var(--fg-muted)" }}>
-                Sources : {data.sources.map((s) => s.id).join(", ")}
+                {t(S.episode.sourcesPrefix)} {data.sources.map((s) => s.id).join(", ")}
               </div>
             )}
           </>

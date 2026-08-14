@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "../src/App";
+import { LanguageProvider } from "../src/i18n/LanguageContext";
 
 // jsdom n'a pas de vrai moteur canvas : on ne teste pas le rendu interne
 // d'ECharts ici (couvert visuellement dans le navigateur), seulement le
@@ -54,7 +55,11 @@ describe("Scenario view — analogs search wiring", () => {
   });
 
   it("runs a search and renders the analogs table with real data", async () => {
-    render(<App />);
+    render(
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>,
+    );
     await userEvent.click(screen.getByRole("button", { name: /Rechercher/ }));
 
     await waitFor(() => expect(screen.getByText("SWE")).toBeInTheDocument());

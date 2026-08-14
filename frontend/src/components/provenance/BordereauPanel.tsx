@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import type { ReceiptResponse } from "../../api/types";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { S } from "../../i18n/strings";
 import { downloadText, toDelimited } from "../../lib/csv";
 import type { ColumnDef } from "../table/Table";
 import { Table } from "../table/Table";
@@ -18,28 +20,29 @@ type Tab = "table" | "sources" | "page";
 /** §18.6 : panneau « Données utilisées (n) » — onglets Tableau / Sources /
  * Vue source, export CSV/JSON/SOURCES.txt. */
 export function BordereauPanel({ data, loading, error }: BordereauPanelProps) {
+  const { t } = useLanguage();
   const [tab, setTab] = useState<Tab>("table");
 
-  if (loading) return <EmptyState>Construction du bordereau…</EmptyState>;
+  if (loading) return <EmptyState>{t(S.bordereau.building)}</EmptyState>;
   if (error) return <EmptyState>{error}</EmptyState>;
-  if (!data) return <EmptyState>Aucune donnée affichée — le bordereau se remplit avec la recherche.</EmptyState>;
+  if (!data) return <EmptyState>{t(S.bordereau.empty)}</EmptyState>;
 
   const columns: ColumnDef<ReceiptResponse["rows"][number]>[] = [
-    { key: "country", label: "Pays", accessor: (r) => r.country },
-    { key: "indicator", label: "Indicateur", accessor: (r) => r.indicator },
-    { key: "period", label: "Période", accessor: (r) => r.period },
-    { key: "value", label: "Valeur", numeric: true, decimals: 2, accessor: (r) => r.value },
-    { key: "source", label: "Source", accessor: (r) => r.source.id },
-    { key: "file", label: "Fichier", accessor: (r) => r.raw_file?.filename ?? null },
+    { key: "country", label: t(S.bordereau.colCountry), accessor: (r) => r.country },
+    { key: "indicator", label: t(S.bordereau.colIndicator), accessor: (r) => r.indicator },
+    { key: "period", label: t(S.bordereau.colPeriod), accessor: (r) => r.period },
+    { key: "value", label: t(S.bordereau.colValue), numeric: true, decimals: 2, accessor: (r) => r.value },
+    { key: "source", label: t(S.bordereau.colSource), accessor: (r) => r.source.id },
+    { key: "file", label: t(S.bordereau.colFile), accessor: (r) => r.raw_file?.filename ?? null },
     {
       key: "flags",
-      label: "Flags",
+      label: t(S.bordereau.colFlags),
       accessor: (r) =>
         [
-          r.flags.interpolated && "interpolé",
-          r.flags.spliced && "raccordé",
-          r.flags.break && "rupture",
-          r.flags.conflict && "conflit",
+          r.flags.interpolated && t(S.bordereau.flagInterpolated),
+          r.flags.spliced && t(S.bordereau.flagSpliced),
+          r.flags.break && t(S.bordereau.flagBreak),
+          r.flags.conflict && t(S.bordereau.flagConflict),
         ]
           .filter(Boolean)
           .join(", ") || null,
@@ -89,13 +92,13 @@ export function BordereauPanel({ data, loading, error }: BordereauPanelProps) {
     <div className={styles.wrapper}>
       <div className={styles.tabs}>
         <div className={styles.tab} data-active={tab === "table"} onClick={() => setTab("table")}>
-          Tableau ({data.rows.length})
+          {t(S.bordereau.tabTable)(data.rows.length)}
         </div>
         <div className={styles.tab} data-active={tab === "sources"} onClick={() => setTab("sources")}>
-          Sources ({data.sources_summary.length})
+          {t(S.bordereau.tabSources)(data.sources_summary.length)}
         </div>
         <div className={styles.tab} data-active={tab === "page"} onClick={() => setTab("page")}>
-          Vue source
+          {t(S.bordereau.tabPage)}
         </div>
       </div>
       <div className={styles.body}>
@@ -103,22 +106,17 @@ export function BordereauPanel({ data, loading, error }: BordereauPanelProps) {
           (data.rows.length > 0 ? (
             <Table columns={columns} rows={data.rows} getRowKey={(r) => `${r.country}-${r.indicator}-${r.period}`} />
           ) : (
-            <EmptyState>Aucune ligne dans ce bordereau.</EmptyState>
+            <EmptyState>{t(S.bordereau.noRows)}</EmptyState>
           ))}
         {tab === "sources" &&
           data.sources_summary.map((s) => (
             <div key={s.id} className={styles.card}>
               <div className={styles.cardTitle}>{s.id}</div>
-              <div className={styles.cardMeta}>{s.n_rows} lignes</div>
+              <div className={styles.cardMeta}>{t(S.bordereau.rowsCount)(s.n_rows)}</div>
               <div className={styles.cardMeta}>{s.citation}</div>
             </div>
           ))}
-        {tab === "page" && (
-          <EmptyState>
-            Rendu de page source non disponible pour l'instant (docs/limitations.md) — la preuve est le
-            triptyque fichier archivé + hash + locator, visible dans l'onglet Tableau.
-          </EmptyState>
-        )}
+        {tab === "page" && <EmptyState>{t(S.bordereau.pageUnavailable)}</EmptyState>}
       </div>
       <div className={styles.exportRow}>
         <button type="button" className={styles.exportBtn} onClick={exportCsv}>
@@ -134,7 +132,7 @@ export function BordereauPanel({ data, loading, error }: BordereauPanelProps) {
           SOURCES.txt
         </button>
       </div>
-      <div className={styles.checksum}>checksum {data.checksum.slice(0, 16)}…</div>
+      <div className={styles.checksum}>{t(S.bordereau.checksum)(data.checksum.slice(0, 16))}</div>
     </div>
   );
 }
