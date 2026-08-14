@@ -32,11 +32,23 @@ services:
 
   web:
     build: ./frontend
-    environment:
-      VITE_API_URL: http://localhost:8000
     ports:
       - "5173:5173"
     depends_on:
+      - api
+
+  # Origine unique pour l'accès partagé (README § « Partager un lien
+  # public ») : le frontend appelle l'API en chemin relatif (/api/v1/...),
+  # donc ce proxy fonctionne derrière n'importe quelle URL de tunnel sans
+  # jamais avoir besoin de reconstruire l'image quand cette URL change.
+  proxy:
+    image: nginx:alpine
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - web
       - api
 
 volumes:

@@ -80,15 +80,20 @@ coût est le même. Au démarrage du conteneur `api`, l'*entrypoint*
 qui construit lui-même le panel de features en mémoire au premier appel (`GET /health`,
 `GET /version`, ou toute recherche). Aucune étape manuelle supplémentaire.
 
-- **Web** : http://localhost:5173
+- **Application** : http://localhost:8080 — passe par `proxy` (nginx), qui regroupe le
+  frontend et l'API sous une seule origine (voir « Partager un lien public » plus bas pour
+  pourquoi). C'est l'URL à utiliser pour se servir de l'application.
+- **Web seul** : http://localhost:5173 sert les fichiers statiques du frontend, mais ses appels
+  API sont en chemin relatif (`/api/v1/...`) — sans passer par `proxy`, les recherches
+  échoueront. Utile pour inspecter le build brut, pas pour utiliser l'application.
 - **API** : http://localhost:8000/docs (documentation OpenAPI interactive)
 - **Postgres** : `localhost:5432` (utilisateur/mot de passe/base : `macrolens`)
 
 Le premier démarrage télécharge réellement les jeux de données sources (JST ~1 Mo, BIS,
 Maddison) — prévoir une connexion réseau active et quelques minutes.
 
-Pour vérifier que tout fonctionne : ouvrez http://localhost:5173, la vue Scénario doit
-s'afficher (menu, barre d'outils, trois colonnes) ; tapez `FRA 2019` puis Entrée dans `Ctrl+K`,
+Pour vérifier que tout fonctionne : ouvrez http://localhost:8080, la vue Scénario doit
+s'afficher (titre, barre d'outils, trois colonnes) ; tapez `FRA 2019` puis Entrée dans `Ctrl+K`,
 ou choisissez un pays/année dans le panneau Scénario et cliquez *Rechercher [F5]* — une table
 d'analogues avec de vraies années historiques doit apparaître en quelques centaines de
 millisecondes.
@@ -128,6 +133,40 @@ Le frontend lit `frontend/.env.development` (déjà présent dans le dépôt,
 Voir [`docs/data-refresh.md`](docs/data-refresh.md) — `make refresh` automatise la partie
 sûre et idempotente ; le passage à une nouvelle version de source (JST, Maddison) reste une
 décision humaine documentée, jamais automatisée à l'aveugle (§18.7).
+
+### Partager un lien public (accès temporaire, hors de votre machine)
+
+`docker compose up` démarre aussi `proxy` (nginx, port `8080`), qui regroupe le frontend et
+l'API sous une seule origine — le frontend appelle l'API en chemin relatif (`/api/v1/...`),
+donc ce point d'entrée fonctionne sous n'importe quel nom d'hôte, y compris une URL de tunnel
+public, sans jamais avoir besoin de reconstruire l'image.
+
+```bash
+brew install cloudflared      # une seule fois
+cloudflared tunnel --url http://localhost:8080
+```
+
+Affiche une URL publique du type `https://xxxx.trycloudflare.com` — à envoyer telle quelle.
+N'importe qui avec le lien peut alors ouvrir et utiliser l'application normalement (recherche,
+export, bordereau…), sans rien installer de leur côté.
+
+Limites à connaître avant d'envoyer le lien :
+
+- **Le lien ne fonctionne que tant que votre Mac est allumé, connecté, et que `docker compose`
+  et la commande `cloudflared` ci-dessus tournent.** Fermer le laptop, arrêter Docker, ou tuer
+  le process `cloudflared` coupe l'accès pour tout le monde.
+- **L'URL change à chaque relance** de `cloudflared tunnel` (tunnel « quick », sans compte
+  Cloudflare) — il faut renvoyer le nouveau lien si vous le relancez.
+- **Aucune authentification** : toute personne avec le lien a le même accès qu'en local — pas
+  de compte, pas de mot de passe. Adapté à une démonstration ponctuelle à des personnes de
+  confiance, pas à une mise en production.
+- Continuer à développer pendant que le lien est actif ne pose pas de problème : `docker compose
+  build web && docker compose up -d web` (ou tout autre rebuild habituel) reconstruit et
+  redémarre le conteneur normalement — le tunnel, lui, continue de pointer vers le port `8080`
+  et reste donc valide sans rien reconfigurer.
+
+Pour couper le partage : `Ctrl+C` sur la commande `cloudflared`, ou `killall cloudflared`. Les
+services Docker locaux (`web`, `api`, `db`) continuent de tourner indépendamment.
 
 ### Vérifier son installation
 

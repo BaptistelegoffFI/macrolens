@@ -1,4 +1,9 @@
-const API_BASE = `${import.meta.env.VITE_API_URL ?? "http://localhost:8000"}/api/v1`;
+// Par défaut, chemin relatif : le build Docker (servi derrière proxy/nginx.conf,
+// voir docker-compose.yml § proxy) fonctionne alors sous n'importe quelle
+// origine — accès direct local ou URL de tunnel public — sans reconstruire
+// l'image. `npm run dev` fixe un VITE_API_URL absolu via .env.development,
+// qui prend le pas sur ce défaut pendant le développement local.
+const API_BASE = `${import.meta.env.VITE_API_URL ?? ""}/api/v1`;
 
 export class ApiError extends Error {
   status: number;
@@ -25,7 +30,9 @@ async function handle<T>(response: Response): Promise<T> {
 }
 
 export function apiGet<T>(path: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
-  const url = new URL(`${API_BASE}${path}`);
+  // Base explicite : API_BASE peut être un chemin relatif (§ commentaire
+  // ci-dessus), et `new URL()` sans base rejette toute chaîne non absolue.
+  const url = new URL(`${API_BASE}${path}`, window.location.origin);
   if (params) {
     for (const [k, v] of Object.entries(params)) {
       if (v !== undefined) url.searchParams.set(k, String(v));
