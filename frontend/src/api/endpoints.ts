@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "./client";
+import { apiGet, apiPost, apiPostAuth, apiPutAuth } from "./client";
 import type {
   AnalogsSearchRequest,
   AnalogsSearchResponse,
@@ -16,6 +16,7 @@ import type {
   ReceiptRowOut,
   SourceOut,
   StateVectorOut,
+  StatusOut,
 } from "./types";
 
 export const meta = {
@@ -62,4 +63,13 @@ export const provenance = {
   rawFiles: () => apiGet<RawFileOut[]>("/provenance/raw-files"),
   pageUrl: (rawFileId: number, page: number) =>
     `${(import.meta.env.VITE_API_URL ?? "http://localhost:8000")}/api/v1/provenance/page/${rawFileId}/${page}`,
+};
+
+export function getStatus() {
+  return apiGet<StatusOut>("/status");
+}
+
+export const admin = {
+  login: (token: string) => apiPostAuth<{ ok: boolean }>("/admin/login", { token }, token),
+  updateStatus: (token: string, body: StatusOut) => apiPutAuth<StatusOut>("/admin/status", body, token),
 };

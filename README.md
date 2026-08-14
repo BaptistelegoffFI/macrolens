@@ -134,39 +134,52 @@ Voir [`docs/data-refresh.md`](docs/data-refresh.md) — `make refresh` automatis
 sûre et idempotente ; le passage à une nouvelle version de source (JST, Maddison) reste une
 décision humaine documentée, jamais automatisée à l'aveugle (§18.7).
 
-### Partager un lien public (accès temporaire, hors de votre machine)
+### Partager un lien public
 
 `docker compose up` démarre aussi `proxy` (nginx, port `8080`), qui regroupe le frontend et
 l'API sous une seule origine — le frontend appelle l'API en chemin relatif (`/api/v1/...`),
-donc ce point d'entrée fonctionne sous n'importe quel nom d'hôte, y compris une URL de tunnel
-public, sans jamais avoir besoin de reconstruire l'image.
+donc ce point d'entrée fonctionne sous n'importe quel nom d'hôte, sans jamais avoir besoin de
+reconstruire l'image, qu'il s'agisse d'un accès local ou d'un déploiement distant.
+
+Deux façons d'exposer ce port `8080`, selon le besoin :
+
+**Tunnel temporaire** (démonstration ponctuelle, ne tourne que tant que cette machine tourne) :
 
 ```bash
 brew install cloudflared      # une seule fois
 cloudflared tunnel --url http://localhost:8080
 ```
 
-Affiche une URL publique du type `https://xxxx.trycloudflare.com` — à envoyer telle quelle.
-N'importe qui avec le lien peut alors ouvrir et utiliser l'application normalement (recherche,
-export, bordereau…), sans rien installer de leur côté.
+Affiche une URL publique du type `https://xxxx.trycloudflare.com`. Limites : le lien meurt si
+cette machine s'éteint, si Docker s'arrête, ou si la commande `cloudflared` est tuée ; l'URL
+change à chaque relance (pas de compte Cloudflare = pas de nom réservé).
 
-Limites à connaître avant d'envoyer le lien :
+**Déploiement autonome** (le site tourne sans dépendre de cette machine — recommandé pour un
+lien envoyé largement) : voir `docs/decisions/0007-proxy-partage-lien-public.md` §3 pour le
+choix d'hébergeur. Dans tous les cas, `proxy` (port `8080`) est le seul point d'entrée à exposer
+— `web`/`api`/`db` n'ont pas besoin d'être accessibles depuis l'extérieur.
 
-- **Le lien ne fonctionne que tant que votre Mac est allumé, connecté, et que `docker compose`
-  et la commande `cloudflared` ci-dessus tournent.** Fermer le laptop, arrêter Docker, ou tuer
-  le process `cloudflared` coupe l'accès pour tout le monde.
-- **L'URL change à chaque relance** de `cloudflared tunnel` (tunnel « quick », sans compte
-  Cloudflare) — il faut renvoyer le nouveau lien si vous le relancez.
-- **Aucune authentification** : toute personne avec le lien a le même accès qu'en local — pas
-  de compte, pas de mot de passe. Adapté à une démonstration ponctuelle à des personnes de
-  confiance, pas à une mise en production.
-- Continuer à développer pendant que le lien est actif ne pose pas de problème : `docker compose
-  build web && docker compose up -d web` (ou tout autre rebuild habituel) reconstruit et
-  redémarre le conteneur normalement — le tunnel, lui, continue de pointer vers le port `8080`
-  et reste donc valide sans rien reconfigurer.
+### Administration (fermer le site, bloquer, publier une annonce)
 
-Pour couper le partage : `Ctrl+C` sur la commande `cloudflared`, ou `killall cloudflared`. Les
-services Docker locaux (`web`, `api`, `db`) continuent de tourner indépendamment.
+`/admin` (ex. `http://localhost:8080/admin`) donne accès à un panneau d'administration séparé
+du reste de l'application — voir `docs/decisions/0008-panneau-administration.md`. Protégé par
+un jeton unique (`ADMIN_TOKEN`), pas un système de comptes :
+
+- **Mode maintenance** : ferme le site pour tout le monde (page de fermeture avec message
+  personnalisable). Un onglet déjà ouvert se ferme aussi, sous 60 secondes.
+- **Annonce** : bandeau visible en haut de l'application, sans fermer le site.
+
+`docker-compose.yml` fixe une valeur de repli (`macrolens-dev-admin`) **uniquement pour le
+développement local — jamais valable pour un déploiement exposé publiquement.** Avant de
+partager un lien largement, fixez un jeton fort :
+
+```bash
+export ADMIN_TOKEN="$(openssl rand -hex 24)"   # à conserver précieusement, pas à commiter
+docker compose up -d
+```
+
+Si `ADMIN_TOKEN` n'est pas défini au démarrage de `api`, un avertissement est logué et `/admin`
+refuse toute requête (503) plutôt que d'accepter un jeton par défaut devinable.
 
 ### Vérifier son installation
 

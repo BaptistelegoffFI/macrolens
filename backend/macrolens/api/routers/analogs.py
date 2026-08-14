@@ -5,12 +5,17 @@ from sqlalchemy.orm import Session
 
 from macrolens.api.analogs_service import SearchError, search_analogs
 from macrolens.api.deps import get_db, get_pool
+from macrolens.api.routers.admin import deny_if_maintenance
 from macrolens.api.schemas.analogs import AnalogsSearchRequest, AnalogsSearchResponse
 
 router = APIRouter(tags=["analogs"])
 
 
-@router.post("/analogs/search", response_model=AnalogsSearchResponse)
+@router.post(
+    "/analogs/search",
+    response_model=AnalogsSearchResponse,
+    dependencies=[Depends(deny_if_maintenance)],
+)
 def post_analogs_search(
     request: AnalogsSearchRequest, session: Session = Depends(get_db)
 ) -> AnalogsSearchResponse:

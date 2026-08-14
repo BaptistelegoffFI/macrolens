@@ -21,6 +21,11 @@ services:
       DATABASE_URL: postgresql+psycopg://macrolens:macrolens@db:5432/macrolens
       MACROLENS_DATA_DIR: /app/data
       MACROLENS_REPORTS_DIR: /app/reports
+      # Valeur de repli UNIQUEMENT pour le développement local (jamais exposé
+      # publiquement) — un déploiement partagé DOIT fixer un ADMIN_TOKEN fort
+      # dans l'environnement avant de démarrer (voir README § « Créer un lien
+      # solide et un accès administrateur »). Sinon /admin reste guessable.
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-macrolens-dev-admin}
     volumes:
       - ./data:/app/data
       - ./reports:/app/reports

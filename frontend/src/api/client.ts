@@ -48,3 +48,21 @@ export function apiPost<T>(path: string, body: unknown): Promise<T> {
     body: JSON.stringify(body),
   }).then((r) => handle<T>(r));
 }
+
+/** Panneau d'administration (§ADR 0008) : jeton porteur envoyé en en-tête,
+ * jamais dans l'URL ni le corps sérialisé au repos. */
+export function apiPostAuth<T>(path: string, body: unknown, token: string): Promise<T> {
+  return fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  }).then((r) => handle<T>(r));
+}
+
+export function apiPutAuth<T>(path: string, body: unknown, token: string): Promise<T> {
+  return fetch(`${API_BASE}${path}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  }).then((r) => handle<T>(r));
+}

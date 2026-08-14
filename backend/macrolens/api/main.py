@@ -1,3 +1,5 @@
+import logging
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager, suppress
 
@@ -5,7 +7,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from macrolens.api.deps import get_pool
-from macrolens.api.routers import analogs, episodes, events, meta, provenance, series
+from macrolens.api.routers import admin, analogs, episodes, events, meta, provenance, series
+
+logger = logging.getLogger("macrolens.admin")
 
 
 @asynccontextmanager
@@ -15,6 +19,11 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     # l'API de démarrer — la première requête réelle reconstruira le cache.
     with suppress(Exception):
         get_pool("rolling30")
+    if not os.environ.get("ADMIN_TOKEN"):
+        logger.warning(
+            "ADMIN_TOKEN non défini : le panneau d'administration (/admin) refusera toute "
+            "requête (503) tant qu'aucun jeton n'est configuré."
+        )
     yield
 
 
@@ -35,6 +44,7 @@ app.include_router(events.router, prefix="/api/v1")
 app.include_router(analogs.router, prefix="/api/v1")
 app.include_router(episodes.router, prefix="/api/v1")
 app.include_router(provenance.router, prefix="/api/v1")
+app.include_router(admin.router, prefix="/api/v1")
 
 
 @app.get("/health")

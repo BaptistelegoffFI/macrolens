@@ -261,6 +261,40 @@ export const S = {
       en: "For each horizon (1, 3, 5, 10 years), the retained analogs give an empirical distribution — median, quartiles, share of negative cases — never an isolated mean nor a parametric confidence interval (rule 5). MacroLens predicts nothing: it reports what historically followed the closest situations (rule 4).",
     },
   },
+
+  maintenance: {
+    title: { fr: "Site en maintenance", en: "Site under maintenance" },
+    defaultMessage: {
+      fr: "L'application est temporairement fermée. Merci de revenir plus tard.",
+      en: "The application is temporarily closed. Please check back later.",
+    },
+  },
+
+  announcement: {
+    dismiss: { fr: "Masquer", en: "Dismiss" },
+  },
+
+  admin: {
+    pageTitle: { fr: "Administration MacroLens", en: "MacroLens administration" },
+    tokenLabel: { fr: "Jeton d'administration", en: "Admin token" },
+    login: { fr: "Se connecter", en: "Log in" },
+    loginError: { fr: "Jeton invalide.", en: "Invalid token." },
+    loggedInAs: { fr: "Session administrateur active.", en: "Admin session active." },
+    logout: { fr: "Se déconnecter", en: "Log out" },
+    maintenanceModeLabel: { fr: "Mode maintenance (ferme le site)", en: "Maintenance mode (closes the site)" },
+    maintenanceMessageLabel: {
+      fr: "Message affiché pendant la maintenance",
+      en: "Message shown during maintenance",
+    },
+    announcementLabel: {
+      fr: "Annonce (bandeau visible par tous, optionnel)",
+      en: "Announcement (banner visible to everyone, optional)",
+    },
+    save: { fr: "Enregistrer", en: "Save" },
+    saved: { fr: "Enregistré.", en: "Saved." },
+    saveError: { fr: "Échec de l'enregistrement.", en: "Failed to save." },
+    backToApp: { fr: "← Retour à l'application", en: "← Back to the app" },
+  },
 } as const;
 
 export type Lang = "fr" | "en";

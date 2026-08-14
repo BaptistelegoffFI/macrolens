@@ -193,3 +193,18 @@ class StateVector(Base):
     raw_value: Mapped[float | None] = mapped_column(Double, nullable=True)
     pct_rank: Mapped[float | None] = mapped_column(Double, nullable=True)
     is_complete: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+
+class SiteStatus(Base):
+    """État global du site (mode maintenance, annonce) — hors périmètre du
+    plan, ajouté pour l'administration d'un déploiement public (ADR 0008).
+    Une seule ligne (id=1), appliqué au niveau applicatif, pas contraint en
+    base : pas besoin d'une table à verrou pour un site à un seul admin."""
+
+    __tablename__ = "site_status"
+
+    id: Mapped[int] = mapped_column(SmallInteger, primary_key=True)
+    maintenance_mode: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    maintenance_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    announcement: Mapped[str | None] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

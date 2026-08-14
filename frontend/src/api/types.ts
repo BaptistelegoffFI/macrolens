@@ -283,3 +283,10 @@ export interface CompareRequest {
 export interface CompareResponse {
   episodes: EpisodeOut[];
 }
+
+// ---- admin.py — hors périmètre du plan, voir docs/decisions/0008 ----
+export interface StatusOut {
+  maintenance_mode: boolean;
+  maintenance_message: string | null;
+  announcement: string | null;
+}

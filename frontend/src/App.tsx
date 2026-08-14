@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { getState } from "./api/endpoints";
-import type { AnalogOut, AnalogsSearchRequest, StateVectorOut } from "./api/types";
+import { getState, getStatus } from "./api/endpoints";
+import type { AnalogOut, AnalogsSearchRequest, StateVectorOut, StatusOut } from "./api/types";
 import styles from "./App.module.css";
 import { FanChart } from "./components/charts/FanChart";
 import { Timeline } from "./components/charts/Timeline";
@@ -290,6 +290,23 @@ export function App() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const search = useAnalogsSearch();
 
+  // §ADR 0008 — hors périmètre du plan : panneau d'administration. Un
+  // sondage à intervalle plutôt qu'un seul appel au montage, pour qu'un
+  // onglet déjà ouvert se ferme aussi dans un délai raisonnable quand
+  // l'admin active le mode maintenance, pas seulement les nouveaux visiteurs.
+  const [siteStatus, setSiteStatus] = useState<StatusOut | null>(null);
+  const [announcementDismissed, setAnnouncementDismissed] = useState(false);
+  useEffect(() => {
+    function poll() {
+      void getStatus()
+        .then(setSiteStatus)
+        .catch(() => {});
+    }
+    poll();
+    const id = window.setInterval(poll, 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
   function setWeight(family: FeatureFamily, value: number) {
     setWeights((prev) => ({
       ...FEATURE_FAMILIES.reduce(
@@ -430,9 +447,32 @@ export function App() {
     void navigator.clipboard?.writeText(window.location.href);
   }
 
+  if (siteStatus?.maintenance_mode) {
+    return (
+      <div className={styles.maintenancePage}>
+        <div className={styles.maintenanceBox}>
+          <div className={styles.maintenanceTitle}>{t(S.maintenance.title)}</div>
+          <div>{siteStatus.maintenance_message || t(S.maintenance.defaultMessage)}</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="mobile-gate">{t(S.app.mobileGate)}</div>
+      {siteStatus?.announcement && !announcementDismissed && (
+        <div className={styles.announcementBanner}>
+          <span>{siteStatus.announcement}</span>
+          <button
+            type="button"
+            className={styles.announcementDismiss}
+            onClick={() => setAnnouncementDismissed(true)}
+          >
+            {t(S.announcement.dismiss)}
+          </button>
+        </div>
+      )}
       {paletteOpen && (
         <CommandPalette onClose={() => setPaletteOpen(false)} onExecute={handleCommand} />
       )}

@@ -68,6 +68,53 @@
   color: var(--fg-muted);
 }
 
+/* §ADR 0008 — hors périmètre du plan : panneau d'administration. */
+.maintenancePage {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-app);
+  font-family: var(--font-sans);
+}
+
+.maintenanceBox {
+  max-width: 420px;
+  text-align: center;
+  padding: 32px;
+  border: 1px solid var(--rule);
+}
+
+.maintenanceTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--fg);
+}
+
+.announcementBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--bg-selected);
+  border-bottom: 1px solid var(--accent);
+  font-size: 12px;
+  color: var(--fg);
+}
+
+.announcementDismiss {
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .crisisMarker {
   color: var(--crisis);
   font-family: var(--font-mono);
