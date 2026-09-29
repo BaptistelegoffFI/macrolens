@@ -44,8 +44,14 @@ _default_origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[*_default_origins, *_extra_origins],
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    # PUT : /admin/status (§ADR 0008). Authorization : jeton porteur du
+    # panneau d'administration — sans ça, le navigateur bloque la requête
+    # dès le preflight ("It does not have HTTP ok status"), avant même que
+    # l'API ne voie l'en-tête. Repéré en testant le déploiement Render, où
+    # web et api sont deux origines distinctes (ADR 0010) — invisible en
+    # local derrière le proxy same-origin (ADR 0007).
+    allow_methods=["GET", "POST", "PUT"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 app.include_router(meta.router, prefix="/api/v1")
