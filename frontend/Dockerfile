@@ -1,9 +1,11 @@
+# Contexte de build = racine du dépôt, pour la même raison que backend/Dockerfile
+# (une seule définition de build, locale et déploiement — voir ADR 0009).
 FROM node:20-slim AS build
 
 WORKDIR /app
-COPY package.json package-lock.json* ./
+COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm install
-COPY . .
+COPY frontend/ .
 RUN npm run build
 
 FROM node:20-slim

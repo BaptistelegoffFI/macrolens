@@ -16,7 +16,9 @@ services:
       retries: 10
 
   api:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     environment:
       DATABASE_URL: postgresql+psycopg://macrolens:macrolens@db:5432/macrolens
       MACROLENS_DATA_DIR: /app/data
@@ -36,7 +38,9 @@ services:
         condition: service_healthy
 
   web:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     ports:
       - "5173:5173"
     depends_on:
@@ -47,9 +51,9 @@ services:
   # donc ce proxy fonctionne derrière n'importe quelle URL de tunnel sans
   # jamais avoir besoin de reconstruire l'image quand cette URL change.
   proxy:
-    image: nginx:alpine
-    volumes:
-      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    build:
+      context: .
+      dockerfile: proxy/Dockerfile
     ports:
       - "8080:80"
     depends_on:
