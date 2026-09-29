@@ -13,7 +13,14 @@ def database_url() -> str:
 
 
 def make_engine() -> Engine:
-    return create_engine(database_url(), future=True)
+    # prepare_threshold=None désactive les prepared statements nommés côté
+    # psycopg — indispensable derrière un pooler PgBouncer/Supavisor (ex.
+    # Supabase) : une requête peut être routée vers une connexion serveur
+    # différente à chaque transaction, donc un nom de prepared statement mis
+    # en cache par psycopg peut déjà exister côté serveur au moment du
+    # replay (psycopg.errors.DuplicatePreparedStatement). Sans effet
+    # notable sur une connexion directe (non poolée).
+    return create_engine(database_url(), future=True, connect_args={"prepare_threshold": None})
 
 
 _engine: Engine | None = None
