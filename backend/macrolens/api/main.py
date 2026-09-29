@@ -29,11 +29,21 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="MacroLens API", version="0.1.0", lifespan=lifespan)
 
-# Front local (Vite dev + preview) et conteneur docker `web` (§10 : origines
-# explicites plutôt qu'un joker, l'API ne sert aucun cookie/credential).
+# Front local (Vite dev + preview) (§10 : origines explicites plutôt qu'un
+# joker, l'API ne sert aucun cookie/credential). CORS_EXTRA_ORIGINS (liste
+# séparée par des virgules) ajoute l'origine du frontend déployé — évite de
+# coder en dur une URL de déploiement dans le dépôt (voir ADR 0010).
+_extra_origins = [
+    o.strip() for o in os.environ.get("CORS_EXTRA_ORIGINS", "").split(",") if o.strip()
+]
+_default_origins = [
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "http://localhost:3000",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:4173", "http://localhost:3000"],
+    allow_origins=[*_default_origins, *_extra_origins],
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
 )
