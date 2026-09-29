@@ -22,15 +22,20 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", database_url())
+# Ne jamais faire transiter l'URL par config.set_main_option/get_section :
+# ConfigParser (utilisé en interne par Alembic Config) traite `%` comme un
+# caractère d'interpolation — un mot de passe percent-encodé (ex. `%21`,
+# nécessaire dès qu'il contient des caractères spéciaux) fait alors planter
+# `set()` avec "invalid interpolation syntax". La variable Python directe
+# contourne entièrement ConfigParser pour cette valeur.
+DB_URL = database_url()
 
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url,
+        url=DB_URL,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -41,7 +46,7 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        {"sqlalchemy.url": DB_URL},
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
