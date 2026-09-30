@@ -1,7 +1,8 @@
-import { apiGet, apiPost, apiPostAuth, apiPutAuth } from "./client";
+import { apiGet, apiGetAuth, apiPost, apiPostAuth, apiPutAuth } from "./client";
 import type {
   AnalogsSearchRequest,
   AnalogsSearchResponse,
+  AnalyticsOut,
   CompareRequest,
   CompareResponse,
   CountryOut,
@@ -17,6 +18,7 @@ import type {
   SourceOut,
   StateVectorOut,
   StatusOut,
+  ViewPing,
 } from "./types";
 
 export const meta = {
@@ -72,4 +74,11 @@ export function getStatus() {
 export const admin = {
   login: (token: string) => apiPostAuth<{ ok: boolean }>("/admin/login", { token }, token),
   updateStatus: (token: string, body: StatusOut) => apiPutAuth<StatusOut>("/admin/status", body, token),
+  analytics: (token: string) => apiGetAuth<AnalyticsOut>("/admin/analytics", token),
 };
+
+/** Ping de fréquentation anonyme (§ADR 0011) : fire-and-forget, ne doit
+ * jamais bloquer ni faire échouer le chargement de l'application. */
+export function recordView(body: ViewPing) {
+  return apiPost<void>("/analytics/view", body);
+}

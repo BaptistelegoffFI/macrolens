@@ -294,6 +294,17 @@ export const S = {
     saved: { fr: "Enregistré.", en: "Saved." },
     saveError: { fr: "Échec de l'enregistrement.", en: "Failed to save." },
     backToApp: { fr: "← Retour à l'application", en: "← Back to the app" },
+    analyticsTitle: { fr: "Fréquentation", en: "Analytics" },
+    analyticsLoading: { fr: "Chargement…", en: "Loading…" },
+    analyticsError: { fr: "Échec du chargement des statistiques.", en: "Failed to load analytics." },
+    totalViews: { fr: "Vues totales", en: "Total views" },
+    uniqueDevices: { fr: "Appareils uniques", en: "Unique devices" },
+    last7Days: { fr: "7 derniers jours", en: "Last 7 days" },
+    dailyBreakdown: { fr: "Détail par jour (30 derniers jours)", en: "Daily breakdown (last 30 days)" },
+    dailyDate: { fr: "Date", en: "Date" },
+    dailyViews: { fr: "Vues", en: "Views" },
+    dailyUniqueDevices: { fr: "Appareils", en: "Devices" },
+    dailyEmpty: { fr: "Aucune vue enregistrée pour l'instant.", en: "No views recorded yet." },
   },
 } as const;
 

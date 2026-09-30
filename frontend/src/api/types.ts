@@ -290,3 +290,23 @@ export interface StatusOut {
   maintenance_message: string | null;
   announcement: string | null;
 }
+
+// ---- admin.py (analytics) — hors périmètre du plan, voir docs/decisions/0011 ----
+export interface ViewPing {
+  client_id: string;
+  path?: string | null;
+}
+
+export interface DailyCount {
+  date: string;
+  views: number;
+  unique_devices: number;
+}
+
+export interface AnalyticsOut {
+  total_views: number;
+  unique_devices: number;
+  views_last_7_days: number;
+  unique_devices_last_7_days: number;
+  daily: DailyCount[];
+}

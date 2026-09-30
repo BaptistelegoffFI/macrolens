@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { admin, getStatus } from "../api/endpoints";
 import { ApiError } from "../api/client";
-import type { StatusOut } from "../api/types";
+import type { AnalyticsOut, StatusOut } from "../api/types";
 import { useLanguage } from "../i18n/LanguageContext";
 import { S } from "../i18n/strings";
 import styles from "./AdminView.module.css";
@@ -20,10 +20,21 @@ export function AdminView() {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [status, setStatus] = useState<StatusOut | null>(null);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [analytics, setAnalytics] = useState<AnalyticsOut | null>(null);
+  const [analyticsError, setAnalyticsError] = useState(false);
 
   useEffect(() => {
     void getStatus().then(setStatus);
   }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    setAnalyticsError(false);
+    admin
+      .analytics(token)
+      .then(setAnalytics)
+      .catch(() => setAnalyticsError(true));
+  }, [token]);
 
   async function login() {
     setLoginError(null);
@@ -138,6 +149,68 @@ export function AdminView() {
                 </button>
                 {saveState === "saved" && <div className={styles.success}>{t(S.admin.saved)}</div>}
                 {saveState === "error" && <div className={styles.error}>{t(S.admin.saveError)}</div>}
+              </>
+            )}
+          </div>
+        )}
+
+        {token && (
+          <div className={styles.card}>
+            <span className={styles.fieldLabel}>{t(S.admin.analyticsTitle)}</span>
+            {analyticsError && <div className={styles.error}>{t(S.admin.analyticsError)}</div>}
+            {!analytics && !analyticsError && (
+              <div className={styles.sessionRow}>{t(S.admin.analyticsLoading)}</div>
+            )}
+            {analytics && (
+              <>
+                <div className={styles.statsRow}>
+                  <div className={styles.stat}>
+                    <span className={styles.statValue}>{analytics.total_views}</span>
+                    <span className={styles.statLabel}>{t(S.admin.totalViews)}</span>
+                  </div>
+                  <div className={styles.stat}>
+                    <span className={styles.statValue}>{analytics.unique_devices}</span>
+                    <span className={styles.statLabel}>{t(S.admin.uniqueDevices)}</span>
+                  </div>
+                  <div className={styles.stat}>
+                    <span className={styles.statValue}>{analytics.views_last_7_days}</span>
+                    <span className={styles.statLabel}>
+                      {t(S.admin.totalViews)} · {t(S.admin.last7Days)}
+                    </span>
+                  </div>
+                  <div className={styles.stat}>
+                    <span className={styles.statValue}>{analytics.unique_devices_last_7_days}</span>
+                    <span className={styles.statLabel}>
+                      {t(S.admin.uniqueDevices)} · {t(S.admin.last7Days)}
+                    </span>
+                  </div>
+                </div>
+
+                <span className={styles.fieldLabel}>{t(S.admin.dailyBreakdown)}</span>
+                {analytics.daily.length === 0 ? (
+                  <div className={styles.sessionRow}>{t(S.admin.dailyEmpty)}</div>
+                ) : (
+                  <div className={styles.dailyTableScroll}>
+                    <table className={styles.dailyTable}>
+                      <thead>
+                        <tr>
+                          <th>{t(S.admin.dailyDate)}</th>
+                          <th>{t(S.admin.dailyViews)}</th>
+                          <th>{t(S.admin.dailyUniqueDevices)}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...analytics.daily].reverse().map((row) => (
+                          <tr key={row.date}>
+                            <td>{row.date}</td>
+                            <td>{row.views}</td>
+                            <td>{row.unique_devices}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </>
             )}
           </div>

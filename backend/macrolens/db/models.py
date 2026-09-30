@@ -208,3 +208,18 @@ class SiteStatus(Base):
     maintenance_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     announcement: Mapped[str | None] = mapped_column(Text, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class PageView(Base):
+    """Fréquentation, hors périmètre du plan, pour le dashboard analytics de
+    l'admin (ADR 0011). `client_id` est un UUID aléatoire généré côté
+    navigateur et stocké en localStorage (jamais une IP) : compte les
+    appareils distincts sans collecter de donnée personnelle."""
+
+    __tablename__ = "page_views"
+    __table_args__ = (Index("ix_page_views_viewed_at", "viewed_at"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    client_id: Mapped[str] = mapped_column(Text, nullable=False)
+    viewed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    path: Mapped[str | None] = mapped_column(Text, nullable=True)

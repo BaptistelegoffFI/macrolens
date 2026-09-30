@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { getState, getStatus } from "./api/endpoints";
+import { getState, getStatus, recordView } from "./api/endpoints";
 import type { AnalogOut, AnalogsSearchRequest, StateVectorOut, StatusOut } from "./api/types";
 import styles from "./App.module.css";
 import { FanChart } from "./components/charts/FanChart";
@@ -28,6 +28,7 @@ import { S } from "./i18n/strings";
 import type { ParsedCommand } from "./lib/commandParser";
 import { FAMILY_LABELS, FEATURE_FAMILIES, featuresByFamily } from "./lib/features";
 import type { FeatureFamily } from "./lib/features";
+import { getClientId } from "./lib/clientId";
 import { readPermalinkParam, setPermalinkParam } from "./lib/permalink";
 import { keysForAnalogsSearch } from "./lib/provenanceKeys";
 import { CompareView } from "./views/CompareView";
@@ -305,6 +306,13 @@ export function App() {
     poll();
     const id = window.setInterval(poll, 60_000);
     return () => window.clearInterval(id);
+  }, []);
+
+  // §ADR 0011 — hors périmètre du plan : ping de fréquentation anonyme pour
+  // le dashboard analytics admin. Une fois par montage, fire-and-forget : un
+  // échec réseau ne doit jamais affecter le chargement de l'application.
+  useEffect(() => {
+    void recordView({ client_id: getClientId() }).catch(() => {});
   }, []);
 
   function setWeight(family: FeatureFamily, value: number) {

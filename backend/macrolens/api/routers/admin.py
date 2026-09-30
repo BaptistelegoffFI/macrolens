@@ -8,15 +8,23 @@ from __future__ import annotations
 
 import os
 import secrets
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Header, HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from macrolens.api.deps import get_db
-from macrolens.api.schemas.admin import LoginRequest, LoginResponse, StatusOut, StatusUpdate
-from macrolens.db.models import SiteStatus
+from macrolens.api.schemas.admin import (
+    AnalyticsOut,
+    DailyCount,
+    LoginRequest,
+    LoginResponse,
+    StatusOut,
+    StatusUpdate,
+    ViewPing,
+)
+from macrolens.db.models import PageView, SiteStatus
 
 router = APIRouter(tags=["admin"])
 
@@ -89,6 +97,58 @@ def update_status(body: StatusUpdate, session: Session = Depends(get_db)) -> Sit
     session.commit()
     session.refresh(row)
     return row
+
+
+@router.post("/analytics/view", status_code=204)
+def record_view(body: ViewPing, session: Session = Depends(get_db)) -> None:
+    """Public : un ping par chargement de page (§ADR 0011). `client_id` est
+    un UUID aléatoire généré et conservé côté navigateur (localStorage),
+    jamais une adresse IP — compte les appareils distincts sans collecter
+    de donnée personnelle."""
+    session.add(PageView(client_id=body.client_id, viewed_at=datetime.now(UTC), path=body.path))
+    session.commit()
+
+
+@router.get("/admin/analytics", response_model=AnalyticsOut, dependencies=[Depends(require_admin)])
+def get_analytics(session: Session = Depends(get_db)) -> AnalyticsOut:
+    total_views = session.execute(select(func.count()).select_from(PageView)).scalar_one()
+    unique_devices = session.execute(
+        select(func.count(func.distinct(PageView.client_id)))
+    ).scalar_one()
+
+    seven_days_ago = datetime.now(UTC) - timedelta(days=7)
+    views_7d = session.execute(
+        select(func.count()).select_from(PageView).where(PageView.viewed_at >= seven_days_ago)
+    ).scalar_one()
+    unique_7d = session.execute(
+        select(func.count(func.distinct(PageView.client_id))).where(
+            PageView.viewed_at >= seven_days_ago
+        )
+    ).scalar_one()
+
+    thirty_days_ago = datetime.now(UTC) - timedelta(days=30)
+    day_col = func.date(PageView.viewed_at)
+    rows = session.execute(
+        select(
+            day_col.label("day"),
+            func.count().label("views"),
+            func.count(func.distinct(PageView.client_id)).label("unique_devices"),
+        )
+        .where(PageView.viewed_at >= thirty_days_ago)
+        .group_by(day_col)
+        .order_by(day_col)
+    ).all()
+    daily = [
+        DailyCount(date=str(r.day), views=r.views, unique_devices=r.unique_devices) for r in rows
+    ]
+
+    return AnalyticsOut(
+        total_views=total_views,
+        unique_devices=unique_devices,
+        views_last_7_days=views_7d,
+        unique_devices_last_7_days=unique_7d,
+        daily=daily,
+    )
 
 
 def deny_if_maintenance(session: Session = Depends(get_db)) -> None:

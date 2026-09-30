@@ -3,6 +3,8 @@ maintenance et annonce pour un déploiement public à un seul administrateur.
 Refus par défaut si ADMIN_TOKEN n'est pas configuré — jamais de mot de passe
 implicite en production."""
 
+import uuid
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.exc import OperationalError
@@ -102,6 +104,40 @@ def test_admin_disabled_returns_503_when_no_token_configured(
         json={"maintenance_mode": True},
     )
     assert response.status_code == 503
+
+
+def test_view_ping_is_public_and_returns_no_content() -> None:
+    response = client.post("/api/v1/analytics/view", json={"client_id": "test-device-ping"})
+    assert response.status_code == 204
+
+
+def test_analytics_rejected_without_auth() -> None:
+    response = client.get("/api/v1/admin/analytics")
+    assert response.status_code == 401
+
+
+def test_analytics_counts_views_and_unique_devices() -> None:
+    # Client_id générés à chaque exécution (uuid4) pour ne jamais retomber sur
+    # un identifiant déjà vu lors d'un run précédent sur la même base
+    # partagée et persistante (sinon "unique_devices" n'augmenterait pas).
+    device_1 = f"analytics-test-{uuid.uuid4()}"
+    device_2 = f"analytics-test-{uuid.uuid4()}"
+
+    before = client.get(
+        "/api/v1/admin/analytics", headers={"Authorization": f"Bearer {TOKEN}"}
+    ).json()
+
+    client.post("/api/v1/analytics/view", json={"client_id": device_1})
+    client.post("/api/v1/analytics/view", json={"client_id": device_1})
+    client.post("/api/v1/analytics/view", json={"client_id": device_2})
+
+    after = client.get(
+        "/api/v1/admin/analytics", headers={"Authorization": f"Bearer {TOKEN}"}
+    ).json()
+
+    assert after["total_views"] == before["total_views"] + 3
+    assert after["unique_devices"] == before["unique_devices"] + 2
+    assert after["daily"], "au moins une entrée pour aujourd'hui"
 
 
 def test_maintenance_mode_blocks_analogs_search() -> None:

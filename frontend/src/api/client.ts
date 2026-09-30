@@ -51,6 +51,11 @@ export function apiPost<T>(path: string, body: unknown): Promise<T> {
 
 /** Panneau d'administration (§ADR 0008) : jeton porteur envoyé en en-tête,
  * jamais dans l'URL ni le corps sérialisé au repos. */
+export function apiGetAuth<T>(path: string, token: string): Promise<T> {
+  const url = new URL(`${API_BASE}${path}`, window.location.origin);
+  return fetch(url, { headers: { Authorization: `Bearer ${token}` } }).then((r) => handle<T>(r));
+}
+
 export function apiPostAuth<T>(path: string, body: unknown, token: string): Promise<T> {
   return fetch(`${API_BASE}${path}`, {
     method: "POST",
