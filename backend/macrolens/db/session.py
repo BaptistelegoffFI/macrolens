@@ -20,7 +20,27 @@ def make_engine() -> Engine:
     # en cache par psycopg peut déjà exister côté serveur au moment du
     # replay (psycopg.errors.DuplicatePreparedStatement). Sans effet
     # notable sur une connexion directe (non poolée).
-    return create_engine(database_url(), future=True, connect_args={"prepare_threshold": None})
+    #
+    # pool_pre_ping : teste chaque connexion avant de la réutiliser et en
+    # rouvre une silencieusement si elle a été fermée côté pooler pendant
+    # qu'elle était inactive — un pooler géré (Supabase Supavisor) coupe les
+    # connexions inactives sans prévenir SQLAlchemy.
+    # pool_recycle : recycle toute connexion de plus de 280s, avant que le
+    # pooler n'ait l'occasion de la couper lui-même.
+    # pool_size/max_overflow relevés : la construction du panel de features
+    # (deps.get_pool) garde une connexion ouverte pendant toute la
+    # construction, pas seulement le temps de la requête SQL — un pic de
+    # requêtes concurrentes juste après un redémarrage à froid épuisait le
+    # pool par défaut (5 + 10) avant que le verrou de deps.py n'existe.
+    return create_engine(
+        database_url(),
+        future=True,
+        connect_args={"prepare_threshold": None},
+        pool_pre_ping=True,
+        pool_recycle=280,
+        pool_size=8,
+        max_overflow=15,
+    )
 
 
 _engine: Engine | None = None
