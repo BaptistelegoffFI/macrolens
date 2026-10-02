@@ -22,6 +22,8 @@ export function SeriesExplorerView() {
   const [indicators, setIndicators] = useState<IndicatorOut[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>(DEFAULT_COUNTRIES);
   const [indicator, setIndicator] = useState("cpi");
+  const [fromYear, setFromYear] = useState("");
+  const [toYear, setToYear] = useState("");
   const [seriesByCountry, setSeriesByCountry] = useState<Record<string, ObservationOut[]>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +36,9 @@ export function SeriesExplorerView() {
     });
   }, []);
 
+  const from = fromYear !== "" && !Number.isNaN(Number(fromYear)) ? Number(fromYear) : undefined;
+  const to = toYear !== "" && !Number.isNaN(Number(toYear)) ? Number(toYear) : undefined;
+
   useEffect(() => {
     if (selectedCountries.length === 0) {
       setSeriesByCountry({});
@@ -41,7 +46,7 @@ export function SeriesExplorerView() {
     }
     setLoading(true);
     setError(null);
-    Promise.all(selectedCountries.map((c) => getSeries({ country: c, indicator })))
+    Promise.all(selectedCountries.map((c) => getSeries({ country: c, indicator, from, to })))
       .then((results) => {
         const map: Record<string, ObservationOut[]> = {};
         selectedCountries.forEach((c, i) => {
@@ -54,7 +59,7 @@ export function SeriesExplorerView() {
         setError(err instanceof Error ? err.message : t(S.common.unknownError));
         setLoading(false);
       });
-  }, [selectedCountries, indicator, t]);
+  }, [selectedCountries, indicator, from, to, t]);
 
   function toggleCountry(iso3: string) {
     setSelectedCountries((prev) => (prev.includes(iso3) ? prev.filter((c) => c !== iso3) : [...prev, iso3]));
@@ -146,6 +151,44 @@ export function SeriesExplorerView() {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.cardTitle}>{t(S.seriesExplorer.periodLabel)}</div>
+          <div className={styles.periodRow}>
+            <label className={styles.periodField}>
+              <span className={styles.periodFieldLabel}>{t(S.seriesExplorer.periodFrom)}</span>
+              <input
+                type="number"
+                className={styles.yearInput}
+                value={fromYear}
+                placeholder="1860"
+                onChange={(e) => setFromYear(e.target.value)}
+              />
+            </label>
+            <label className={styles.periodField}>
+              <span className={styles.periodFieldLabel}>{t(S.seriesExplorer.periodTo)}</span>
+              <input
+                type="number"
+                className={styles.yearInput}
+                value={toYear}
+                placeholder="2026"
+                onChange={(e) => setToYear(e.target.value)}
+              />
+            </label>
+          </div>
+          {(fromYear !== "" || toYear !== "") && (
+            <button
+              type="button"
+              className={styles.periodResetBtn}
+              onClick={() => {
+                setFromYear("");
+                setToYear("");
+              }}
+            >
+              {t(S.seriesExplorer.periodReset)}
+            </button>
+          )}
         </div>
 
         <div className={styles.card}>

@@ -132,6 +132,10 @@ export const S = {
 
   seriesExplorer: {
     indicatorLabel: { fr: "Indicateur", en: "Indicator" },
+    periodLabel: { fr: "Période", en: "Period" },
+    periodFrom: { fr: "De", en: "From" },
+    periodTo: { fr: "À", en: "To" },
+    periodReset: { fr: "Réinitialiser", en: "Reset" },
     countriesLabel: { fr: (n: number) => `Pays (${n})`, en: (n: number) => `Countries (${n})` },
     exportCsv: { fr: "Exporter CSV", en: "Export CSV" },
     exportTsv: { fr: "Exporter TSV", en: "Export TSV" },
