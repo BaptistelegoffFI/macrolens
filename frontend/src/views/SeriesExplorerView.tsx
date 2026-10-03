@@ -10,10 +10,20 @@ import { EmptyState } from "../components/shell/EmptyState";
 import { Num } from "../components/table/Num";
 import { useLanguage } from "../i18n/LanguageContext";
 import { S } from "../i18n/strings";
+import type { Bi } from "../i18n/strings";
 import { downloadDataUrl, downloadText, toDelimited } from "../lib/csv";
+import { applyScale, scaleAvailability } from "../lib/seriesScale";
+import type { PointsByCountry, ScaleMode } from "../lib/seriesScale";
 import styles from "./SeriesExplorerView.module.css";
 
 const DEFAULT_COUNTRIES = ["FRA", "DEU", "ITA", "SWE", "FIN", "NOR"];
+
+const SCALE_OPTIONS: { mode: ScaleMode; label: Bi }[] = [
+  { mode: "level", label: S.seriesExplorer.scaleLevel },
+  { mode: "log", label: S.seriesExplorer.scaleLog },
+  { mode: "base100", label: S.seriesExplorer.scaleBase100 },
+  { mode: "zscore", label: S.seriesExplorer.scaleZscore },
+];
 
 /** §11.3 Vue Explorateur de séries (F4) : pays × indicateurs, superposition, export. */
 export function SeriesExplorerView() {
@@ -24,6 +34,7 @@ export function SeriesExplorerView() {
   const [indicator, setIndicator] = useState("cpi");
   const [fromYear, setFromYear] = useState("");
   const [toYear, setToYear] = useState("");
+  const [scale, setScale] = useState<ScaleMode>("level");
   const [seriesByCountry, setSeriesByCountry] = useState<Record<string, ObservationOut[]>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,17 +78,47 @@ export function SeriesExplorerView() {
 
   const indicatorMeta = indicators.find((i) => i.code === indicator);
 
+  const pointsByCountry = useMemo<PointsByCountry>(() => {
+    const map: PointsByCountry = {};
+    for (const c of selectedCountries) {
+      map[c] = (seriesByCountry[c] ?? [])
+        .filter((o) => o.value !== null)
+        .map((o) => [new Date(o.period_start).getFullYear(), o.value as number]);
+    }
+    return map;
+  }, [selectedCountries, seriesByCountry]);
+
+  const availability = useMemo(() => scaleAvailability(pointsByCountry), [pointsByCountry]);
+  const scaled = useMemo(() => applyScale(scale, pointsByCountry), [scale, pointsByCountry]);
+  const effectiveScale = scaled.mode;
+  const fellBack = scale !== effectiveScale;
+
   const option = useMemo<EChartsOption>(() => {
+    const decimals2 = effectiveScale === "base100" || effectiveScale === "zscore";
     const series = selectedCountries.map((c, i) => ({
       type: "line" as const,
       name: c,
       symbol: "none" as const,
       connectNulls: false,
       lineStyle: { color: tokens.series[i % tokens.series.length], width: 1 },
-      data: (seriesByCountry[c] ?? [])
-        .filter((o) => o.value !== null)
-        .map((o) => [new Date(o.period_start).getFullYear(), o.value]),
+      data: scaled.series[c] ?? [],
+      ...(i === 0 && (effectiveScale === "base100" || effectiveScale === "zscore")
+        ? {
+            markLine: {
+              silent: true,
+              symbol: "none" as const,
+              lineStyle: { color: tokens.axis, width: 1, type: "dashed" as const },
+              label: { show: false },
+              data: [{ yAxis: effectiveScale === "base100" ? 100 : 0 }],
+            },
+          }
+        : {}),
     }));
+    const yLabel = (v: number): string => {
+      if (effectiveScale === "zscore") return v.toFixed(1);
+      if (effectiveScale === "log" && Math.abs(v) < 1) return v.toPrecision(1);
+      return formatAxisNumber(v);
+    };
     return {
       ...baseChartOption,
       // containLabel: true — la boîte grid inclut les libellés d'axe, donc
@@ -87,7 +128,11 @@ export function SeriesExplorerView() {
       // indice actions nominal en période d'hyperinflation).
       grid: { left: 16, right: 24, top: 16, bottom: 16, containLabel: true },
       legend: { show: false },
-      tooltip: { ...baseChartOption.tooltip, trigger: "axis" as const },
+      tooltip: {
+        ...baseChartOption.tooltip,
+        trigger: "axis" as const,
+        ...(decimals2 ? { valueFormatter: (v: unknown) => (typeof v === "number" ? v.toFixed(2) : String(v)) } : {}),
+      },
       xAxis: {
         ...axisNumericStyle.x,
         type: "value" as const,
@@ -101,13 +146,14 @@ export function SeriesExplorerView() {
       },
       yAxis: {
         ...axisNumericStyle.y,
-        type: "value" as const,
-        scale: true,
-        axisLabel: { ...axisNumericStyle.y.axisLabel, formatter: formatAxisNumber, margin: 10 },
+        ...(effectiveScale === "log"
+          ? { type: "log" as const, logBase: 10 }
+          : { type: "value" as const, scale: true }),
+        axisLabel: { ...axisNumericStyle.y.axisLabel, formatter: yLabel, margin: 10 },
       },
       series,
     };
-  }, [selectedCountries, seriesByCountry]);
+  }, [selectedCountries, scaled, effectiveScale]);
 
   const legendRows = selectedCountries.map((c, i) => {
     const obs = (seriesByCountry[c] ?? []).filter((o) => o.value !== null);
@@ -192,6 +238,45 @@ export function SeriesExplorerView() {
         </div>
 
         <div className={styles.card}>
+          <div className={styles.cardTitle}>{t(S.seriesExplorer.scaleLabel)}</div>
+          <div className={styles.scaleGrid}>
+            {SCALE_OPTIONS.map((opt) => {
+              const reason = opt.mode === "log" || opt.mode === "base100" ? availability[opt.mode] : null;
+              return (
+                <button
+                  key={opt.mode}
+                  type="button"
+                  className={styles.scaleBtn}
+                  data-active={effectiveScale === opt.mode}
+                  aria-pressed={effectiveScale === opt.mode}
+                  disabled={reason !== null}
+                  title={
+                    reason === "non_positive"
+                      ? t(S.seriesExplorer.scaleUnavailableNonPositive)
+                      : reason === "no_common_year"
+                        ? t(S.seriesExplorer.scaleUnavailableNoCommonYear)
+                        : undefined
+                  }
+                  onClick={() => setScale(opt.mode)}
+                >
+                  {t(opt.label)}
+                </button>
+              );
+            })}
+          </div>
+          <p className={styles.scaleHelp}>
+            {effectiveScale === "level" && t(S.seriesExplorer.scaleLevelHelp)}
+            {effectiveScale === "log" && t(S.seriesExplorer.scaleLogHelp)}
+            {effectiveScale === "base100" &&
+              scaled.baseYear !== null &&
+              t(S.seriesExplorer.scaleBase100Help)(scaled.baseYear)}
+            {effectiveScale === "zscore" && t(S.seriesExplorer.scaleZscoreHelp)}
+          </p>
+          {fellBack && <p className={styles.scaleWarn}>{t(S.seriesExplorer.scaleFellBack)}</p>}
+          {effectiveScale !== "level" && <p className={styles.scaleHelp}>{t(S.seriesExplorer.scaleRawNote)}</p>}
+        </div>
+
+        <div className={styles.card}>
           <div className={styles.cardTitle}>{t(S.seriesExplorer.countriesLabel)(selectedCountries.length)}</div>
           <div className={styles.countryList}>
             {countries.map((c) => (
@@ -218,7 +303,18 @@ export function SeriesExplorerView() {
                 <span className={styles.chartTitle}>
                   {pick(indicatorMeta?.label_fr ?? indicator, indicatorMeta?.label_en ?? indicator)}
                 </span>
-                {indicatorMeta?.unit && <span className={styles.unitBadge}>{indicatorMeta.unit}</span>}
+                {effectiveScale === "base100" && scaled.baseYear !== null ? (
+                  <span className={styles.unitBadge}>{t(S.seriesExplorer.scaleBadgeBase100)(scaled.baseYear)}</span>
+                ) : effectiveScale === "zscore" ? (
+                  <span className={styles.unitBadge}>{t(S.seriesExplorer.scaleBadgeZscore)}</span>
+                ) : (
+                  <>
+                    {indicatorMeta?.unit && <span className={styles.unitBadge}>{indicatorMeta.unit}</span>}
+                    {effectiveScale === "log" && (
+                      <span className={styles.unitBadge}>{t(S.seriesExplorer.scaleBadgeLog)}</span>
+                    )}
+                  </>
+                )}
               </div>
               <div className={styles.chartBody}>
                 <EChart ref={chartRef} option={option} height={280} />

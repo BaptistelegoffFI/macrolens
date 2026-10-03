@@ -89,6 +89,47 @@
   padding: 0;
 }
 
+.scaleGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.scaleBtn {
+  height: var(--control-h);
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  color: var(--fg);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.scaleBtn[data-active="true"] {
+  background: var(--bg-selected);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.scaleBtn:disabled {
+  color: var(--fg-muted);
+  background: var(--bg-chrome);
+  cursor: not-allowed;
+}
+
+.scaleHelp {
+  margin: 10px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--fg-secondary);
+}
+
+.scaleWarn {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--flag);
+}
+
 .countryList {
   max-height: 320px;
   overflow: auto;

@@ -73,6 +73,9 @@ export const axisNumericStyle = {
  * précision exacte importe moins que la lisibilité. */
 export function formatAxisNumber(v: number): string {
   const abs = Math.abs(v);
+  // Au-delà de 10^15 (ex. hyperinflation en base 100), « 10000.0T » déborde de
+  // l'espace d'axe : notation scientifique, plus courte.
+  if (abs >= 1e15) return v.toExponential(0);
   if (abs >= 1e12) return `${(v / 1e12).toFixed(1)}T`;
   if (abs >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
   if (abs >= 1e6) return `${(v / 1e6).toFixed(1)}M`;

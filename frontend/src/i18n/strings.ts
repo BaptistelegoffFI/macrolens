@@ -134,6 +134,51 @@ export const S = {
     periodFrom: { fr: "De", en: "From" },
     periodTo: { fr: "À", en: "To" },
     periodReset: { fr: "Réinitialiser", en: "Reset" },
+    scaleLabel: { fr: "Échelle", en: "Scale" },
+    scaleLevel: { fr: "Niveau", en: "Level" },
+    scaleLog: { fr: "Logarithmique", en: "Logarithmic" },
+    scaleBase100: { fr: "Base 100", en: "Base 100" },
+    scaleZscore: { fr: "Centré-réduit (z)", en: "Standardized (z)" },
+    scaleLevelHelp: {
+      fr: "Valeurs brutes sur un axe linéaire.",
+      en: "Raw values on a linear axis.",
+    },
+    scaleLogHelp: {
+      fr: "Axe logarithmique : des écarts verticaux égaux correspondent à des variations en pourcentage égales. Les séries à croissance lente et rapide deviennent comparables et l'histoire ancienne n'est plus écrasée.",
+      en: "Logarithmic axis: equal vertical distances mean equal percentage changes. Slow and fast growers become comparable and early history is no longer flattened.",
+    },
+    scaleBase100Help: {
+      fr: (year: number) =>
+        `Chaque série est divisée par sa valeur en ${year} (première année commune à toutes les séries sélectionnées), puis multipliée par 100. Compare la croissance cumulée quelle que soit l'unité ou la devise.`,
+      en: (year: number) =>
+        `Each series is divided by its value in ${year} (first year common to all selected series), then multiplied by 100. Compares cumulative growth regardless of unit or currency.`,
+    },
+    scaleZscoreHelp: {
+      fr: "(valeur − moyenne) ÷ écart-type, par série sur la période affichée. Compare la forme des séries quelle que soit leur unité ou leur amplitude.",
+      en: "(value − mean) ÷ standard deviation, per series over the displayed period. Compares the shape of series regardless of unit or magnitude.",
+    },
+    scaleRawNote: {
+      fr: "Le tableau et les exports CSV, TSV et JSON gardent les valeurs brutes.",
+      en: "The table and the CSV, TSV and JSON exports keep the raw values.",
+    },
+    scaleUnavailableNonPositive: {
+      fr: "Indisponible : une série sélectionnée contient des valeurs ≤ 0.",
+      en: "Unavailable: a selected series contains values ≤ 0.",
+    },
+    scaleUnavailableNoCommonYear: {
+      fr: "Indisponible : les séries sélectionnées n'ont aucune année commune.",
+      en: "Unavailable: the selected series share no common year.",
+    },
+    scaleFellBack: {
+      fr: "Le mode demandé est indisponible pour cette sélection : affichage en niveau.",
+      en: "The requested mode is unavailable for this selection: showing levels.",
+    },
+    scaleBadgeBase100: {
+      fr: (year: number) => `Base 100 = ${year}`,
+      en: (year: number) => `Base 100 = ${year}`,
+    },
+    scaleBadgeZscore: { fr: "Écarts-types (z)", en: "Standard deviations (z)" },
+    scaleBadgeLog: { fr: "Échelle log", en: "Log scale" },
     countriesLabel: { fr: (n: number) => `Pays (${n})`, en: (n: number) => `Countries (${n})` },
     exportCsv: { fr: "Exporter CSV", en: "Export CSV" },
     exportTsv: { fr: "Exporter TSV", en: "Export TSV" },
