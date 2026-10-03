@@ -19,14 +19,19 @@ export function FeatureValueInputs({ values, onChange }: FeatureValueInputsProps
           {group.features.map((f) => (
             <div key={f.code} className={styles.field}>
               <span className={styles.fieldLabel}>{f.label}</span>
-              <input
-                className={styles.textInput}
-                type="number"
-                step="0.1"
-                placeholder="—"
-                value={values[f.code] ?? ""}
-                onChange={(e) => onChange(f.code, e.target.value)}
-              />
+              <span className={styles.unitField} title={f.unitHelp}>
+                <input
+                  className={styles.textInput}
+                  type="number"
+                  step="0.1"
+                  placeholder="—"
+                  aria-label={`${f.label} (${f.unit})`}
+                  style={f.unit.length > 2 ? { width: 112, paddingRight: 48 } : { width: 84, paddingRight: 22 }}
+                  value={values[f.code] ?? ""}
+                  onChange={(e) => onChange(f.code, e.target.value)}
+                />
+                <span className={styles.unitSuffix}>{f.unit}</span>
+              </span>
             </div>
           ))}
         </div>

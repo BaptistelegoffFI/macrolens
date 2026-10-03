@@ -40,6 +40,37 @@
   text-align: right;
 }
 
+/* Unité de saisie affichée à l'intérieur du champ, à droite (colonne de 220px :
+   pas de place pour une troisième colonne à côté du champ). */
+.unitField {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Les flèches haut/bas d'un champ numérique réservent de la largeur et
+   tronquent la valeur (« -12,35 » affiché « -12,3 ») ; les touches ↑/↓ du
+   clavier continuent de fonctionner. */
+.unitField input {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.unitField input::-webkit-outer-spin-button,
+.unitField input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.unitSuffix {
+  position: absolute;
+  right: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-muted);
+  pointer-events: none;
+}
+
 .errorBanner {
   margin: 8px;
   padding: 6px 8px;
