@@ -43,5 +43,9 @@ export const EChart = forwardRef<EChartHandle, EChartProps>(function EChart({ op
     chartRef.current?.setOption(option, true);
   }, [option]);
 
+  useEffect(() => {
+    chartRef.current?.resize();
+  }, [height]);
+
   return <div ref={containerRef} style={{ width: "100%", height }} />;
 });

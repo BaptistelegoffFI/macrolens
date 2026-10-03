@@ -24,6 +24,7 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
   const { t, lang } = useLanguage();
   const [country, setCountry] = useState(initialCountry);
   const [year, setYear] = useState(initialYear);
+  const [expanded, setExpanded] = useState<string | null>(null);
   const { data, loading, error, run } = useEpisode();
 
   useEffect(() => {
@@ -94,12 +95,20 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
           <>
             <div className={styles.grid}>
               {rawIndicators(lang).map((ind) => (
-                <div key={ind.code} className={styles.cell}>
+                <div key={ind.code} className={styles.cell} data-expanded={expanded === ind.code}>
+                  <button
+                    type="button"
+                    className={styles.expandBtn}
+                    onClick={() => setExpanded(expanded === ind.code ? null : ind.code)}
+                  >
+                    {t(expanded === ind.code ? S.episode.collapse : S.episode.expand)}
+                  </button>
                   <SeriesSparkline
                     label={ind.label}
                     unit={ind.unit}
                     observations={data.series[ind.code] ?? []}
                     anchorYear={data.year}
+                    height={expanded === ind.code ? 340 : 150}
                   />
                 </div>
               ))}

@@ -468,7 +468,6 @@ export function App() {
 
   return (
     <>
-      <div className="mobile-gate">{t(S.app.mobileGate)}</div>
       {siteStatus?.announcement && !announcementDismissed && (
         <div className={styles.announcementBanner}>
           <span>{siteStatus.announcement}</span>

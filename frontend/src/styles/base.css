@@ -56,24 +56,8 @@ select {
   }
 }
 
-/* §11.8 : pas de responsive mobile — poste de travail, largeur mini 1280px. */
-.mobile-gate {
-  display: none;
-}
-
-@media (max-width: 1279px) {
-  #root {
-    display: none;
-  }
-
-  .mobile-gate {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    padding: 32px;
-    text-align: center;
-    font-family: var(--font-sans);
-    color: var(--fg-secondary);
-  }
+/* Largeur minimale : en dessous, la page défile horizontalement au lieu de
+   se masquer (l'ancienne barrière à 1280px laissait une page blanche). */
+#root {
+  min-width: 960px;
 }

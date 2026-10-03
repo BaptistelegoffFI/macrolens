@@ -4,13 +4,34 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  width: 100%;
 }
 
 .cell {
+  position: relative;
+  min-width: 0;
   border-bottom: 1px solid var(--rule-light);
   border-right: 1px solid var(--rule-light);
   padding: 4px 8px;
+}
+
+.cell[data-expanded="true"] {
+  grid-column: 1 / -1;
+}
+
+.expandBtn {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  z-index: 1;
+  height: 18px;
+  padding: 0 6px;
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  color: var(--accent);
+  font-size: 10px;
+  cursor: pointer;
 }
 
 .stateTable {

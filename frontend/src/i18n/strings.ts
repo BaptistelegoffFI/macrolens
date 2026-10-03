@@ -18,10 +18,6 @@ export interface Bi {
 
 export const S = {
   app: {
-    mobileGate: {
-      fr: "MacroLens est un instrument de poste de travail — largeur minimale 1280px requise.",
-      en: "MacroLens is a workstation instrument — minimum width 1280px required.",
-    },
     viewComingSoon: {
       fr: (view: string) => `Vue « ${view} » — à venir.`,
       en: (view: string) => `"${view}" view — coming soon.`,
@@ -124,6 +120,8 @@ export const S = {
   },
 
   episode: {
+    expand: { fr: "Agrandir", en: "Expand" },
+    collapse: { fr: "Réduire", en: "Collapse" },
     panelTitle: { fr: "Épisode", en: "Episode" },
     searchGroupTitle: { fr: "Recherche", en: "Search" },
     loadButton: { fr: "Charger", en: "Load" },

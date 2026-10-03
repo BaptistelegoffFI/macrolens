@@ -68,7 +68,7 @@ export function ResizableColumns({
       {children.map((child, i) => {
         const isLast = i === children.length - 1;
         return (
-          <div key={i} style={{ display: "flex" }}>
+          <div key={i} style={isLast ? { display: "flex", flex: 1, minWidth: 0 } : { display: "flex" }}>
             <div className={styles.column} style={isLast ? { flex: 1 } : { width: widths[i] }}>
               {child}
             </div>

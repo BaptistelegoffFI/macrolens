@@ -10,12 +10,13 @@ export interface SeriesSparklineProps {
   unit: string;
   observations: ObservationOut[];
   anchorYear: number;
+  height?: number;
 }
 
 /** Petit multiple (§11.2 « toutes les séries autour d'une année ») — une
  * série brute, marqueur vertical à l'ancre. Points manquants non reliés
  * (connectNulls: false), pas d'interpolation silencieuse (règle 3). */
-export function SeriesSparkline({ label, unit, observations, anchorYear }: SeriesSparklineProps) {
+export function SeriesSparkline({ label, unit, observations, anchorYear, height = 150 }: SeriesSparklineProps) {
   const option = useMemo<EChartsOption>(() => {
     const data = observations
       .filter((o) => o.value !== null)
@@ -70,5 +71,5 @@ export function SeriesSparkline({ label, unit, observations, anchorYear }: Serie
     };
   }, [observations, label, unit, anchorYear]);
 
-  return <EChart option={option} height={110} />;
+  return <EChart option={option} height={height} />;
 }
