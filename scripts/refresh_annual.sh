@@ -37,7 +37,7 @@ read -r -p "Entrée pour continuer... "
 
 echo
 echo "=== 3/5 — Rejeu du pipeline complet (idempotent) ==="
-(cd backend && uv run macrolens etl run-all)
+(cd backend && uv run macrolens etl run-all --refresh)
 
 echo
 echo "=== 4/5 — Reconstruction des vecteurs d'état (4 référentiels) ==="

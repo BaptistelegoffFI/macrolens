@@ -10,8 +10,10 @@ décrit la procédure complète ; `scripts/refresh_annual.sh` en automatise la p
    (rolling, sans version figée : l'API BIS sert toujours les dernières données à la même URL).
    Un changement de hash est **attendu**, pas une anomalie (voir `docs/limitations.md`).
 2. Pause pour une vérification manuelle (voir plus bas).
-3. Rejoue `macrolens etl run-all` — idempotent : ne re-télécharge pas JST/Maddison si leur
-   vintage actuel est déjà présent sur disque.
+3. Rejoue `macrolens etl run-all --refresh` — rejeu complet et délibéré (ADR 0026). Sans
+   `--refresh`, `run-all` ignore toute source déjà chargée en base (c'est ce que fait le
+   démarrage de l'API en production) ; avec, il re-télécharge si le fichier est absent du
+   disque et ré-ingère tout.
 4. Reconstruit les vecteurs d'état sur les 4 référentiels (`rolling30`, `era`, `cross_section`,
    `pool`) — chacun a son propre `build_id`, tous doivent être à jour.
 5. Fait tourner `make check` (lint + types + tests) pour détecter toute régression introduite

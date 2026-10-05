@@ -83,7 +83,7 @@ export const admin = {
 /** Ping de fréquentation anonyme (§ADR 0011) : fire-and-forget, ne doit
  * jamais bloquer ni faire échouer le chargement de l'application. */
 export function recordView(body: ViewPing) {
-  return apiPost<void>("/analytics/view", body);
+  return apiPost<void>("/analytics/view", body, { retry: false });
 }
 
 /** Rendements d'actifs (ADR 0015 à 0024). Endpoints additifs : leur échec ne doit

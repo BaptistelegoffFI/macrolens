@@ -7,6 +7,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import { App } from "./App";
+import { FailSafe } from "./components/shell/FailSafe";
+import { RootFallback } from "./components/shell/RootFallback";
+import { WakingBanner } from "./components/shell/WakingBanner";
 import { LanguageProvider } from "./i18n/LanguageContext";
 import "./styles/tokens.css";
 import "./styles/base.css";
@@ -19,6 +22,11 @@ const isAdmin = window.location.pathname === "/admin";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <LanguageProvider>{isAdmin ? <AdminView /> : <App />}</LanguageProvider>
+    <FailSafe fallback={<RootFallback />}>
+      <LanguageProvider>
+        {isAdmin ? <AdminView /> : <App />}
+        <WakingBanner />
+      </LanguageProvider>
+    </FailSafe>
   </React.StrictMode>,
 );

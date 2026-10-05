@@ -7,6 +7,20 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>MacroLens nécessite JavaScript / MacroLens requires JavaScript.</noscript>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Filet ultime (ADR 0027) : si l'application n'a rien affiché après 12 s (script bloqué, bundle
+      // périmé en cache, réseau coupé), un message avec bouton de rechargement remplace la page vide.
+      setTimeout(function () {
+        var root = document.getElementById("root");
+        if (!root || root.childNodes.length > 0) return;
+        root.innerHTML =
+          '<div role="alert" style="max-width:520px;margin:15vh auto 0;padding:0 16px;font:14px/1.5 system-ui,sans-serif">' +
+          '<p style="font-weight:600;font-size:16px;margin:0 0 8px">MacroLens n\'a pas pu se charger / MacroLens did not load</p>' +
+          "<p>Rechargez la page ; si le problème persiste, réessayez dans une minute.<br>Reload the page; if it persists, try again in a minute.</p>" +
+          '<button type="button" onclick="location.reload()">Recharger / Reload</button></div>';
+      }, 12000);
+    </script>
   </body>
 </html>

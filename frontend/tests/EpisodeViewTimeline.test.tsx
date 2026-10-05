@@ -56,7 +56,7 @@ describe("Episode view timeline", () => {
     expect(screen.getByText("1878")).toBeInTheDocument();
     expect(screen.getByText("2008")).toBeInTheDocument();
     expect(screen.getByText("World War I", { selector: "text" })).toBeInTheDocument();
-    expect(fetch).toHaveBeenCalledWith(expect.objectContaining({ href: expect.stringMatching(/\/events\?country=SWE/) }));
+    expect(fetch).toHaveBeenCalledWith(expect.objectContaining({ href: expect.stringMatching(/\/events\?country=SWE/) }), expect.anything());
   });
 
   it("falls back to the episode's own events when the events request fails", async () => {
