@@ -230,7 +230,25 @@ export const S = {
 
   eventFrieze: {
     title: { fr: "Frise d'événements", en: "Event timeline" },
-    empty: { fr: "Aucun événement recensé sur cette fenêtre.", en: "No recorded event in this window." },
+    empty: { fr: "Aucun événement recensé pour ce pays.", en: "No recorded event for this country." },
+    laneBankingCrisis: { fr: "Crises bancaires", en: "Banking crises" },
+    laneWar: { fr: "Guerres", en: "Wars" },
+    laneRegime: { fr: "Régimes monétaires et politiques", en: "Monetary and political regimes" },
+    laneOilShock: { fr: "Chocs pétroliers", en: "Oil shocks" },
+    laneOther: { fr: "Autres événements", en: "Other events" },
+    anchor: { fr: "ancre", en: "anchor" },
+    window: {
+      fr: (a: number, b: number) => `fenêtre des graphiques ci-dessus, ${a} à ${b}`,
+      en: (a: number, b: number) => `window of the charts above, ${a} to ${b}`,
+    },
+    ariaLabel: {
+      fr: (n: number, a: number, b: number) => `Frise de ${n} événements, de ${a} à ${b}`,
+      en: (n: number, a: number, b: number) => `Timeline of ${n} events, from ${a} to ${b}`,
+    },
+    span: {
+      fr: (a: number, b: number) => `${a} à ${b}`,
+      en: (a: number, b: number) => `${a} to ${b}`,
+    },
   },
 
   bordereau: {
