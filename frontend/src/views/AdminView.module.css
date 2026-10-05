@@ -46,6 +46,42 @@
   padding: 32px 16px;
 }
 
+/* Connecté : deux colonnes. Cartes à gauche, journal d'activité à droite (ADR 0028). */
+.bodyWide {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 560px) minmax(320px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.bodyWide > * {
+  grid-column: 1;
+}
+
+.bodyWide > .backLink {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+.bodyWide > aside {
+  grid-column: 2;
+  grid-row: 2 / span 20;
+}
+
+@media (max-width: 900px) {
+  .bodyWide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bodyWide > aside {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
 .backLink {
   display: inline-block;
   margin-bottom: 16px;

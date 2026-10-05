@@ -54,6 +54,9 @@ def test_new_routes_are_additive_and_all_under_the_expected_paths(
 ) -> None:
     added = sorted(set(current["paths"]) - set(snapshot["paths"]))
     assert added == [
+        "/api/v1/admin/activity",  # ADR 0028, journal d'usage de l'admin
+        "/api/v1/admin/rankings",
+        "/api/v1/analytics/event",
         "/api/v1/scenario/asset-returns",
         "/api/v1/scenario/asset-returns/detail",
         "/api/v1/series/{country}/asset-classes",
