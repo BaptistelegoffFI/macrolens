@@ -93,10 +93,19 @@ comme limite connue plutôt que masqué.
   ingéré** tant que vous n'avez pas validé ce tableau. Les lignes correspondantes de la page Classes
   d'actifs s'affichent « non disponible » avec la raison.
 
-## 5. Décisions attendues
+## 5. Décisions (2026-10-05)
 
-1. Accord pour ingérer le Pink Sheet de la Banque mondiale (prix spot, CC BY) ?
-2. Demander l'autorisation à Ken French avant d'ingérer les secteurs américains ?
-3. JST est sous licence non commerciale : l'usage prévu auprès des gérants reste-t-il non commercial ?
-4. Ajouter la citation du QJE (2019) à `sources.yaml`, ce qui modifie l'onglet Sources déjà en ligne ?
-5. Faut-il raccorder une source pour 2021-2026, sachant que ce serait une jonction de sources ?
+1. **Pink Sheet de la Banque mondiale : non ingéré.** Le lien de téléchargement contient un
+   identifiant qui change chaque année (`...-0050012025` puis `...-0050012026`) alors que la
+   production retélécharge ses sources à chaque démarrage : le lien se casserait chaque janvier. Ce
+   sont en outre des prix en USD, sans rendement total ni roll yield, qui n'existent que depuis 1960
+   alors que la plupart des analogues sont plus anciens.
+2. **Ken French : non ingéré.** Aucune procédure formelle : la page ne porte qu'un copyright. La
+   voie normale est un courriel à l'auteur demandant l'autorisation de publier des séries dérivées.
+3. **JST : usage non commercial confirmé** (projet personnel et intellectuel). Mention ajoutée à
+   l'onglet Sources et méthode.
+4. **Citation du QJE dans `sources.yaml` : non faite.** Elle n'est pas nécessaire au fonctionnement ;
+   elle figure déjà sur chaque nouvelle série et dans l'onglet Sources et méthode, et ne pas toucher
+   `sources.yaml` laisse `/meta/sources` identique.
+5. **Défaut japonais 1946-1947 : corrigé** par une garde de calcul (voir ADR 0019).
+6. 2021-2026 : pas de raccord de source (jonction silencieuse refusée).

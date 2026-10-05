@@ -18,12 +18,16 @@ le brief). Chaque cellule porte `n_requested`, `n` et la raison de chaque exclus
   Ses analogues sortent des lignes d'actifs (`no_series`), pas comptés à zéro. Change et
   inflation existent.
 - **Japon 1946-1947** : JST n'a pas de rendement actions ces deux années (bourse fermée). L'indice
-  chaîné existant (`equity_index_nominal`, derrière `out_equity_real_cum` déjà déployé) saute les
-  deux années, ce qui revient à leur attribuer 0 %. Cela touche 12 fenêtres japonaises (ancrages
-  1938-1945). Le nouveau calcul les exclut. **Le comportement déployé n'est pas modifié** (consigne
-  de déploiement) ; il est consigné dans
-  `tests/integration/test_asset_returns_vs_existing_outcomes.py`. Il surestime probablement
-  fortement le rendement réel de ces fenêtres, l'inflation japonaise de 1946-1947 étant très élevée.
+  chaîné existant (`equity_index_nominal`) sautait ces années sans changer le niveau, c'est-à-dire
+  en leur attribuant un rendement nul ; les réalisations déjà déployées (`out_equity_real_cum`,
+  `out_max_drawdown_equity`, 12 fenêtres d'ancrages 1938 à 1945) et la variable `equity_real_3y`
+  du Japon en 1948 en héritaient, avec un rendement réel probablement très surestimé (inflation
+  japonaise de 1946-1947 très élevée). **Corrigé dans une garde de calcul** : un ratio ou un
+  repli sur un indice chaîné qui enjambe une année manquante reste manquant
+  (`outcomes_build._chain_has_gap`, `core/features._real_cumulative_return(chained=True)`). Les
+  indices de niveau observé (prix immobiliers) ne sont pas concernés. Les données ingérées ne sont
+  pas modifiées : les niveaux affichés de `equity_index_nominal` et `equity_capgain_index` du Japon
+  après 1947 restent décalés dans l'Explorateur (voir `docs/limitations.md`).
 - 48 fenêtres n'existent que dans le nouveau calcul : l'ancrage est l'année qui précède le premier
   rendement publié, que l'ancien indice (base 100 la première année) ne peut pas représenter.
 

@@ -130,9 +130,12 @@ dessous, un message dédié le dit clairement plutôt que de dégrader silencieu
 - **Japon, rendements annuels** : les valeurs annuelles de la colonne JST `eq_tr` divergent
   fortement du Nikkei (1990 : -13 % contre -39 %) alors que le cumul pluriannuel concorde. Cause
   non établie, dans la donnée source. Voir `docs/research/asset-validation.md`.
-- **`out_equity_real_cum` existant, Japon 1946-1947** : l'indice chaîné `equity_index_nominal`
-  saute ces deux années sans rendement et leur attribue 0 %, ce qui touche 12 fenêtres japonaises
-  (ancrages 1938 à 1945) et surestime probablement leur rendement réel. Non modifié (consigne de
-  déploiement) ; le nouveau calcul exclut ces fenêtres.
+- **Japon 1946-1947, indice actions chaîné** : JST n'a aucun rendement ces deux années et le
+  chaînage les sautait comme un rendement nul. Les réalisations (12 fenêtres) et la variable
+  `equity_real_3y` du Japon en 1948 sont corrigées (elles restent manquantes). **Reste vrai** : les
+  niveaux de `equity_index_nominal` et `equity_capgain_index` du Japon après 1947, visibles dans
+  l'Explorateur, sont décalés du rendement inconnu de ces deux années (traité comme nul).
+  Corriger les niveaux demanderait de modifier les données ingérées, ce qui n'a pas été fait.
 - **Repli maximal** : mesuré en fin d'année, donc minorant du repli réel.
-- **Licence JST** : CC BY-NC-SA, usage non commercial. À clarifier pour un usage auprès de gérants.
+- **Licence JST** : CC BY-NC-SA, usage non commercial. Le projet est personnel, intellectuel et non
+  commercial (précisé le 2026-10-05), ce qui est compatible.

@@ -220,7 +220,7 @@ export const ASSET_METHODOLOGY = {
   },
   licenceTitle: { fr: "Licence et citation.", en: "Licence and citation." },
   licenceBody: {
-    fr: "JST est diffusé sous licence CC BY-NC-SA (usage non commercial, attribution, partage à l'identique). Pour toute donnée de rendements, JST demande de citer Jordà, Knoll, Kuvshinov, Schularick et Taylor (2019), « The Rate of Return on Everything, 1870-2015 », Quarterly Journal of Economics 134(3), 1225-1298.",
-    en: "JST is released under CC BY-NC-SA (non-commercial use, attribution, share-alike). For any returns data, JST asks to cite Jordà, Knoll, Kuvshinov, Schularick and Taylor (2019), “The Rate of Return on Everything, 1870-2015”, Quarterly Journal of Economics 134(3), 1225-1298.",
+    fr: "Ce projet est personnel, intellectuel et non commercial. JST est diffusé sous licence CC BY-NC-SA (usage non commercial, attribution, partage à l'identique) et les valeurs dérivées affichées ici sont partagées dans les mêmes conditions. Pour toute donnée de rendements, JST demande de citer Jordà, Knoll, Kuvshinov, Schularick et Taylor (2019), « The Rate of Return on Everything, 1870-2015 », Quarterly Journal of Economics 134(3), 1225-1298.",
+    en: "This project is personal, intellectual and non-commercial. JST is released under CC BY-NC-SA (non-commercial use, attribution, share-alike) and the derived values shown here are shared on the same terms. For any returns data, JST asks to cite Jordà, Knoll, Kuvshinov, Schularick and Taylor (2019), “The Rate of Return on Everything, 1870-2015”, Quarterly Journal of Economics 134(3), 1225-1298.",
   },
 } as const;

@@ -30,13 +30,20 @@ valeur de 1919 à 1924) affichent « non disponible » avec N = 0, jamais zéro.
   (actions -31 % réel sur 5 ans, signe et ordre de grandeur) et par recoupement exact avec le
   pipeline existant.
 
-## Recoupement avec le pipeline déployé
+## Recoupement avec le pipeline déployé, et une correction
 
 8 729 fenêtres (pays, année, horizon) comparées à `out_equity_real_cum` : écart maximal inférieur
 à 1e-6. Divergences expliquées (ADR 0019) : 48 fenêtres que seul le nouveau calcul produit
-(ancrage la dernière année avant un rendement), et **12 fenêtres japonaises que seul l'ancien
-calcul produit, parce que l'indice chaîné existant saute 1946-1947 (aucun rendement dans JST) en
-leur attribuant 0 %**. Le comportement déployé n'a pas été modifié.
+(ancrage la dernière année avant un rendement), et 12 fenêtres japonaises que seul l'ancien
+calcul produisait, parce que l'indice chaîné sautait 1946-1947 (aucun rendement dans JST) en leur
+attribuant 0 %.
+
+**Ce défaut est corrigé** par une garde de calcul (`_chain_has_gap`, et `chained=True` pour la
+variable `equity_real_3y`). Effet mesuré sur 14 ancres et 4 cadres de référence : l'ensemble des
+analogues ne change pour aucune requête ordinaire ; le cadre par défaut est identique ; les cadres
+`era` et `pool` changent de moins de 0,0002 en distance (une valeur de moins dans la distribution
+de référence) ; seules les requêtes ancrées sur le Japon 1948 changent nettement, parce que leur
+variable actions reposait sur un rendement imputé.
 
 ## Couverture réelle
 

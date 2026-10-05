@@ -10,6 +10,15 @@ Classes d'actifs (F9), nouveau groupe de séries dans l'Explorateur, nouvelle se
 méthode. Les hauteurs des rangées du panneau central sont réinitialisées une fois (une rangée
 ajoutée). Aucun endpoint existant ne change : 21 routes et 41 schémas vérifiés à l'octet près.
 
+## Correction incluse dans cette mise en ligne
+
+Une garde corrige un défaut déjà en ligne : l'indice actions chaîné sautait 1946-1947 au Japon
+comme un rendement nul. Commit séparé (`git revert` possible seul). Effets sur le site : 12
+fenêtres japonaises de réalisations deviennent manquantes ; la variable `equity_real_3y` du Japon
+en 1948 devient manquante, donc ce candidat sort du pool d'analogues (le compteur « candidats » baisse
+de 1) ; les distances des cadres `era` et `pool` bougent de moins de 0,0002 ; le cadre par défaut
+est identique pour toutes les requêtes hors Japon 1948.
+
 ## Danger à connaître
 
 Le démarrage de l'API exécute `alembic upgrade head && seed && etl run-all && uvicorn`.
