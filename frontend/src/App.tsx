@@ -6,10 +6,12 @@ import styles from "./App.module.css";
 import { FanChart } from "./components/charts/FanChart";
 import { Timeline } from "./components/charts/Timeline";
 import { BordereauPanel } from "./components/provenance/BordereauPanel";
+import { AssetReturnsBlock } from "./components/scenario/AssetReturnsBlock";
 import { FeatureValueInputs } from "./components/scenario/FeatureValueInputs";
 import { WeightSlider } from "./components/scenario/WeightSlider";
 import { CommandPalette } from "./components/shell/CommandPalette";
 import { EmptyState } from "./components/shell/EmptyState";
+import { FailSafe } from "./components/shell/FailSafe";
 import { Panel } from "./components/shell/Panel";
 import { ResizableColumns } from "./components/shell/ResizableColumns";
 import { ResizableRows } from "./components/shell/ResizableRows";
@@ -31,6 +33,8 @@ import type { FeatureFamily } from "./lib/features";
 import { getClientId } from "./lib/clientId";
 import { readPermalinkParam, setPermalinkParam } from "./lib/permalink";
 import { keysForAnalogsSearch } from "./lib/provenanceKeys";
+import { AssetClassesView } from "./views/AssetClassesView";
+import type { AssetClassesPrefill } from "./views/AssetClassesView";
 import { CompareView } from "./views/CompareView";
 import { CoverageView } from "./views/CoverageView";
 import { EpisodeView } from "./views/EpisodeView";
@@ -44,6 +48,7 @@ const SHORTCUT_TO_VIEW: Record<string, string> = {
   F6: "compare",
   F7: "coverage",
   F8: "sources",
+  F9: "assets",
 };
 
 interface ScenarioViewProps {
@@ -59,6 +64,7 @@ interface ScenarioViewProps {
   weights: Record<FeatureFamily, number> | null;
   onWeightChange: (family: FeatureFamily, value: number) => void;
   search: ReturnType<typeof useAnalogsSearch>;
+  onOpenAssetClasses: (anchor: { country: string; year: number } | null) => void;
 }
 
 function ScenarioView({
@@ -74,11 +80,20 @@ function ScenarioView({
   weights,
   onWeightChange,
   search,
+  onOpenAssetClasses,
 }: ScenarioViewProps) {
   const { t, lang } = useLanguage();
   const { data, loading, error } = search;
   const horizons = toolbar.horizons;
   const lastHorizon = horizons[horizons.length - 1];
+
+  // Rendements d'actifs (ADR 0015 à 0024) : les analogues déjà trouvés, rien d'autre.
+  const assetAnalogs = useMemo(
+    () => data?.analogs.map((a) => ({ country: a.country, year: a.year })) ?? null,
+    [data],
+  );
+  const assetAnchor =
+    data?.query_echo.mode === "anchor" && data.query_echo.anchor ? data.query_echo.anchor : null;
 
   // §8.2.5 : double affichage obligatoire — le panneau Scénario montre le
   // vecteur d'état (brut + rang) de la requête elle-même, pas seulement des
@@ -204,7 +219,7 @@ function ScenarioView({
       </Panel>
 
       <Panel title={t(S.scenario.analoguesPanelTitle)} meta={data ? String(data.analogs.length) : "0"}>
-        <ResizableRows storageKey="ml.scenario.rows" defaultHeights={[240, 240]}>
+        <ResizableRows storageKey="ml.scenario.rows" defaultHeights={[240, 460, 240]}>
           <div>
             {error && <div className={styles.errorBanner}>{error}</div>}
             {data?.warnings.map((w, i) => (
@@ -221,6 +236,11 @@ function ScenarioView({
               <Table columns={columns} rows={data.analogs} getRowKey={(r) => `${r.country}-${r.year}`} />
             )}
           </div>
+          <AssetReturnsBlock
+            analogs={assetAnalogs}
+            anchor={assetAnchor}
+            onOpenAssetClasses={onOpenAssetClasses}
+          />
           {data && data.analogs.length > 0 ? (
             <FanChart data={data} variable="out_growth_cum" variableLabel={t(S.scenario.fanChartVariableLabel)} />
           ) : (
@@ -289,6 +309,7 @@ export function App() {
   const [shockDeltas, setShockDeltas] = useState<Record<string, number>>({});
   const [comparePairs, setComparePairs] = useState<{ country: string; year: number }[] | undefined>();
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [assetsPrefill, setAssetsPrefill] = useState<AssetClassesPrefill | null>(null);
   const search = useAnalogsSearch();
 
   // §ADR 0008 — hors périmètre du plan : panneau d'administration. Un
@@ -451,6 +472,27 @@ export function App() {
     }
   }
 
+  // Lien « Classes d'actifs » du bloc Scénario : pays de l'ancre et dix ans de part et
+  // d'autre, bornés par la couverture JST (1870 à 2020).
+  function openAssetClasses(anchor: { country: string; year: number } | null) {
+    setAssetsPrefill(
+      anchor
+        ? {
+            country: anchor.country,
+            anchorYear: anchor.year,
+            fromYear: Math.max(1870, anchor.year - 10),
+            toYear: Math.min(2020, anchor.year + 10),
+          }
+        : null,
+    );
+    setActiveView("assets");
+  }
+
+  function handleViewChange(view: string) {
+    if (view !== "assets") setAssetsPrefill(null);
+    setActiveView(view);
+  }
+
   function copyPermalink() {
     void navigator.clipboard?.writeText(window.location.href);
   }
@@ -485,7 +527,7 @@ export function App() {
       )}
       <WindowShell
         activeView={activeView}
-        onViewChange={setActiveView}
+        onViewChange={handleViewChange}
         toolbar={
           <Toolbar value={toolbar} onChange={setToolbar} onRun={handleRun} onCopyPermalink={copyPermalink} />
         }
@@ -518,6 +560,7 @@ export function App() {
             weights={weights}
             onWeightChange={setWeight}
             search={search}
+            onOpenAssetClasses={openAssetClasses}
           />
         ) : activeView === "episode" ? (
           <EpisodeView />
@@ -527,6 +570,13 @@ export function App() {
           <CompareView externalPairs={comparePairs} />
         ) : activeView === "coverage" ? (
           <CoverageView />
+        ) : activeView === "assets" ? (
+          <FailSafe fallback={<EmptyState>{t(S.assets.unavailable)}</EmptyState>}>
+            <AssetClassesView
+              key={assetsPrefill ? `${assetsPrefill.country}-${assetsPrefill.anchorYear}` : "free"}
+              prefill={assetsPrefill}
+            />
+          </FailSafe>
         ) : activeView === "sources" ? (
           <SourcesView />
         ) : (

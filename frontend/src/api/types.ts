@@ -310,3 +310,159 @@ export interface AnalyticsOut {
   unique_devices_last_7_days: number;
   daily: DailyCount[];
 }
+
+// ---- asset_returns.py — hors périmètre du plan, voir docs/decisions/0015 à 0024 ----
+export type AssetReturnBasis = "real_total_return" | "nominal_fx_return" | "cpi_change";
+export type AssetSection = "core" | "housing" | "fx" | "inflation";
+
+export interface AssetSourceRef {
+  id: string;
+  citation: string;
+  url: string;
+  licence: string;
+}
+
+export interface AssetSeriesMeta {
+  series_id: string;
+  asset_class: string;
+  tier: number;
+  measure: string;
+  label_fr: string;
+  label_en: string;
+  caveat_fr: string | null;
+  caveat_en: string | null;
+  citation: string;
+  source: AssetSourceRef;
+  first_year: number | null;
+  last_year: number | null;
+}
+
+export interface AssetCountryCoverage {
+  country: string;
+  first_year: number;
+  last_year: number;
+  n_obs: number;
+}
+
+export interface AssetQuantiles {
+  median: number | null;
+  q1: number | null;
+  q3: number | null;
+  min: number | null;
+  max: number | null;
+}
+
+export interface AssetExclusions {
+  before_start: number;
+  truncated_end: number;
+  gap: number;
+  no_series: number;
+}
+
+export interface AssetHorizonCell {
+  horizon: number;
+  n_requested: number;
+  n: number;
+  n_extreme: number;
+  n_interpolated: number | null;
+  n_pegged: number | null;
+  hit_rate: number | null;
+  cumulative: AssetQuantiles;
+  annualised: AssetQuantiles;
+  max_drawdown: AssetQuantiles | null;
+  exclusions: AssetExclusions;
+}
+
+export interface AssetClassOut {
+  class_id: string;
+  section: AssetSection;
+  return_basis: AssetReturnBasis;
+  series: AssetSeriesMeta;
+  countries: AssetCountryCoverage[];
+  cells: AssetHorizonCell[];
+}
+
+export interface AssetPathPoint {
+  step: number;
+  n: number;
+  median: number | null;
+  q1: number | null;
+  q3: number | null;
+}
+
+export interface AssetForwardPath {
+  class_id: string;
+  horizon: number;
+  points: AssetPathPoint[];
+}
+
+export interface AssetReturnsRequest {
+  analogs: { country: string; year: number }[];
+  horizons?: number[];
+}
+
+export interface AssetReturnsResponse {
+  schema_version: string;
+  tier: number;
+  n_analogs: number;
+  horizons: number[];
+  classes: AssetClassOut[];
+  forward_paths: AssetForwardPath[];
+}
+
+export interface AssetSeriesPoint {
+  year: number;
+  value: number | null;
+  nominal: number | null;
+  real: number | null;
+  level: number | null;
+  interpolated: boolean;
+}
+
+export interface AssetRangeSummary {
+  available: boolean;
+  start_year: number | null;
+  end_year: number | null;
+  partial_coverage: boolean;
+  gaps: { start_year: number; end_year: number }[];
+  n_obs: number;
+  level_kind: "real_index" | "local_per_usd" | "cpi_index";
+  level_start: number | null;
+  level_end: number | null;
+  change: number | null;
+  annualised: number | null;
+  nominal_level_end: number | null;
+  nominal_change: number | null;
+  nominal_annualised: number | null;
+  max_drawdown: number | null;
+}
+
+export interface AssetCountrySeries {
+  series: AssetSeriesMeta;
+  headline: "real_return" | "nominal_fx_return" | "inflation";
+  points: AssetSeriesPoint[];
+  summary: AssetRangeSummary;
+}
+
+export type AssetTreeStatus = "group" | "available" | "no_country_data" | "not_ingested" | "excluded";
+
+export interface AssetTreeNode {
+  id: string;
+  label_fr: string;
+  label_en: string;
+  series_id: string | null;
+  status: AssetTreeStatus;
+  tier: number | null;
+  reason_fr: string | null;
+  reason_en: string | null;
+  children: AssetTreeNode[];
+}
+
+export interface CountryAssetClassesResponse {
+  schema_version: string;
+  country: string;
+  from_year: number | null;
+  to_year: number | null;
+  series: AssetCountrySeries[];
+  tree: AssetTreeNode[];
+}

@@ -3,8 +3,11 @@ import type {
   AnalogsSearchRequest,
   AnalogsSearchResponse,
   AnalyticsOut,
+  AssetReturnsRequest,
+  AssetReturnsResponse,
   CompareRequest,
   CompareResponse,
+  CountryAssetClassesResponse,
   CountryOut,
   CoverageCellOut,
   EpisodeOut,
@@ -81,4 +84,14 @@ export const admin = {
  * jamais bloquer ni faire échouer le chargement de l'application. */
 export function recordView(body: ViewPing) {
   return apiPost<void>("/analytics/view", body);
+}
+
+/** Rendements d'actifs (ADR 0015 à 0024). Endpoints additifs : leur échec ne doit
+ * jamais affecter une autre page, les appelants dégradent sans bloquer. */
+export function getAssetReturns(request: AssetReturnsRequest) {
+  return apiPost<AssetReturnsResponse>("/scenario/asset-returns", request);
+}
+
+export function getCountryAssetClasses(country: string, from?: number, to?: number) {
+  return apiGet<CountryAssetClassesResponse>(`/series/${country}/asset-classes`, { from, to });
 }
