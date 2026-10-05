@@ -93,6 +93,19 @@ def _get(series: dict[str, dict[int, float]], indicator: str, year: int) -> floa
     return series.get(indicator, {}).get(year)
 
 
+def _chain_has_gap(
+    series: dict[str, dict[int, float]], indicator: str, first: int, last: int
+) -> bool:
+    """Vrai si un indice chaîné saute une année à l'intérieur de [first, last]. Le chaînage
+    ignore un rendement manquant sans changer le niveau (rendement nul implicite) : tout rapport
+    ou repli calculé par-dessus est faux et doit rester manquant (ADR 0019). Les années
+    manquantes en bord de fenêtre (série pas encore commencée) ne sont pas un saut."""
+    present = [y for y in range(first, last + 1) if _get(series, indicator, y) is not None]
+    if not present:
+        return False
+    return any(_get(series, indicator, y) is None for y in range(present[0], present[-1] + 1))
+
+
 def compute_outcomes(
     country_series: dict[str, dict[int, float]],
     crisis_years: set[int],
@@ -114,8 +127,9 @@ def compute_outcomes(
 
     eq0 = _get(country_series, "equity_index_nominal", year)
     eq1 = _get(country_series, "equity_index_nominal", year + horizon)
+    equity_gap = _chain_has_gap(country_series, "equity_index_nominal", year, year + horizon)
     equity_real_cum = None
-    if eq0 and eq1 and cpi0 and cpi1:
+    if eq0 and eq1 and cpi0 and cpi1 and not equity_gap:
         equity_real_cum = 100.0 * ((eq1 / cpi1) / (eq0 / cpi0) - 1.0)
 
     house0 = _get(country_series, "house_price_index", year)
@@ -156,7 +170,7 @@ def compute_outcomes(
         c = _get(country_series, "cpi", y)
         if e is not None and c is not None:
             real_eq_series.append(e / c)
-    if len(real_eq_series) >= 2:
+    if len(real_eq_series) >= 2 and not equity_gap:
         peak = real_eq_series[0]
         worst = 0.0
         for v in real_eq_series[1:]:

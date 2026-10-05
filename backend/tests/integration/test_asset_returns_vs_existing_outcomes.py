@@ -5,10 +5,9 @@ Résultat attendu et documenté (ADR 0019) :
 - partout où les deux existent, les valeurs sont identiques ;
 - 48 fenêtres n'existent que dans le nouveau calcul : l'ancien indice chaîné démarre à 100
   la première année de rendement et perd ce premier rendement ;
-- 12 fenêtres japonaises n'existent que dans l'ancien : JST n'a aucun rendement actions en
-  1946 et 1947 (bourse fermée) et l'indice chaîné existant saute ces années, ce qui revient
-  à leur attribuer 0 %. La consigne interdit ce comblage : le nouveau calcul exclut ces
-  fenêtres. Le comportement existant n'est PAS modifié ici (consigne de déploiement).
+- avant correction, 12 fenêtres japonaises n'existaient que dans l'ancien calcul : JST n'a aucun
+  rendement actions en 1946 et 1947 (bourse fermée) et l'indice chaîné sautait ces années, ce qui
+  revient à leur attribuer 0 %. Corrigé : l'ancien calcul exclut maintenant ces fenêtres aussi.
 """
 
 import pytest
@@ -87,12 +86,12 @@ def test_windows_only_in_the_new_calculation_are_anchored_just_before_a_return( 
     assert {(c, y) for c, y, _ in only_new} <= expected
 
 
-def test_windows_only_in_the_legacy_calculation_are_japan_across_the_1946_47_closure(  # type: ignore[no-untyped-def]
+def test_no_window_exists_only_in_the_legacy_calculation_any_more(  # type: ignore[no-untyped-def]
     comparison,
 ) -> None:
+    """Avant correction, 12 fenêtres japonaises (ancrages 1938 à 1945) n'existaient que dans
+    l'ancien calcul : l'indice chaîné sautait 1946-1947 (aucun rendement dans JST). La garde
+    `_chain_has_gap` de outcomes_build.py les supprime : l'ancien calcul est maintenant aligné
+    sur le nouveau, qui n'a jamais comblé ce trou."""
     _, _, only_old, _ = comparison
-    assert len(only_old) == 12
-    for country, year, horizon in only_old:
-        assert country == "JPN"
-        assert year < 1946 <= year + horizon  # la fenêtre traverse la fermeture de la bourse
-        assert year + horizon >= 1948
+    assert only_old == []
