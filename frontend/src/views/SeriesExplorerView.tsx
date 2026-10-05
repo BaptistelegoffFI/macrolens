@@ -59,7 +59,6 @@ export function SeriesExplorerView() {
   const [macroData, setMacroData] = useState<Record<string, Record<string, ObservationOut[]>>>({});
   const [assetData, setAssetData] = useState<Record<string, CountryAssetClassesResponse>>({});
   const [assetError, setAssetError] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const chartRef = useRef<EChartHandle>(null);
 
@@ -77,63 +76,84 @@ export function SeriesExplorerView() {
     () => [primary, ...overlays.filter((k) => k !== primary)],
     [primary, overlays],
   );
-  const activeSignature = activeKeys.join(",");
+  // Deux signatures distinctes : changer de série d'actifs ne relance aucun chargement macro, et
+  // ajouter une 2e série d'actifs ne relance pas l'appel (l'endpoint renvoie déjà les six).
+  const macroSignature = activeKeys
+    .filter((k) => !isAssetKey(k))
+    .map((k) => k.slice(MACRO.length))
+    .join(",");
+  const wantsAssets = activeKeys.some(isAssetKey);
+  const [macroLoading, setMacroLoading] = useState(false);
+  const [assetLoading, setAssetLoading] = useState(false);
+  const loading = macroLoading || assetLoading;
 
   useEffect(() => {
-    if (selectedCountries.length === 0) {
+    if (selectedCountries.length === 0 || macroSignature === "") {
       setMacroData({});
-      setAssetData({});
+      setMacroLoading(false);
       return;
     }
     let cancelled = false;
-    setLoading(true);
+    setMacroLoading(true);
     setError(null);
-    setAssetError(false);
-    const keys = activeSignature.split(",");
-    const macroCodes = keys.filter((k) => !isAssetKey(k)).map((k) => k.slice(MACRO.length));
-    const wantsAssets = keys.some(isAssetKey);
-    const macroRequests = macroCodes.flatMap((code) =>
+    const requests = macroSignature.split(",").flatMap((code) =>
       selectedCountries.map((c) =>
-        getSeries({ country: c, indicator: code, from, to }).then(
-          (rows) => [code, c, rows] as const,
-        ),
+        getSeries({ country: c, indicator: code, from, to }).then((rows) => [code, c, rows] as const),
       ),
     );
-    // Les séries d'actifs sont chargées à part (allSettled) : leur échec ne doit jamais
-    // empêcher l'affichage des séries macro (ADR 0024, dégradation gracieuse).
-    const assetRequests = wantsAssets
-      ? Promise.allSettled(selectedCountries.map((c) => getCountryAssetClasses(c, from, to)))
-      : Promise.resolve([]);
-    Promise.all([Promise.all(macroRequests), assetRequests])
-      .then(([macroResults, assetResults]) => {
+    Promise.all(requests)
+      .then((results) => {
         if (cancelled) return;
         const macro: Record<string, Record<string, ObservationOut[]>> = {};
-        for (const [code, country, rows] of macroResults) {
+        for (const [code, country, rows] of results) {
           (macro[code] ??= {})[country] = rows;
         }
+        setMacroData(macro);
+        setMacroLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : t(S.common.unknownError));
+        setMacroLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCountries, macroSignature, from, to, t]);
+
+  // Les séries d'actifs sont chargées à part (allSettled) : leur échec ne doit jamais empêcher
+  // l'affichage des séries macro (ADR 0024, dégradation gracieuse).
+  useEffect(() => {
+    if (selectedCountries.length === 0 || !wantsAssets) {
+      setAssetData({});
+      setAssetError(false);
+      setAssetLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setAssetLoading(true);
+    setAssetError(false);
+    Promise.allSettled(selectedCountries.map((c) => getCountryAssetClasses(c, from, to))).then(
+      (results) => {
+        if (cancelled) return;
         const assets: Record<string, CountryAssetClassesResponse> = {};
         let failed = false;
-        assetResults.forEach((result, i) => {
+        results.forEach((result, i) => {
           if (result.status === "fulfilled" && Array.isArray(result.value?.series)) {
             assets[selectedCountries[i]] = result.value;
           } else {
             failed = true;
           }
         });
-        setMacroData(macro);
         setAssetData(assets);
         setAssetError(failed);
-        setLoading(false);
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        setError(err instanceof Error ? err.message : t(S.common.unknownError));
-        setLoading(false);
-      });
+        setAssetLoading(false);
+      },
+    );
     return () => {
       cancelled = true;
     };
-  }, [selectedCountries, activeSignature, from, to, t]);
+  }, [selectedCountries, wantsAssets, from, to]);
 
   function toggleCountry(iso3: string) {
     setSelectedCountries((prev) => (prev.includes(iso3) ? prev.filter((c) => c !== iso3) : [...prev, iso3]));

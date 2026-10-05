@@ -75,6 +75,31 @@ describe("SeriesExplorerView with asset overlays", () => {
     expect(screen.getByText("Indice des prix + Actions, rendement réel annuel")).toBeInTheDocument();
   });
 
+  it("does not reload when a second asset series is added, nor leave the loader stuck", async () => {
+    install("ok");
+    renderExplorer();
+    await userEvent.click(await screen.findByRole("checkbox", { name: /Actions, rendement réel annuel/ }));
+    await waitFor(() => expect(urls().filter((u) => u.includes("/asset-classes"))).toHaveLength(6));
+    const macroBefore = urls().filter((u) => u.includes("/series?")).length;
+    await userEvent.click(screen.getByRole("checkbox", { name: /Inflation annuelle \(prix\)/ }));
+    await new Promise((r) => setTimeout(r, 50));
+    expect(urls().filter((u) => u.includes("/asset-classes"))).toHaveLength(6);
+    expect(urls().filter((u) => u.includes("/series?")).length).toBe(macroBefore);
+    expect(screen.queryByText("Chargement…")).not.toBeInTheDocument();
+  });
+
+  it("works with an asset series as the only series, with no macro request", async () => {
+    install("ok");
+    renderExplorer();
+    const select = (await screen.findAllByRole("combobox"))[0];
+    const before = urls().filter((u) => u.includes("/series?")).length;
+    await userEvent.selectOptions(select, "asset:jst.equity_tr");
+    await waitFor(() => expect(urls().filter((u) => u.includes("/asset-classes")).length).toBe(6));
+    expect(urls().filter((u) => u.includes("/series?")).length).toBe(before);
+    await waitFor(() => expect(screen.queryByText("Chargement…")).not.toBeInTheDocument());
+    expect(screen.getAllByText("Actions, rendement réel annuel").length).toBeGreaterThan(0);
+  });
+
   it("recommends the standardized scale when units are mixed and applies it on click", async () => {
     install("ok");
     renderExplorer();

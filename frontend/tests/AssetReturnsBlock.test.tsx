@@ -45,7 +45,7 @@ describe("AssetReturnsBlock", () => {
   it("posts the analogues returned by the search and renders every class with its tier", async () => {
     mockFetch(async () => ({ ok: true, json: async () => ASSET_RETURNS_FIXTURE }));
     renderBlock();
-    await screen.findByText("Actions");
+    await screen.findByRole("rowheader", { name: /Actions/ });
     expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining("/scenario/asset-returns"),
       expect.objectContaining({ method: "POST" }),
@@ -109,12 +109,21 @@ describe("AssetReturnsBlock", () => {
   it("switches the displayed measure and says drawdown is a lower bound", async () => {
     mockFetch(async () => ({ ok: true, json: async () => ASSET_RETURNS_FIXTURE }));
     renderBlock();
-    await screen.findByText("Actions");
+    await screen.findByRole("rowheader", { name: /Actions/ });
     await userEvent.click(screen.getByRole("button", { name: "Annualisé" }));
     expect(screen.getAllByText("-5.0%").length).toBeGreaterThan(0);
     await userEvent.click(screen.getByRole("button", { name: "Repli maximal" }));
     expect(screen.getAllByText("-30.0%").length).toBeGreaterThan(0);
     expect(screen.getByText(/minorant du repli réel/)).toBeInTheDocument();
+  });
+
+  it("labels each curve of the median path chart", async () => {
+    mockFetch(async () => ({ ok: true, json: async () => ASSET_RETURNS_FIXTURE }));
+    renderBlock();
+    const title = await screen.findByText(/Trajectoire médiane sur 10 ans/);
+    const chartBlock = title.parentElement as HTMLElement;
+    expect(within(chartBlock).getByText("Actions")).toBeInTheDocument();
+    expect(within(chartBlock).getByText("Obligations d'État")).toBeInTheDocument();
   });
 
   it("shows the provenance line with source, tier, coverage and the no-imputation rule", async () => {

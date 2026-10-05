@@ -96,5 +96,24 @@ export function AssetPathChart({ paths }: AssetPathChartProps) {
     };
   }, [paths, lang, t]);
 
-  return <EChart option={option} height={220} />;
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 16, fontSize: 11, marginBottom: 4 }}>
+        {paths.map((path, i) => (
+          <span key={path.class_id} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <span
+              style={{
+                display: "inline-block",
+                width: 14,
+                height: 2,
+                background: tokens.series[i % tokens.series.length],
+              }}
+            />
+            {CLASS_LABELS[path.class_id]?.[lang] ?? path.class_id}
+          </span>
+        ))}
+      </div>
+      <EChart option={option} height={220} />
+    </div>
+  );
 }
