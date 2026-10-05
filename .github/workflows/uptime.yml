@@ -1,0 +1,57 @@
+name: Uptime
+
+# ADR 0027 / docs/operations.md. Interroge le site en production plusieurs fois par jour :
+#  - réveille les services Render gratuits avant l'arrivée d'un visiteur ;
+#  - garde le projet Supabase actif (les projets gratuits sont mis en pause après ~7 jours sans
+#    requête) ;
+#  - fait échouer le workflow, donc notifie GitHub, si un contrôle échoue durablement.
+# GitHub désactive les workflows planifiés d'un dépôt public après 60 jours sans activité : le
+# réactiver depuis l'onglet Actions si cela arrive.
+
+on:
+  schedule:
+    - cron: "17 5,11,17,23 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      WEB: https://macrolens-web.onrender.com
+      API: https://macrolens-api-ofns.onrender.com
+    steps:
+      - name: Web serves the app
+        run: |
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 15 --retry-all-errors \
+            --max-time 90 "$WEB/" | grep -q '<div id="root">'
+
+      - name: API health
+        run: |
+          curl --fail --silent --show-error --retry 8 --retry-delay 15 --retry-all-errors \
+            --max-time 90 "$API/health"
+
+      - name: Site status (database reachable)
+        run: |
+          curl --fail --silent --show-error --retry 5 --retry-delay 10 --retry-all-errors \
+            --max-time 60 "$API/api/v1/status"
+
+      - name: Analogue search returns results
+        run: |
+          curl --fail --silent --show-error --retry 5 --retry-delay 10 --retry-all-errors \
+            --max-time 60 -X POST "$API/api/v1/analogs/search" \
+            -H 'Content-Type: application/json' \
+            -d '{"mode":"anchor","anchor":{"country":"SWE","year":1991},"k":5}' \
+            | python3 -c 'import json,sys; d=json.load(sys.stdin); assert len(d["analogs"])==5, d'
+
+      - name: Asset returns endpoints
+        run: |
+          curl --fail --silent --show-error --retry 5 --retry-delay 10 --retry-all-errors \
+            --max-time 60 -X POST "$API/api/v1/scenario/asset-returns" \
+            -H 'Content-Type: application/json' \
+            -d '{"analogs":[{"country":"SWE","year":1991}]}' > /dev/null
+          curl --fail --silent --show-error --retry 5 --retry-delay 10 --retry-all-errors \
+            --max-time 60 "$API/api/v1/series/USA/asset-classes?from=1929&to=1932" > /dev/null

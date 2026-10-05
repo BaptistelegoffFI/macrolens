@@ -33,10 +33,13 @@ def _cmd_etl_download(args: argparse.Namespace) -> int:
     return 0
 
 
-def _cmd_etl_run_all(_args: argparse.Namespace) -> int:
+def _cmd_etl_run_all(args: argparse.Namespace) -> int:
     with session_scope() as session:
-        report = pipeline.run_all(session)
+        report = pipeline.run_all(session, refresh=args.refresh)
     for s in report.sources:
+        if s.skipped or s.reconcile is None:
+            print(f"{s.source_id}: déjà chargée, ingestion ignorée (--refresh pour rejouer)")
+            continue
         r = s.reconcile
         print(
             f"{s.source_id}: nouvelles={r.inserted_new} "
@@ -45,6 +48,8 @@ def _cmd_etl_run_all(_args: argparse.Namespace) -> int:
         )
     if report.asset_observations is None:
         print("asset_returns: ECHEC (non bloquant, voir les journaux)")
+    elif report.asset_skipped:
+        print(f"asset_returns: déjà chargé, lignes={report.asset_observations}")
     else:
         print(f"asset_returns: lignes={report.asset_observations}")
     print(
@@ -81,7 +86,15 @@ def build_parser() -> argparse.ArgumentParser:
     download_parser.add_argument("--force", action="store_true")
     download_parser.set_defaults(func=_cmd_etl_download)
 
-    run_all_parser = etl_subparsers.add_parser("run-all", help="Rejoue le pipeline complet")
+    run_all_parser = etl_subparsers.add_parser(
+        "run-all",
+        help="Charge les sources absentes de la base ; --refresh rejoue tout (ADR 0026)",
+    )
+    run_all_parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help="rejoue toutes les sources même si elles sont déjà chargées",
+    )
     run_all_parser.set_defaults(func=_cmd_etl_run_all)
 
     build_features_parser = subparsers.add_parser(

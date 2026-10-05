@@ -42,6 +42,7 @@ describe("AssetClassesView", () => {
     const row = (await screen.findByRole("rowheader", { name: /Actions/ })).closest("tr") as HTMLElement;
     expect(fetch).toHaveBeenCalledWith(
       expect.objectContaining({ href: expect.stringMatching(/\/series\/USA\/asset-classes\?from=1929&to=1932/) }),
+      expect.anything(),
     );
     expect(within(row).getByText("100.0")).toBeInTheDocument();
     expect(within(row).getByText("48.1")).toBeInTheDocument();
@@ -138,6 +139,7 @@ describe("AssetClassesView", () => {
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith(
         expect.objectContaining({ href: expect.stringMatching(/from=1950&to=1932/) }),
+        expect.anything(),
       ),
     );
   });

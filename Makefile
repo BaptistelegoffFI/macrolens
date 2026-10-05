@@ -31,7 +31,7 @@ seed:
 	cd backend && uv run macrolens seed
 
 etl:
-	cd backend && uv run macrolens etl run-all
+	cd backend && uv run macrolens etl run-all --refresh
 
 build-features:
 	cd backend && uv run macrolens build-features

@@ -15,6 +15,7 @@ from typing import Any, cast
 
 import pandas as pd
 import pyreadstat
+from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
@@ -143,3 +144,20 @@ def run_jst_assets(session: Session, *, data_dir: Path) -> int:
     )
     _upsert_series_meta(session, catalogue)
     return _upsert_observations(session, rows, raw_file_ids[dta_file.filename])
+
+
+def count_loaded(session: Session) -> int:
+    return int(session.scalar(select(func.count()).select_from(AssetObservation)) or 0)
+
+
+def is_loaded(session: Session, data_dir: Path) -> bool:
+    """Vrai si toutes les séries du catalogue sont enregistrées et que les rendements existent :
+    le démarrage de la production n'a alors rien à retélécharger (ADR 0026). Toute erreur
+    (tables absentes, base indisponible) vaut « pas chargé » : l'ingestion non bloquante prend
+    le relais et consigne l'échec."""
+    try:
+        catalogue = load_catalogue(data_dir / "reference" / "asset_catalogue.yaml")
+        registered = int(session.scalar(select(func.count()).select_from(AssetSeries)) or 0)
+        return registered >= len(catalogue.series) and count_loaded(session) > 0
+    except Exception:
+        return False

@@ -342,6 +342,13 @@ export const S = {
     dismiss: { fr: "Masquer", en: "Dismiss" },
   },
 
+  waking: {
+    message: {
+      fr: "Le serveur se réveille après une période d'inactivité. Cela peut prendre une minute ; la page se met à jour toute seule.",
+      en: "The server is waking up after a period of inactivity. This can take up to a minute; the page updates by itself.",
+    },
+  },
+
   admin: {
     pageTitle: { fr: "Administration MacroLens", en: "MacroLens administration" },
     tokenLabel: { fr: "Jeton d'administration", en: "Admin token" },

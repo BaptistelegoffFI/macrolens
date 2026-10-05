@@ -1,0 +1,14 @@
+.banner {
+  position: fixed;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  z-index: 1000;
+  max-width: min(640px, calc(100vw - 32px));
+  padding: 8px 14px;
+  background: var(--bg-selected);
+  border: 1px solid var(--accent);
+  color: var(--fg);
+  font-size: 12px;
+  line-height: 1.4;
+}
