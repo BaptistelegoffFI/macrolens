@@ -22,7 +22,7 @@ Le démarrage de l'API exécute `alembic upgrade head && seed && etl run-all && 
 
 ## Avant
 
-1. `make check` vert sur la branche, base locale (fait : 281 tests backend, 191 frontend au dernier
+1. `make check` vert sur la branche, base locale (fait : 287 tests backend, 191 frontend au dernier
    passage).
 2. Noter les points de retour : SHA des déploiements actuels (`render deploys list <service>`) pour
    `macrolens-api` et `macrolens-web`, et la révision de la base (`fc77db09a6e1`, vérifiable en
