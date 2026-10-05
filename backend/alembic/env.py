@@ -5,6 +5,8 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from macrolens.db.base import Base
 from macrolens.db.models import (  # noqa: F401 — registers tables on Base.metadata
+    AssetObservation,
+    AssetSeries,
     Country,
     Event,
     Indicator,
