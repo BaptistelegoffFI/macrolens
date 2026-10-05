@@ -8,7 +8,7 @@ from macrolens.core.asset_aggregation import AssetWindow, aggregate_cell, aggreg
 
 
 def _w(*returns: float, extreme: bool = False) -> AssetWindow:
-    return AssetWindow(real_returns=tuple(returns), extreme=extreme)
+    return AssetWindow(returns=tuple(returns), extreme=extreme)
 
 
 def test_aggregate_cell_single_year_quantiles_and_hit_rate() -> None:

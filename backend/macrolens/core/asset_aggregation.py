@@ -17,9 +17,10 @@ from macrolens.core.outcomes import aggregate_continuous
 
 @dataclass(frozen=True)
 class AssetWindow:
-    """Fenêtre prospective complète d'un analogue : rendements réels annuels."""
+    """Fenêtre prospective complète d'un analogue : rendements annuels (réels pour
+    les classes d'actifs, nominaux pour le change et l'inflation, ADR 0017)."""
 
-    real_returns: tuple[float, ...]
+    returns: tuple[float, ...]
     extreme: bool = False
 
 
@@ -72,10 +73,10 @@ def aggregate_cell(windows: Sequence[AssetWindow | None]) -> AssetCell:
     annualised: list[float] = []
     drawdowns: list[float] = []
     for window in present:
-        cum, ann = cumulative_and_annualised(window.real_returns)
+        cum, ann = cumulative_and_annualised(window.returns)
         cumulative.append(cum)
         annualised.append(ann)
-        drawdowns.append(max_drawdown(window.real_returns))
+        drawdowns.append(max_drawdown(window.returns))
     return AssetCell(
         n=len(present),
         n_extreme=sum(1 for w in present if w.extreme),
@@ -89,8 +90,8 @@ def aggregate_cell(windows: Sequence[AssetWindow | None]) -> AssetCell:
 def aggregate_paths(windows: Sequence[AssetWindow | None], horizon: int) -> list[PathPoint]:
     """Trajectoire médiane et interquartile du rendement réel cumulé, de l'année 0 à
     `horizon`. Seules les fenêtres complètes sur tout l'horizon comptent."""
-    complete = [w for w in windows if w is not None and len(w.real_returns) == horizon]
-    paths = [cumulative_path(w.real_returns) for w in complete]
+    complete = [w for w in windows if w is not None and len(w.returns) == horizon]
+    paths = [cumulative_path(w.returns) for w in complete]
     points: list[PathPoint] = []
     for step in range(horizon + 1):
         agg = aggregate_continuous([p[step] - 1.0 for p in paths])
