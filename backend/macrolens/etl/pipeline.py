@@ -6,19 +6,22 @@ les sources, pour refléter l'état complet de la base.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from macrolens.etl import conflicts, coverage, load, reconcile, validate
+from macrolens.etl import asset_returns, conflicts, coverage, load, reconcile, validate
 from macrolens.etl.reconcile import ReconcileReport
 from macrolens.etl.sources import bis_cbpol, jst, maddison
 from macrolens.paths import DATA_DIR, REPORTS_DIR
 
 DEFAULT_DATA_DIR = DATA_DIR
 DEFAULT_REPORTS_DIR = REPORTS_DIR
+
+logger = logging.getLogger("macrolens.etl.pipeline")
 
 
 @dataclass(frozen=True)
@@ -33,6 +36,8 @@ class PipelineReport:
     n_observations: int = 0  # total réel en base (requête directe), pas un delta de ce run
     coverage_report_path: Path | None = None
     conflicts_report_path: Path | None = None
+    # None = ingestion des rendements d'actifs échouée (non bloquante, ADR 0024).
+    asset_observations: int | None = None
 
 
 def _validate_or_raise(df: pd.DataFrame, data_dir: Path, source_label: str) -> None:
@@ -103,6 +108,20 @@ def run_maddison(
     return SourceRunReport(source_id=maddison.SOURCE_ID, reconcile=recon)
 
 
+def _run_asset_returns_non_blocking(session: Session, data_dir: Path) -> int | None:
+    """ADR 0024 : en production, chaque démarrage de l'API enchaîne
+    `alembic upgrade head && seed && etl run-all && uvicorn`. Un échec de
+    l'ingestion des rendements d'actifs, fonctionnalité additive, ne doit
+    jamais empêcher l'application principale de démarrer. Le savepoint isole
+    l'échec : l'ingestion principale déjà écrite reste intacte."""
+    try:
+        with session.begin_nested():
+            return asset_returns.run_jst_assets(session, data_dir=data_dir)
+    except Exception:
+        logger.exception("ingestion des rendements d'actifs échouée (non bloquant)")
+        return None
+
+
 def run_all(session: Session, *, data_dir: Path = DEFAULT_DATA_DIR) -> PipelineReport:
     sources = [
         run_jst(session, data_dir=data_dir),
@@ -111,6 +130,8 @@ def run_all(session: Session, *, data_dir: Path = DEFAULT_DATA_DIR) -> PipelineR
     ]
 
     session.flush()
+
+    asset_rows = _run_asset_returns_non_blocking(session, data_dir)
 
     reports_dir = REPORTS_DIR
     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -127,4 +148,5 @@ def run_all(session: Session, *, data_dir: Path = DEFAULT_DATA_DIR) -> PipelineR
         n_observations=coverage.total_observations(session),
         coverage_report_path=coverage_path,
         conflicts_report_path=conflicts_path,
+        asset_observations=asset_rows,
     )

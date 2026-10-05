@@ -1,8 +1,13 @@
 import type { EChartsOption } from "echarts";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { getSeries, meta } from "../api/endpoints";
-import type { CountryOut, IndicatorOut, ObservationOut } from "../api/types";
+import { getCountryAssetClasses, getSeries, meta } from "../api/endpoints";
+import type {
+  CountryAssetClassesResponse,
+  CountryOut,
+  IndicatorOut,
+  ObservationOut,
+} from "../api/types";
 import { axisNumericStyle, baseChartOption, formatAxisNumber, tokens } from "../charts/theme";
 import type { EChartHandle } from "../components/charts/EChart";
 import { EChart } from "../components/charts/EChart";
@@ -11,6 +16,7 @@ import { Num } from "../components/table/Num";
 import { useLanguage } from "../i18n/LanguageContext";
 import { S } from "../i18n/strings";
 import type { Bi } from "../i18n/strings";
+import { ASSET_SERIES_OPTIONS } from "../lib/assetReturns";
 import { downloadDataUrl, downloadText, toDelimited } from "../lib/csv";
 import { applyScale, scaleAvailability } from "../lib/seriesScale";
 import type { PointsByCountry, ScaleMode } from "../lib/seriesScale";
@@ -25,18 +31,34 @@ const SCALE_OPTIONS: { mode: ScaleMode; label: Bi }[] = [
   { mode: "zscore", label: S.seriesExplorer.scaleZscore },
 ];
 
-/** §11.3 Vue Explorateur de séries (F4) : pays × indicateurs, superposition, export. */
+const MACRO = "macro:";
+const ASSET = "asset:";
+const isAssetKey = (key: string) => key.startsWith(ASSET);
+
+interface Pair {
+  id: string;
+  country: string;
+  key: string;
+  color: string;
+  label: string;
+}
+
+/** §11.3 Vue Explorateur de séries (F4) : pays × indicateurs, superposition, export.
+ * Les classes d'actifs (ADR 0015 à 0024) s'ajoutent aux séries macro avec le même graphique
+ * et le même modèle d'interaction : une série est une clé « macro:cpi » ou « asset:jst.equity_tr ». */
 export function SeriesExplorerView() {
-  const { t, pick } = useLanguage();
+  const { t, pick, lang } = useLanguage();
   const [countries, setCountries] = useState<CountryOut[]>([]);
   const [indicators, setIndicators] = useState<IndicatorOut[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>(DEFAULT_COUNTRIES);
-  const [indicator, setIndicator] = useState("cpi");
+  const [primary, setPrimary] = useState(`${MACRO}cpi`);
+  const [overlays, setOverlays] = useState<string[]>([]);
   const [fromYear, setFromYear] = useState("");
   const [toYear, setToYear] = useState("");
   const [scale, setScale] = useState<ScaleMode>("level");
-  const [seriesByCountry, setSeriesByCountry] = useState<Record<string, ObservationOut[]>>({});
-  const [loading, setLoading] = useState(false);
+  const [macroData, setMacroData] = useState<Record<string, Record<string, ObservationOut[]>>>({});
+  const [assetData, setAssetData] = useState<Record<string, CountryAssetClassesResponse>>({});
+  const [assetError, setAssetError] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const chartRef = useRef<EChartHandle>(null);
 
@@ -50,58 +72,161 @@ export function SeriesExplorerView() {
   const from = fromYear !== "" && !Number.isNaN(Number(fromYear)) ? Number(fromYear) : undefined;
   const to = toYear !== "" && !Number.isNaN(Number(toYear)) ? Number(toYear) : undefined;
 
+  const activeKeys = useMemo(
+    () => [primary, ...overlays.filter((k) => k !== primary)],
+    [primary, overlays],
+  );
+  // Deux signatures distinctes : changer de série d'actifs ne relance aucun chargement macro, et
+  // ajouter une 2e série d'actifs ne relance pas l'appel (l'endpoint renvoie déjà les six).
+  const macroSignature = activeKeys
+    .filter((k) => !isAssetKey(k))
+    .map((k) => k.slice(MACRO.length))
+    .join(",");
+  const wantsAssets = activeKeys.some(isAssetKey);
+  const [macroLoading, setMacroLoading] = useState(false);
+  const [assetLoading, setAssetLoading] = useState(false);
+  const loading = macroLoading || assetLoading;
+
   useEffect(() => {
-    if (selectedCountries.length === 0) {
-      setSeriesByCountry({});
+    if (selectedCountries.length === 0 || macroSignature === "") {
+      setMacroData({});
+      setMacroLoading(false);
       return;
     }
-    setLoading(true);
+    let cancelled = false;
+    setMacroLoading(true);
     setError(null);
-    Promise.all(selectedCountries.map((c) => getSeries({ country: c, indicator, from, to })))
+    const requests = macroSignature.split(",").flatMap((code) =>
+      selectedCountries.map((c) =>
+        getSeries({ country: c, indicator: code, from, to }).then((rows) => [code, c, rows] as const),
+      ),
+    );
+    Promise.all(requests)
       .then((results) => {
-        const map: Record<string, ObservationOut[]> = {};
-        selectedCountries.forEach((c, i) => {
-          map[c] = results[i];
-        });
-        setSeriesByCountry(map);
-        setLoading(false);
+        if (cancelled) return;
+        const macro: Record<string, Record<string, ObservationOut[]>> = {};
+        for (const [code, country, rows] of results) {
+          (macro[code] ??= {})[country] = rows;
+        }
+        setMacroData(macro);
+        setMacroLoading(false);
       })
       .catch((err: unknown) => {
+        if (cancelled) return;
         setError(err instanceof Error ? err.message : t(S.common.unknownError));
-        setLoading(false);
+        setMacroLoading(false);
       });
-  }, [selectedCountries, indicator, from, to, t]);
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCountries, macroSignature, from, to, t]);
+
+  // Les séries d'actifs sont chargées à part (allSettled) : leur échec ne doit jamais empêcher
+  // l'affichage des séries macro (ADR 0024, dégradation gracieuse).
+  useEffect(() => {
+    if (selectedCountries.length === 0 || !wantsAssets) {
+      setAssetData({});
+      setAssetError(false);
+      setAssetLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setAssetLoading(true);
+    setAssetError(false);
+    Promise.allSettled(selectedCountries.map((c) => getCountryAssetClasses(c, from, to))).then(
+      (results) => {
+        if (cancelled) return;
+        const assets: Record<string, CountryAssetClassesResponse> = {};
+        let failed = false;
+        results.forEach((result, i) => {
+          if (result.status === "fulfilled" && Array.isArray(result.value?.series)) {
+            assets[selectedCountries[i]] = result.value;
+          } else {
+            failed = true;
+          }
+        });
+        setAssetData(assets);
+        setAssetError(failed);
+        setAssetLoading(false);
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCountries, wantsAssets, from, to]);
 
   function toggleCountry(iso3: string) {
     setSelectedCountries((prev) => (prev.includes(iso3) ? prev.filter((c) => c !== iso3) : [...prev, iso3]));
   }
 
-  const indicatorMeta = indicators.find((i) => i.code === indicator);
+  function toggleOverlay(key: string) {
+    setOverlays((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+  }
 
-  const pointsByCountry = useMemo<PointsByCountry>(() => {
+  const primaryCode = primary.startsWith(MACRO) ? primary.slice(MACRO.length) : null;
+  const indicatorMeta = primaryCode ? indicators.find((i) => i.code === primaryCode) : undefined;
+
+  function labelOf(key: string): string {
+    if (isAssetKey(key)) {
+      const option = ASSET_SERIES_OPTIONS.find((o) => `${ASSET}${o.id}` === key);
+      return option ? option[lang] : key;
+    }
+    const code = key.slice(MACRO.length);
+    const found = indicators.find((i) => i.code === code);
+    return found ? pick(found.label_fr, found.label_en) : code;
+  }
+
+  const single = activeKeys.length === 1;
+  const pairs = useMemo<Pair[]>(
+    () =>
+      activeKeys.flatMap((key, keyIndex) =>
+        selectedCountries.map((country, countryIndex) => ({
+          id: `${country}|${key}`,
+          country,
+          key,
+          color: tokens.series[(keyIndex * selectedCountries.length + countryIndex) % tokens.series.length],
+          label: single ? country : `${country} · ${labelOf(key)}`,
+        })),
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeKeys, selectedCountries, single, lang, indicators],
+  );
+
+  // Points (année, valeur) de chaque paire. Une série d'actifs est affichée en pourcentage
+  // (valeur annuelle x 100) ; les valeurs brutes de l'API restent des fractions.
+  const pointsByPair = useMemo<PointsByCountry>(() => {
     const map: PointsByCountry = {};
-    for (const c of selectedCountries) {
-      map[c] = (seriesByCountry[c] ?? [])
-        .filter((o) => o.value !== null)
-        .map((o) => [new Date(o.period_start).getFullYear(), o.value as number]);
+    for (const pair of pairs) {
+      if (isAssetKey(pair.key)) {
+        const id = pair.key.slice(ASSET.length);
+        const series = assetData[pair.country]?.series.find((s) => s.series.series_id === id);
+        map[pair.id] = (series?.points ?? [])
+          .filter((p) => p.value !== null)
+          .map((p) => [p.year, (p.value as number) * 100]);
+      } else {
+        const code = pair.key.slice(MACRO.length);
+        map[pair.id] = (macroData[code]?.[pair.country] ?? [])
+          .filter((o) => o.value !== null)
+          .map((o) => [new Date(o.period_start).getFullYear(), o.value as number]);
+      }
     }
     return map;
-  }, [selectedCountries, seriesByCountry]);
+  }, [pairs, macroData, assetData]);
 
-  const availability = useMemo(() => scaleAvailability(pointsByCountry), [pointsByCountry]);
-  const scaled = useMemo(() => applyScale(scale, pointsByCountry), [scale, pointsByCountry]);
+  const availability = useMemo(() => scaleAvailability(pointsByPair), [pointsByPair]);
+  const scaled = useMemo(() => applyScale(scale, pointsByPair), [scale, pointsByPair]);
   const effectiveScale = scaled.mode;
   const fellBack = scale !== effectiveScale;
 
   const option = useMemo<EChartsOption>(() => {
     const decimals2 = effectiveScale === "base100" || effectiveScale === "zscore";
-    const series = selectedCountries.map((c, i) => ({
+    const series = pairs.map((pair, i) => ({
       type: "line" as const,
-      name: c,
+      name: pair.label,
       symbol: "none" as const,
       connectNulls: false,
-      lineStyle: { color: tokens.series[i % tokens.series.length], width: 1 },
-      data: scaled.series[c] ?? [],
+      lineStyle: { color: pair.color, width: 1 },
+      data: scaled.series[pair.id] ?? [],
       ...(i === 0 && (effectiveScale === "base100" || effectiveScale === "zscore")
         ? {
             markLine: {
@@ -153,36 +278,53 @@ export function SeriesExplorerView() {
       },
       series,
     };
-  }, [selectedCountries, scaled, effectiveScale]);
+  }, [pairs, scaled, effectiveScale]);
 
-  const legendRows = selectedCountries.map((c, i) => {
-    const obs = (seriesByCountry[c] ?? []).filter((o) => o.value !== null);
-    const last = obs[obs.length - 1];
-    const prev = obs[obs.length - 2];
-    const variation = last && prev && prev.value !== null ? (((last.value ?? 0) - prev.value) / prev.value) * 100 : null;
-    return { country: c, color: tokens.series[i % tokens.series.length], last, variation };
+  const legendRows = pairs.map((pair) => {
+    const points = pointsByPair[pair.id] ?? [];
+    const last = points[points.length - 1];
+    const prev = points[points.length - 2];
+    // Variation en % d'une valeur déjà en %, ou d'une valeur nulle : pas de sens, pas affichée.
+    const variation =
+      !isAssetKey(pair.key) && last && prev && prev[1] !== 0 ? ((last[1] - prev[1]) / prev[1]) * 100 : null;
+    return { pair, last: last ? last[1] : null, variation };
   });
 
+  const singleMacroCode = single && primaryCode ? primaryCode : null;
+  const exportName = single ? primary.slice(primary.indexOf(":") + 1) : "series";
+
   function buildRows(): (string | number | null)[][] {
-    const rows: (string | number | null)[][] = [["pays", "annee", "valeur"]];
-    for (const c of selectedCountries) {
-      for (const o of seriesByCountry[c] ?? []) {
-        rows.push([c, new Date(o.period_start).getFullYear(), o.value]);
+    if (singleMacroCode) {
+      const rows: (string | number | null)[][] = [["pays", "annee", "valeur"]];
+      for (const c of selectedCountries) {
+        for (const o of macroData[singleMacroCode]?.[c] ?? []) {
+          rows.push([c, new Date(o.period_start).getFullYear(), o.value]);
+        }
+      }
+      return rows;
+    }
+    const rows: (string | number | null)[][] = [["pays", "serie", "annee", "valeur"]];
+    for (const pair of pairs) {
+      for (const [year, value] of pointsByPair[pair.id] ?? []) {
+        rows.push([pair.country, pair.key, year, value]);
       }
     }
     return rows;
   }
 
   function exportCsv() {
-    downloadText(`${indicator}.csv`, toDelimited(buildRows(), ","), "text/csv");
+    downloadText(`${exportName}.csv`, toDelimited(buildRows(), ","), "text/csv");
   }
 
   function exportTsv() {
-    downloadText(`${indicator}.tsv`, toDelimited(buildRows(), "\t"), "text/tab-separated-values");
+    downloadText(`${exportName}.tsv`, toDelimited(buildRows(), "\t"), "text/tab-separated-values");
   }
 
   function exportJson() {
-    downloadText(`${indicator}.json`, JSON.stringify(seriesByCountry, null, 2), "application/json");
+    const payload = singleMacroCode
+      ? macroData[singleMacroCode] ?? {}
+      : Object.fromEntries(pairs.map((p) => [p.id, pointsByPair[p.id] ?? []]));
+    downloadText(`${exportName}.json`, JSON.stringify(payload, null, 2), "application/json");
   }
 
   return (
@@ -190,13 +332,60 @@ export function SeriesExplorerView() {
       <div className={styles.controls}>
         <div className={styles.card}>
           <div className={styles.cardTitle}>{t(S.seriesExplorer.indicatorLabel)}</div>
-          <select className={styles.select} value={indicator} onChange={(e) => setIndicator(e.target.value)}>
-            {indicators.map((i) => (
-              <option key={i.code} value={i.code}>
-                {pick(i.label_fr, i.label_en)}
-              </option>
-            ))}
+          <select className={styles.select} value={primary} onChange={(e) => setPrimary(e.target.value)}>
+            <optgroup label={t(S.assets.explorerMacroGroup)}>
+              {indicators.map((i) => (
+                <option key={i.code} value={`${MACRO}${i.code}`}>
+                  {pick(i.label_fr, i.label_en)}
+                </option>
+              ))}
+            </optgroup>
+            <optgroup label={t(S.assets.explorerAssetGroup)}>
+              {ASSET_SERIES_OPTIONS.map((o) => (
+                <option key={o.id} value={`${ASSET}${o.id}`}>
+                  {o[lang]}
+                </option>
+              ))}
+            </optgroup>
           </select>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.cardTitle}>{t(S.assets.explorerOverlayTitle)}</div>
+          <div className={styles.countryList}>
+            <div className={styles.overlayHeading}>{t(S.assets.explorerAssetGroup)}</div>
+            {ASSET_SERIES_OPTIONS.filter((o) => `${ASSET}${o.id}` !== primary).map((o) => (
+              <label key={o.id} className={styles.countryRow}>
+                <input
+                  type="checkbox"
+                  checked={overlays.includes(`${ASSET}${o.id}`)}
+                  onChange={() => toggleOverlay(`${ASSET}${o.id}`)}
+                />
+                {o[lang]}
+              </label>
+            ))}
+            <div className={styles.overlayHeading}>{t(S.assets.explorerMacroGroup)}</div>
+            {indicators
+              .filter((i) => `${MACRO}${i.code}` !== primary)
+              .map((i) => (
+                <label key={i.code} className={styles.countryRow}>
+                  <input
+                    type="checkbox"
+                    checked={overlays.includes(`${MACRO}${i.code}`)}
+                    onChange={() => toggleOverlay(`${MACRO}${i.code}`)}
+                  />
+                  {pick(i.label_fr, i.label_en)}
+                </label>
+              ))}
+          </div>
+          {!single && effectiveScale === "level" && (
+            <p className={styles.mixedHint}>
+              {t(S.assets.explorerMixedUnits)}{" "}
+              <button type="button" className={styles.periodResetBtn} onClick={() => setScale("zscore")}>
+                {t(S.assets.explorerUseZ)}
+              </button>
+            </p>
+          )}
         </div>
 
         <div className={styles.card}>
@@ -295,21 +484,29 @@ export function SeriesExplorerView() {
 
       <div className={styles.content}>
         {error && <div style={{ color: "var(--neg)", padding: 8, fontSize: 11 }}>{error}</div>}
+        {assetError && !loading && (
+          <div className={styles.assetNote} role="note">
+            {t(S.assets.explorerAssetError)}
+          </div>
+        )}
         {loading && <EmptyState>{t(S.common.loading)}</EmptyState>}
         {!loading && (
           <>
             <div className={styles.chartCard}>
               <div className={styles.chartHeader}>
-                <span className={styles.chartTitle}>
-                  {pick(indicatorMeta?.label_fr ?? indicator, indicatorMeta?.label_en ?? indicator)}
-                </span>
+                <span className={styles.chartTitle}>{activeKeys.map(labelOf).join(" + ")}</span>
                 {effectiveScale === "base100" && scaled.baseYear !== null ? (
                   <span className={styles.unitBadge}>{t(S.seriesExplorer.scaleBadgeBase100)(scaled.baseYear)}</span>
                 ) : effectiveScale === "zscore" ? (
                   <span className={styles.unitBadge}>{t(S.seriesExplorer.scaleBadgeZscore)}</span>
                 ) : (
                   <>
-                    {indicatorMeta?.unit && <span className={styles.unitBadge}>{indicatorMeta.unit}</span>}
+                    {single && indicatorMeta?.unit && (
+                      <span className={styles.unitBadge}>{indicatorMeta.unit}</span>
+                    )}
+                    {single && isAssetKey(primary) && (
+                      <span className={styles.unitBadge}>{t(S.assets.explorerAssetUnit)}</span>
+                    )}
                     {effectiveScale === "log" && (
                       <span className={styles.unitBadge}>{t(S.seriesExplorer.scaleBadgeLog)}</span>
                     )}
@@ -325,13 +522,13 @@ export function SeriesExplorerView() {
               <table className={styles.legend}>
                 <tbody>
                   {legendRows.map((r) => (
-                    <tr key={r.country}>
+                    <tr key={r.pair.id}>
                       <td className={styles.legendCell}>
-                        <span className={styles.swatch} style={{ background: r.color }} />
-                        {r.country}
+                        <span className={styles.swatch} style={{ background: r.pair.color }} />
+                        {r.pair.label}
                       </td>
                       <td className={`${styles.legendCell} ${styles.legendNum}`}>
-                        <Num value={r.last?.value ?? null} decimals={2} />
+                        <Num value={r.last} decimals={2} />
                       </td>
                       <td className={`${styles.legendCell} ${styles.legendNum}`}>
                         <Num value={r.variation} decimals={1} unit="%" sign tone="auto" />
@@ -357,7 +554,7 @@ export function SeriesExplorerView() {
                 className={styles.exportBtn}
                 onClick={() => {
                   const url = chartRef.current?.getDataUrl();
-                  if (url) downloadDataUrl(`${indicator}.png`, url);
+                  if (url) downloadDataUrl(`${exportName}.png`, url);
                 }}
               >
                 {t(S.seriesExplorer.exportPng)}

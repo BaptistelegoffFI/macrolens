@@ -119,3 +119,23 @@ sources, les en-têtes de colonnes des exports CSV/TSV/JSON, et le formatage num
 
 Assumé explicitement par le plan (§11.8) : poste de travail, largeur minimale 1280px. En
 dessous, un message dédié le dit clairement plutôt que de dégrader silencieusement l'interface.
+
+## Rendements d'actifs (ADR 0015 à 0024)
+
+- **Couverture JST** : 1870 à 2020 (pas 2026). Un analogue ancré après 2010 n'a pas de fenêtre à
+  10 ans. Le Canada n'a aucune série de rendement dans JST R6.
+- **Tiers 2 et 3** : rien n'est ingéré. Les sources proposées par le brief se sont révélées
+  inutilisables (S&P GSCI, Moody's, ICE BofA) ou sans licence de redistribution explicite (Ken
+  French). Voir `docs/research/asset-sources.md`.
+- **Japon, rendements annuels** : les valeurs annuelles de la colonne JST `eq_tr` divergent
+  fortement du Nikkei (1990 : -13 % contre -39 %) alors que le cumul pluriannuel concorde. Cause
+  non établie, dans la donnée source. Voir `docs/research/asset-validation.md`.
+- **Japon 1946-1947, indice actions chaîné** : JST n'a aucun rendement ces deux années et le
+  chaînage les sautait comme un rendement nul. Les réalisations (12 fenêtres) et la variable
+  `equity_real_3y` du Japon en 1948 sont corrigées (elles restent manquantes). **Reste vrai** : les
+  niveaux de `equity_index_nominal` et `equity_capgain_index` du Japon après 1947, visibles dans
+  l'Explorateur, sont décalés du rendement inconnu de ces deux années (traité comme nul).
+  Corriger les niveaux demanderait de modifier les données ingérées, ce qui n'a pas été fait.
+- **Repli maximal** : mesuré en fin d'année, donc minorant du repli réel.
+- **Licence JST** : CC BY-NC-SA, usage non commercial. Le projet est personnel, intellectuel et non
+  commercial (précisé le 2026-10-05), ce qui est compatible.

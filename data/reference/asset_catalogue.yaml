@@ -1,0 +1,178 @@
+# Catalogue des rendements d'actifs (ADR 0021, 0022, 0023).
+#
+# `series` : séries réellement disponibles. Les séries `asset_observations` sont
+# ingérées depuis le fichier JST R6 (colonnes vérifiées dans
+# docs/research/asset-sources.md) ; `fx_rate` et `price_index` sont lues dans la
+# table `observations` déjà en base, sans duplication.
+#
+# `tree` : hiérarchie affichée sur la page Classes d'actifs. Un nœud sans série
+# porte `unavailable` (jamais une ligne vide ni nulle) avec sa raison.
+
+citation_jst: >
+  Jordà, Ò., Knoll, K., Kuvshinov, D., Schularick, M., Taylor, A. M. (2019).
+  "The Rate of Return on Everything, 1870-2015." Quarterly Journal of Economics
+  134(3), 1225-1298 ; Jordà, Ò., Schularick, M., Taylor, A. M. (2017).
+  "Macrofinancial History and the New Business Cycle Facts." NBER Macroeconomics
+  Annual 2016, 31, 213-263. JST Macrohistory Database, release 6.
+
+series:
+  - id: jst.equity_tr
+    asset_class: equities
+    tier: 1
+    measure: total_return
+    source_id: jst
+    storage: asset_observations
+    column: eq_tr
+    interp_columns: [eq_tr_interp]
+    label_fr: "Actions, rendement total"
+    label_en: "Equities, total return"
+    caveat_fr: "Dividendes inclus. Quelques années sont interpolées par JST pour couvrir une fermeture de bourse (drapeau conservé)."
+    caveat_en: "Dividends included. A few years are interpolated by JST to cover exchange closures (flag kept)."
+
+  - id: jst.govt_bond_tr
+    asset_class: govt_bonds
+    tier: 1
+    measure: total_return
+    source_id: jst
+    storage: asset_observations
+    column: bond_tr
+    interp_columns: []
+    label_fr: "Obligations d'État long terme, rendement total"
+    label_en: "Long-term government bonds, total return"
+    caveat_fr: "Coupons inclus. JST ne fournit aucun drapeau d'interpolation pour cette série."
+    caveat_en: "Coupons included. JST provides no interpolation flag for this series."
+
+  - id: jst.bill_return
+    asset_class: cash
+    tier: 1
+    measure: total_return
+    source_id: jst
+    storage: asset_observations
+    column: bill_rate
+    interp_columns: []
+    label_fr: "Bons du Trésor (court terme), rendement"
+    label_en: "Treasury bills (short term), return"
+    caveat_fr: "Rendement du coupon rapporté au prix (coupon / prix précédent). Aucun drapeau d'interpolation fourni par JST."
+    caveat_en: "Coupon return on the previous price (coupon / previous price). No interpolation flag provided by JST."
+
+  - id: jst.housing_tr
+    asset_class: housing
+    tier: 1
+    measure: total_return
+    source_id: jst
+    storage: asset_observations
+    column: housing_tr
+    interp_columns: [rent_ipolated, housing_capgain_ipolated]
+    label_fr: "Immobilier résidentiel, rendement total"
+    label_en: "Residential real estate, total return"
+    caveat_fr: "Série la moins fiable du jeu : repose sur des rendements locatifs reconstitués, et JST interpole loyers et plus-values en temps de guerre (drapeau conservé). Couverture très inégale selon les pays."
+    caveat_en: "Least reliable series in the set: it rests on reconstructed rental yields, and JST interpolates rents and capital gains in wartime (flag kept). Coverage varies widely by country."
+
+  - id: jst.fx_usd
+    asset_class: fx
+    tier: 1
+    measure: fx_rate
+    source_id: jst
+    storage: observations
+    indicator_code: exchange_rate_usd
+    label_fr: "Change contre USD (valeur en USD d'une unité de monnaie locale)"
+    label_en: "Exchange rate vs USD (USD value of one unit of local currency)"
+    caveat_fr: "Nominal, jamais déflaté. Série plate sous étalon-or et Bretton Woods, puis discontinue aux dévaluations : voir le pictogramme de régime. Égale à zéro pour les États-Unis (monnaie de référence)."
+    caveat_en: "Nominal, never deflated. Flat under the gold standard and Bretton Woods, then discontinuous at devaluations: see the regime pictogram. Zero for the United States (base currency)."
+
+  - id: jst.cpi
+    asset_class: inflation
+    tier: 1
+    measure: price_index
+    source_id: jst
+    storage: observations
+    indicator_code: cpi
+    label_fr: "Inflation (prix à la consommation)"
+    label_en: "Inflation (consumer prices)"
+    caveat_fr: "Variation de l'indice des prix. Sert aussi à déflater les rendements nominaux."
+    caveat_en: "Change in the price index. Also used to deflate nominal returns."
+
+reasons:
+  sector_us_pending:
+    fr: "Secteurs américains uniquement (portefeuilles sectoriels Fama-French, depuis 1927, définis par code SIC et non par GICS). Non ingérés : la bibliothèque Ken French ne précise aucune licence de redistribution, l'autorisation de publication reste à demander."
+    en: "US sectors only (Fama-French industry portfolios, from 1927, defined by SIC code rather than GICS). Not ingested: the Ken French library states no redistribution licence, publication permission is still to be requested."
+  commodity_spot_pending:
+    fr: "Seuls des indices de prix spot existent en accès libre (Pink Sheet de la Banque mondiale, CC BY), sans rendement total ni roll yield. Non ingérés en attente de validation."
+    en: "Only spot price indices are freely available (World Bank Pink Sheet, CC BY), with no total return or roll yield. Not ingested pending approval."
+  credit_no_source:
+    fr: "Aucune série de rendement total gratuite et reproductible. ICE BofA (reproduction interdite, historique limité à 3 ans depuis avril 2026) et Moody's (copie, stockage et redistribution interdits) sont exclus."
+    en: "No free, reproducible total-return series. ICE BofA (reproduction prohibited, history limited to 3 years since April 2026) and Moody's (copying, storage and redistribution prohibited) are excluded."
+  private_markets:
+    fr: "Exclu volontairement : aucune série gratuite, reproductible et valorisée au prix de marché n'existe (les indices Cambridge Associates, Preqin et Burgiss sont propriétaires et lissés par des valorisations d'expert). Un proxy coté devrait être étiqueté comme tel, jamais comme du marché privé."
+    en: "Deliberately excluded: no free, reproducible, mark-to-market series exists (Cambridge Associates, Preqin and Burgiss indices are proprietary and smoothed by appraisal-based valuations). A listed proxy would have to be labelled as such, never as private-market returns."
+
+tree:
+  - id: equities
+    label_fr: "Actions"
+    label_en: "Equities"
+    series: jst.equity_tr
+    children:
+      - id: equities_sectors
+        label_fr: "Par secteur"
+        label_en: "By sector"
+        children:
+          - { id: sector_technology, label_fr: "Technologie", label_en: "Technology", unavailable: { tier: 3, reason: sector_us_pending } }
+          - { id: sector_financials, label_fr: "Financières", label_en: "Financials", unavailable: { tier: 3, reason: sector_us_pending } }
+          - { id: sector_energy, label_fr: "Énergie", label_en: "Energy", unavailable: { tier: 3, reason: sector_us_pending } }
+          - { id: sector_industrials, label_fr: "Industrielles", label_en: "Industrials", unavailable: { tier: 3, reason: sector_us_pending } }
+          - { id: sector_utilities, label_fr: "Services publics et infrastructures", label_en: "Utilities and infrastructure", unavailable: { tier: 3, reason: sector_us_pending } }
+          - { id: sector_healthcare, label_fr: "Santé", label_en: "Healthcare", unavailable: { tier: 3, reason: sector_us_pending } }
+          - { id: sector_materials, label_fr: "Matériaux", label_en: "Materials", unavailable: { tier: 3, reason: sector_us_pending } }
+          - { id: sector_consumer, label_fr: "Consommation", label_en: "Consumer", unavailable: { tier: 3, reason: sector_us_pending } }
+
+  - id: fixed_income
+    label_fr: "Obligations"
+    label_en: "Fixed income"
+    children:
+      - id: govt
+        label_fr: "Emprunts d'État"
+        label_en: "Government"
+        children:
+          - { id: govt_short, label_fr: "Court terme (bons du Trésor)", label_en: "Short term (bills)", series: jst.bill_return }
+          - { id: govt_long, label_fr: "Long terme", label_en: "Long term", series: jst.govt_bond_tr }
+      - id: credit
+        label_fr: "Crédit"
+        label_en: "Credit"
+        children:
+          - { id: credit_ig, label_fr: "Investment grade", label_en: "Investment grade", unavailable: { tier: 3, reason: credit_no_source } }
+          - { id: credit_hy, label_fr: "High yield", label_en: "High yield", unavailable: { tier: 3, reason: credit_no_source } }
+
+  - id: commodities
+    label_fr: "Matières premières"
+    label_en: "Commodities"
+    children:
+      - { id: commodities_energy, label_fr: "Énergie", label_en: "Energy", unavailable: { tier: 2, reason: commodity_spot_pending } }
+      - { id: commodities_industrial_metals, label_fr: "Métaux industriels", label_en: "Industrial metals", unavailable: { tier: 2, reason: commodity_spot_pending } }
+      - { id: commodities_precious_metals, label_fr: "Métaux précieux", label_en: "Precious metals", unavailable: { tier: 2, reason: commodity_spot_pending } }
+      - { id: commodities_agriculture, label_fr: "Agriculture", label_en: "Agriculture", unavailable: { tier: 2, reason: commodity_spot_pending } }
+
+  - id: real_estate
+    label_fr: "Immobilier"
+    label_en: "Real estate"
+    children:
+      - { id: real_estate_residential, label_fr: "Résidentiel", label_en: "Residential", series: jst.housing_tr }
+
+  - id: cash
+    label_fr: "Liquidités (bons du Trésor)"
+    label_en: "Cash (bills)"
+    series: jst.bill_return
+
+  - id: fx
+    label_fr: "Change"
+    label_en: "FX"
+    series: jst.fx_usd
+
+  - id: inflation
+    label_fr: "Inflation (référence)"
+    label_en: "Inflation (reference)"
+    series: jst.cpi
+
+  - id: private_markets
+    label_fr: "Private equity et dette privée"
+    label_en: "Private equity and private debt"
+    excluded: private_markets

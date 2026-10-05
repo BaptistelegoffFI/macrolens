@@ -145,13 +145,26 @@ def _trailing_mean(x: np.ndarray, window: int, min_periods: int) -> np.ndarray:
     return out
 
 
-def _real_cumulative_return(nominal_index: np.ndarray, cpi: np.ndarray, years: int) -> np.ndarray:
+def _real_cumulative_return(
+    nominal_index: np.ndarray, cpi: np.ndarray, years: int, *, chained: bool = False
+) -> np.ndarray:
     """Rendement réel cumulé sur `years` ans : déflate le rendement nominal
-    cumulé par l'inflation cumulée sur la même fenêtre."""
+    cumulé par l'inflation cumulée sur la même fenêtre.
+
+    `chained=True` pour un indice construit en chaînant des rendements annuels
+    (actions) : une année manquante à l'intérieur de la fenêtre y est sautée sans
+    changer le niveau, ce qui revient à lui attribuer un rendement nul ; le rapport
+    des deux extrémités serait alors faux. Le résultat est donc manquant (jamais
+    imputé, ADR 0019). Un indice de niveau observé (prix immobiliers) n'a pas ce
+    défaut : ses deux extrémités suffisent."""
     out = np.full_like(nominal_index, np.nan, dtype=float)
     if years < len(nominal_index):
         real_index = nominal_index / cpi
         out[years:] = 100.0 * (real_index[years:] / real_index[:-years] - 1.0)
+        if chained:
+            for t in range(years, len(nominal_index)):
+                if np.isnan(nominal_index[t - years + 1 : t]).any():
+                    out[t] = np.nan
     return out
 
 
@@ -171,7 +184,9 @@ def compute_features(panel: RawPanel) -> FeaturePanel:
 
     credit_gap5 = _diff(panel.credit_private_gdp, 5)
 
-    equity_real_3y = _real_cumulative_return(panel.equity_index_nominal, panel.cpi, 3)
+    equity_real_3y = _real_cumulative_return(
+        panel.equity_index_nominal, panel.cpi, 3, chained=True
+    )
     house_real_3y = _real_cumulative_return(panel.house_price_index, panel.cpi, 3)
 
     unemp_gap = panel.unemployment_rate - _trailing_mean(

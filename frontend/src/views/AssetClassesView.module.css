@@ -1,0 +1,224 @@
+.layout {
+  display: flex;
+  height: 100%;
+  gap: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.controls {
+  flex: 0 0 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: auto;
+}
+
+.content {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: auto;
+}
+
+.card {
+  border: 1px solid var(--rule-light);
+  background: var(--bg-chrome);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardTitle {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 6px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 0;
+}
+
+.fieldLabel {
+  font-size: 10px;
+  color: var(--fg-secondary);
+}
+
+.select,
+.yearInput {
+  width: 100%;
+  height: var(--control-h);
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  font: inherit;
+  font-size: 11px;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+.yearInput {
+  font-family: var(--font-mono);
+}
+
+.yearInput[aria-invalid="true"] {
+  border-color: var(--neg);
+}
+
+.periodRow {
+  display: flex;
+  gap: 12px;
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+}
+
+.chip {
+  height: var(--control-h);
+  padding: 0 10px;
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  color: var(--fg);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.chip[data-active="true"] {
+  background: var(--bg-selected);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.intro {
+  margin: 0 0 8px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--fg-secondary);
+  max-width: 760px;
+}
+
+.prefilled {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 2px 8px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 11px;
+}
+
+.notice {
+  font-size: 11px;
+  color: var(--fg-secondary);
+  padding: 8px 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.colHead {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-secondary);
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  background: var(--bg-app);
+}
+
+.row > * {
+  border-bottom: 1px solid var(--rule-light);
+  vertical-align: top;
+}
+
+.row[data-depth="0"] > .label {
+  font-weight: 600;
+}
+
+.label {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+
+.chevron {
+  width: 16px;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 2px;
+}
+
+.chevronSpacer {
+  display: inline-block;
+  width: 18px;
+}
+
+.tierCell {
+  padding: 6px 8px;
+  width: 44px;
+}
+
+.tier {
+  display: inline-block;
+  padding: 0 4px;
+  border: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--fg-secondary);
+  background: var(--bg-chrome);
+  cursor: help;
+}
+
+.numCell {
+  padding: 6px 8px;
+  font-size: 11px;
+}
+
+.coverage {
+  font-family: var(--font-mono);
+}
+
+.sub {
+  font-size: 10px;
+  color: var(--fg-muted);
+}
+
+.unavailable {
+  padding: 6px 8px;
+  background: var(--bg-row-alt);
+}
+
+.unavailableLabel {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--fg-muted);
+}
+
+.reason {
+  font-size: 10px;
+  color: var(--fg-muted);
+  margin-top: 2px;
+  max-width: 560px;
+  white-space: normal;
+  line-height: 1.4;
+}

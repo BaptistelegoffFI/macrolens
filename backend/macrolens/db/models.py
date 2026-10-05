@@ -223,3 +223,44 @@ class PageView(Base):
     client_id: Mapped[str] = mapped_column(Text, nullable=False)
     viewed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     path: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class AssetSeries(Base):
+    """Métadonnées d'une série de rendements d'actifs (ADR 0021, 0022). Table
+    additive, hors périmètre du plan : aucun endpoint déjà déployé ne la lit.
+    `tier` : 1 = JST 1870-2020, 2 et 3 réservés (aucune ingestion à ce jour)."""
+
+    __tablename__ = "asset_series"
+
+    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    asset_class: Mapped[str] = mapped_column(Text, nullable=False)
+    tier: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    measure: Mapped[str] = mapped_column(Text, nullable=False)
+    source_id: Mapped[str] = mapped_column(ForeignKey("sources.id"), nullable=False)
+    citation: Mapped[str] = mapped_column(Text, nullable=False)
+    label_fr: Mapped[str] = mapped_column(Text, nullable=False)
+    label_en: Mapped[str] = mapped_column(Text, nullable=False)
+    caveat_fr: Mapped[str | None] = mapped_column(Text, nullable=True)
+    caveat_en: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class AssetObservation(Base):
+    """Rendement annuel nominal en monnaie locale (fraction : 0,05 = 5 %), tel que
+    publié par la source, avec sa provenance (même contrat que `observations`)."""
+
+    __tablename__ = "asset_observations"
+    __table_args__ = (Index("ix_asset_observations_country_series", "country_iso3", "series_id"),)
+
+    series_id: Mapped[str] = mapped_column(ForeignKey("asset_series.id"), primary_key=True)
+    country_iso3: Mapped[str] = mapped_column(ForeignKey("countries.iso3"), primary_key=True)
+    period_start: Mapped[date] = mapped_column(Date, primary_key=True)
+    freq: Mapped[str] = mapped_column(String(1), primary_key=True)
+
+    value: Mapped[float] = mapped_column(Double, nullable=False)
+    is_interpolated: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_break: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    raw_file_id: Mapped[int | None] = mapped_column(ForeignKey("raw_files.id"), nullable=True)
+    locator: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
+    raw_value_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    transform_chain: Mapped[list[str] | None] = mapped_column(ARRAY(Text), nullable=True)
+    ingested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

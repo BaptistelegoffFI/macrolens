@@ -129,3 +129,77 @@ def test_anti_lookahead_truncation_does_not_change_past_values() -> None:
         np.testing.assert_allclose(
             full.features[name][:12], truncated.features[name][:12], equal_nan=True
         )
+
+
+# ---- indice chaîné avec année manquante (ADR 0019) --------------------------------------
+
+
+def _panel_with_equity_gap(missing: list[int]) -> RawPanel:
+    base = _panel()
+    equity = base.equity_index_nominal.copy()
+    equity[missing] = np.nan
+    return RawPanel(
+        years=base.years,
+        gdp_real_pc=base.gdp_real_pc,
+        cpi=base.cpi,
+        rate_short=base.rate_short,
+        rate_long=base.rate_long,
+        debt_public_gdp=base.debt_public_gdp,
+        credit_private_gdp=base.credit_private_gdp,
+        equity_index_nominal=equity,
+        house_price_index=base.house_price_index,
+        unemployment_rate=base.unemployment_rate,
+        current_account_gdp=base.current_account_gdp,
+    )
+
+
+def test_equity_real_3y_is_missing_when_the_chained_index_skips_a_year_in_the_window() -> None:
+    """Un indice chaîné saute une année sans rendement comme un rendement nul : le rapport des
+    deux extrémités serait faux. Années 5 et 6 manquantes : les fenêtres de 3 ans qui les
+    enjambent (extrémités en 3 à 9, intérieur contenant 5 ou 6) deviennent manquantes."""
+    clean = compute_features(_panel()).features["equity_real_3y"]
+    gapped = compute_features(_panel_with_equity_gap([5, 6])).features["equity_real_3y"]
+    # t=8 : fenêtre 5..8, extrémités 5 et 8, extrémité 5 manquante -> déjà manquant.
+    # t=7 : fenêtre 4..7, intérieur 5 et 6 manquants, extrémités présentes : le cas du Japon 1948.
+    assert np.isnan(gapped[7])
+    assert not np.isnan(clean[7])
+    # Fenêtre sans année manquante : strictement inchangée.
+    assert gapped[3] == pytest.approx(clean[3])
+    assert gapped[4] == pytest.approx(clean[4])
+    assert gapped[10] == pytest.approx(clean[10])
+    assert gapped[14] == pytest.approx(clean[14])
+
+
+def test_house_real_3y_is_not_affected_by_a_gap_in_a_level_index() -> None:
+    """Un indice de niveau observé (prix immobiliers) n'a pas besoin des années intermédiaires."""
+    base = _panel()
+    house = base.house_price_index.copy()
+    house[[5, 6]] = np.nan
+    gapped = RawPanel(
+        years=base.years, gdp_real_pc=base.gdp_real_pc, cpi=base.cpi, rate_short=base.rate_short,
+        rate_long=base.rate_long, debt_public_gdp=base.debt_public_gdp,
+        credit_private_gdp=base.credit_private_gdp, equity_index_nominal=base.equity_index_nominal,
+        house_price_index=house, unemployment_rate=base.unemployment_rate,
+        current_account_gdp=base.current_account_gdp,
+    )  # fmt: skip
+    clean = compute_features(base).features["house_real_3y"]
+    got = compute_features(gapped).features["house_real_3y"]
+    assert got[7] == pytest.approx(clean[7])
+
+
+def test_equity_gap_guard_keeps_the_anti_lookahead_property() -> None:
+    """La garde n'utilise que le passé de la fenêtre : tronquer le panel ne change rien avant t."""
+    full = compute_features(_panel_with_equity_gap([5, 6])).features["equity_real_3y"]
+    base = _panel_with_equity_gap([5, 6])
+    n = 9
+    truncated = RawPanel(
+        years=base.years[:n], gdp_real_pc=base.gdp_real_pc[:n], cpi=base.cpi[:n],
+        rate_short=base.rate_short[:n], rate_long=base.rate_long[:n],
+        debt_public_gdp=base.debt_public_gdp[:n], credit_private_gdp=base.credit_private_gdp[:n],
+        equity_index_nominal=base.equity_index_nominal[:n],
+        house_price_index=base.house_price_index[:n], unemployment_rate=base.unemployment_rate[:n],
+        current_account_gdp=base.current_account_gdp[:n],
+    )  # fmt: skip
+    cut = compute_features(truncated).features["equity_real_3y"]
+    np.testing.assert_array_equal(np.isnan(cut), np.isnan(full[:n]))
+    np.testing.assert_allclose(cut[~np.isnan(cut)], full[:n][~np.isnan(full[:n])])

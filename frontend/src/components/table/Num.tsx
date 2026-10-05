@@ -31,7 +31,10 @@ export function Num({ value, decimals = 1, unit, sign = false, tone = "none" }: 
   const resolvedTone = tone === "auto" ? (value < 0 ? "neg" : "pos") : tone;
   const toneColor =
     resolvedTone === "neg" ? "var(--neg)" : resolvedTone === "pos" ? "var(--pos)" : undefined;
-  const formatted = `${sign && value >= 0 ? "+" : ""}${value.toFixed(decimals)}${unit ?? ""}`;
+  // Au-delà de 10^9 (ex. inflation de l'Allemagne en 1923, +1,06e11 %), tous les chiffres
+  // débordent de la cellule sans rien apprendre de plus : notation scientifique.
+  const body = Math.abs(value) >= 1e9 ? value.toExponential(2) : value.toFixed(decimals);
+  const formatted = `${sign && value >= 0 ? "+" : ""}${body}${unit ?? ""}`;
 
   return (
     <span className="num" style={{ color: toneColor }}>

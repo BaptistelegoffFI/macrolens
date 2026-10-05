@@ -81,6 +81,47 @@ export function SourcesView() {
           </p>
         </div>
       </div>
+
+      <div className={styles.section}>
+        <div className={styles.sectionTitle}>{t(S.assetMethodology.title)}</div>
+        <div className={styles.body}>
+          <p>{t(S.assetMethodology.intro)}</p>
+
+          <p>
+            <strong>{t(S.assetMethodology.realTitle)}</strong> {t(S.assetMethodology.realBody)}
+          </p>
+          <div className={styles.formula}>{t(S.assetMethodology.realFormula)}</div>
+
+          <p>
+            <strong>{t(S.assetMethodology.totalTitle)}</strong> {t(S.assetMethodology.totalBody)}
+          </p>
+          <p>
+            <strong>{t(S.assetMethodology.localTitle)}</strong> {t(S.assetMethodology.localBody)}
+          </p>
+          <p>
+            <strong>{t(S.assetMethodology.noImputeTitle)}</strong> {t(S.assetMethodology.noImputeBody)}
+          </p>
+          <p>
+            <strong>{t(S.assetMethodology.medianTitle)}</strong> {t(S.assetMethodology.medianBody)}
+          </p>
+          <p>
+            <strong>{t(S.assetMethodology.drawdownTitle)}</strong> {t(S.assetMethodology.drawdownBody)}
+          </p>
+          <p>
+            <strong>{t(S.assetMethodology.tiersTitle)}</strong> {t(S.assetMethodology.tiersBody)}
+          </p>
+          <p>
+            <strong>{t(S.assetMethodology.excludedSourcesTitle)}</strong>{" "}
+            {t(S.assetMethodology.excludedSourcesBody)}
+          </p>
+          <p>
+            <strong>{t(S.assetMethodology.privateTitle)}</strong> {t(S.assetMethodology.privateBody)}
+          </p>
+          <p>
+            <strong>{t(S.assetMethodology.licenceTitle)}</strong> {t(S.assetMethodology.licenceBody)}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

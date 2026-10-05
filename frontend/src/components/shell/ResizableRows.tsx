@@ -15,7 +15,13 @@ function readHeights(key: string, fallback: number[]): number[] {
     const raw = localStorage.getItem(key);
     if (!raw) return fallback;
     const parsed = JSON.parse(raw) as unknown;
-    if (Array.isArray(parsed) && parsed.every((v) => typeof v === "number")) {
+    // Même longueur que les défauts : une disposition mémorisée avant l'ajout d'une
+    // rangée (longueur différente) donnerait une hauteur `undefined` à la nouvelle.
+    if (
+      Array.isArray(parsed) &&
+      parsed.length === fallback.length &&
+      parsed.every((v) => typeof v === "number")
+    ) {
       return parsed as number[];
     }
   } catch {

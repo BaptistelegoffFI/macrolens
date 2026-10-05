@@ -11,6 +11,8 @@
  * indicateurs (infobulle Couverture) n'a pas d'équivalent EN en base.
  */
 
+import { ASSET_METHODOLOGY, ASSET_STRINGS } from "./assetStrings";
+
 export interface Bi {
   fr: string;
   en: string;
@@ -61,6 +63,7 @@ export const S = {
     compare: { fr: "Comparateur", en: "Compare" },
     coverage: { fr: "Couverture", en: "Coverage" },
     sources: { fr: "Sources & méthode", en: "Sources & methodology" },
+    assets: { fr: "Classes d'actifs", en: "Asset classes" },
     ariaLabel: { fr: "Vues", en: "Views" },
   },
 
@@ -353,6 +356,9 @@ export const S = {
     dailyUniqueDevices: { fr: "Appareils", en: "Devices" },
     dailyEmpty: { fr: "Aucune vue enregistrée pour l'instant.", en: "No views recorded yet." },
   },
+
+  assets: ASSET_STRINGS,
+  assetMethodology: ASSET_METHODOLOGY,
 } as const;
 
 export type Lang = "fr" | "en";

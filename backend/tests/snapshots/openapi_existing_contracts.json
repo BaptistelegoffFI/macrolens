@@ -1,0 +1,2732 @@
+{
+ "paths": {
+  "/api/v1/admin/analytics": {
+   "get": {
+    "operationId": "get_analytics_api_v1_admin_analytics_get",
+    "parameters": [
+     {
+      "in": "header",
+      "name": "authorization",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AnalyticsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Analytics",
+    "tags": [
+     "admin"
+    ]
+   }
+  },
+  "/api/v1/admin/login": {
+   "post": {
+    "operationId": "admin_login_api_v1_admin_login_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/LoginRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LoginResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Admin Login",
+    "tags": [
+     "admin"
+    ]
+   }
+  },
+  "/api/v1/admin/status": {
+   "put": {
+    "operationId": "update_status_api_v1_admin_status_put",
+    "parameters": [
+     {
+      "in": "header",
+      "name": "authorization",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/StatusUpdate"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StatusOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Status",
+    "tags": [
+     "admin"
+    ]
+   }
+  },
+  "/api/v1/analogs/search": {
+   "post": {
+    "operationId": "post_analogs_search_api_v1_analogs_search_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AnalogsSearchRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AnalogsSearchResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Post Analogs Search",
+    "tags": [
+     "analogs"
+    ]
+   }
+  },
+  "/api/v1/analytics/view": {
+   "post": {
+    "description": "Public : un ping par chargement de page (§ADR 0011). `client_id` est\nun UUID aléatoire généré et conservé côté navigateur (localStorage),\njamais une adresse IP — compte les appareils distincts sans collecter\nde donnée personnelle.",
+    "operationId": "record_view_api_v1_analytics_view_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ViewPing"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Record View",
+    "tags": [
+     "admin"
+    ]
+   }
+  },
+  "/api/v1/compare": {
+   "post": {
+    "operationId": "post_compare_api_v1_compare_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CompareRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CompareResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Post Compare",
+    "tags": [
+     "episodes"
+    ]
+   }
+  },
+  "/api/v1/episodes/{country}/{year}": {
+   "get": {
+    "operationId": "get_episode_api_v1_episodes__country___year__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "country",
+      "required": true,
+      "schema": {
+       "title": "Country",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "year",
+      "required": true,
+      "schema": {
+       "title": "Year",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "reference_frame",
+      "required": false,
+      "schema": {
+       "default": "rolling30",
+       "title": "Reference Frame",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/EpisodeOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Episode",
+    "tags": [
+     "episodes"
+    ]
+   }
+  },
+  "/api/v1/events": {
+   "get": {
+    "operationId": "list_events_api_v1_events_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "country",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 3,
+         "minLength": 3,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Country"
+      }
+     },
+     {
+      "in": "query",
+      "name": "kind",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Kind"
+      }
+     },
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/EventOut"
+         },
+         "title": "Response List Events Api V1 Events Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Events",
+    "tags": [
+     "events"
+    ]
+   }
+  },
+  "/api/v1/meta/countries": {
+   "get": {
+    "operationId": "list_countries_api_v1_meta_countries_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/CountryOut"
+         },
+         "title": "Response List Countries Api V1 Meta Countries Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Countries",
+    "tags": [
+     "meta"
+    ]
+   }
+  },
+  "/api/v1/meta/coverage": {
+   "get": {
+    "description": "Matrice pays x indicateur x décennie (§10). Complétude = part des\nannées de la décennie ayant une observation, sur les décennies où le\npays a au moins une donnée (pas de dénominateur avant sa propre entrée\ndans le panel).",
+    "operationId": "coverage_matrix_api_v1_meta_coverage_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/CoverageCellOut"
+         },
+         "title": "Response Coverage Matrix Api V1 Meta Coverage Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Coverage Matrix",
+    "tags": [
+     "meta"
+    ]
+   }
+  },
+  "/api/v1/meta/indicators": {
+   "get": {
+    "operationId": "list_indicators_api_v1_meta_indicators_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/IndicatorOut"
+         },
+         "title": "Response List Indicators Api V1 Meta Indicators Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Indicators",
+    "tags": [
+     "meta"
+    ]
+   }
+  },
+  "/api/v1/meta/sources": {
+   "get": {
+    "operationId": "list_sources_api_v1_meta_sources_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/SourceOut"
+         },
+         "title": "Response List Sources Api V1 Meta Sources Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Sources",
+    "tags": [
+     "meta"
+    ]
+   }
+  },
+  "/api/v1/provenance/observation": {
+   "get": {
+    "operationId": "get_observation_provenance_api_v1_provenance_observation_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "country",
+      "required": true,
+      "schema": {
+       "maxLength": 3,
+       "minLength": 3,
+       "title": "Country",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "indicator",
+      "required": true,
+      "schema": {
+       "title": "Indicator",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "period",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "Period",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "freq",
+      "required": false,
+      "schema": {
+       "default": "A",
+       "title": "Freq",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ReceiptRowOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Observation Provenance",
+    "tags": [
+     "provenance"
+    ]
+   }
+  },
+  "/api/v1/provenance/page/{raw_file_id}/{page}": {
+   "get": {
+    "operationId": "get_source_page_api_v1_provenance_page__raw_file_id___page__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "raw_file_id",
+      "required": true,
+      "schema": {
+       "title": "Raw File Id",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "path",
+      "name": "page",
+      "required": true,
+      "schema": {
+       "title": "Page",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Source Page",
+    "tags": [
+     "provenance"
+    ]
+   }
+  },
+  "/api/v1/provenance/raw-files": {
+   "get": {
+    "operationId": "list_raw_files_api_v1_provenance_raw_files_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/RawFileOut"
+         },
+         "title": "Response List Raw Files Api V1 Provenance Raw Files Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Raw Files",
+    "tags": [
+     "provenance"
+    ]
+   }
+  },
+  "/api/v1/provenance/receipt": {
+   "post": {
+    "operationId": "post_receipt_api_v1_provenance_receipt_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReceiptRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ReceiptResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Post Receipt",
+    "tags": [
+     "provenance"
+    ]
+   }
+  },
+  "/api/v1/series": {
+   "get": {
+    "operationId": "get_series_api_v1_series_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "country",
+      "required": true,
+      "schema": {
+       "maxLength": 3,
+       "minLength": 3,
+       "title": "Country",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "indicator",
+      "required": true,
+      "schema": {
+       "title": "Indicator",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "freq",
+      "required": false,
+      "schema": {
+       "default": "A",
+       "title": "Freq",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/ObservationOut"
+         },
+         "title": "Response Get Series Api V1 Series Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Series",
+    "tags": [
+     "series"
+    ]
+   }
+  },
+  "/api/v1/state/{country}/{year}": {
+   "get": {
+    "operationId": "get_state_vector_api_v1_state__country___year__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "country",
+      "required": true,
+      "schema": {
+       "title": "Country",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "year",
+      "required": true,
+      "schema": {
+       "title": "Year",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "reference_frame",
+      "required": false,
+      "schema": {
+       "default": "rolling30",
+       "title": "Reference Frame",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StateVectorOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get State Vector",
+    "tags": [
+     "series"
+    ]
+   }
+  },
+  "/api/v1/status": {
+   "get": {
+    "description": "Public, jamais gaté par le mode maintenance lui-même — sinon\npersonne ne pourrait jamais savoir pourquoi le site est fermé.",
+    "operationId": "get_status_api_v1_status_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StatusOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Status",
+    "tags": [
+     "admin"
+    ]
+   }
+  },
+  "/health": {
+   "get": {
+    "operationId": "health_health_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "string"
+         },
+         "title": "Response Health Health Get",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Health"
+   }
+  },
+  "/version": {
+   "get": {
+    "operationId": "version_version_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "anyOf": [
+           {
+            "type": "string"
+           },
+           {
+            "type": "null"
+           }
+          ]
+         },
+         "title": "Response Version Version Get",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Version"
+   }
+  }
+ },
+ "schemas": {
+  "AnalogOut": {
+   "properties": {
+    "context_events": {
+     "items": {
+      "$ref": "#/components/schemas/ContextEventOut"
+     },
+     "title": "Context Events",
+     "type": "array"
+    },
+    "country": {
+     "title": "Country",
+     "type": "string"
+    },
+    "distance": {
+     "title": "Distance",
+     "type": "number"
+    },
+    "feature_contributions": {
+     "additionalProperties": {
+      "type": "number"
+     },
+     "title": "Feature Contributions",
+     "type": "object"
+    },
+    "outcomes": {
+     "additionalProperties": {
+      "additionalProperties": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "boolean"
+        },
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "type": "object"
+     },
+     "title": "Outcomes",
+     "type": "object"
+    },
+    "similarity": {
+     "title": "Similarity",
+     "type": "number"
+    },
+    "state": {
+     "items": {
+      "$ref": "#/components/schemas/StateFeatureOut"
+     },
+     "title": "State",
+     "type": "array"
+    },
+    "year": {
+     "title": "Year",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "country",
+    "year",
+    "distance",
+    "similarity",
+    "feature_contributions",
+    "state",
+    "context_events",
+    "outcomes"
+   ],
+   "title": "AnalogOut",
+   "type": "object"
+  },
+  "AnalogsSearchRequest": {
+   "properties": {
+    "anchor": {
+     "anyOf": [
+      {
+       "$ref": "#/components/schemas/AnchorSpec"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "filters": {
+     "$ref": "#/components/schemas/FiltersSpec"
+    },
+    "horizons": {
+     "items": {
+      "type": "integer"
+     },
+     "title": "Horizons",
+     "type": "array"
+    },
+    "k": {
+     "default": 20,
+     "maximum": 100.0,
+     "minimum": 1.0,
+     "title": "K",
+     "type": "integer"
+    },
+    "metric": {
+     "const": "euclidean",
+     "default": "euclidean",
+     "title": "Metric",
+     "type": "string"
+    },
+    "mode": {
+     "default": "anchor",
+     "enum": [
+      "anchor",
+      "manual",
+      "shock"
+     ],
+     "title": "Mode",
+     "type": "string"
+    },
+    "reference_frame": {
+     "default": "rolling30",
+     "enum": [
+      "rolling30",
+      "era",
+      "cross_section",
+      "pool"
+     ],
+     "title": "Reference Frame",
+     "type": "string"
+    },
+    "shock": {
+     "anyOf": [
+      {
+       "$ref": "#/components/schemas/ShockSpec"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "state": {
+     "anyOf": [
+      {
+       "additionalProperties": {
+        "type": "number"
+       },
+       "type": "object"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "State"
+    },
+    "weighting": {
+     "default": "equal",
+     "enum": [
+      "equal",
+      "similarity"
+     ],
+     "title": "Weighting",
+     "type": "string"
+    },
+    "weights": {
+     "anyOf": [
+      {
+       "additionalProperties": {
+        "type": "number"
+       },
+       "type": "object"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Weights"
+    }
+   },
+   "title": "AnalogsSearchRequest",
+   "type": "object"
+  },
+  "AnalogsSearchResponse": {
+   "properties": {
+    "aggregates": {
+     "additionalProperties": {
+      "additionalProperties": {
+       "$ref": "#/components/schemas/OutcomeAggregateOut"
+      },
+      "type": "object"
+     },
+     "title": "Aggregates",
+     "type": "object"
+    },
+    "analogs": {
+     "items": {
+      "$ref": "#/components/schemas/AnalogOut"
+     },
+     "title": "Analogs",
+     "type": "array"
+    },
+    "build_id": {
+     "title": "Build Id",
+     "type": "string"
+    },
+    "concentration": {
+     "$ref": "#/components/schemas/ConcentrationOut"
+    },
+    "excluded": {
+     "$ref": "#/components/schemas/ExcludedOut"
+    },
+    "pool_size": {
+     "title": "Pool Size",
+     "type": "integer"
+    },
+    "query_echo": {
+     "$ref": "#/components/schemas/AnalogsSearchRequest"
+    },
+    "sources_summary": {
+     "items": {
+      "$ref": "#/components/schemas/SourceRefOut"
+     },
+     "title": "Sources Summary",
+     "type": "array"
+    },
+    "warnings": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Warnings",
+     "type": "array"
+    }
+   },
+   "required": [
+    "build_id",
+    "query_echo",
+    "pool_size",
+    "excluded",
+    "analogs",
+    "aggregates",
+    "concentration",
+    "warnings",
+    "sources_summary"
+   ],
+   "title": "AnalogsSearchResponse",
+   "type": "object"
+  },
+  "AnalyticsOut": {
+   "properties": {
+    "daily": {
+     "items": {
+      "$ref": "#/components/schemas/DailyCount"
+     },
+     "title": "Daily",
+     "type": "array"
+    },
+    "total_views": {
+     "title": "Total Views",
+     "type": "integer"
+    },
+    "unique_devices": {
+     "title": "Unique Devices",
+     "type": "integer"
+    },
+    "unique_devices_last_7_days": {
+     "title": "Unique Devices Last 7 Days",
+     "type": "integer"
+    },
+    "views_last_7_days": {
+     "title": "Views Last 7 Days",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "total_views",
+    "unique_devices",
+    "views_last_7_days",
+    "unique_devices_last_7_days",
+    "daily"
+   ],
+   "title": "AnalyticsOut",
+   "type": "object"
+  },
+  "AnchorSpec": {
+   "properties": {
+    "country": {
+     "title": "Country",
+     "type": "string"
+    },
+    "year": {
+     "title": "Year",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "country",
+    "year"
+   ],
+   "title": "AnchorSpec",
+   "type": "object"
+  },
+  "CompareRequest": {
+   "properties": {
+    "pairs": {
+     "items": {
+      "$ref": "#/components/schemas/EpisodePair"
+     },
+     "maxItems": 6,
+     "minItems": 2,
+     "title": "Pairs",
+     "type": "array"
+    },
+    "reference_frame": {
+     "default": "rolling30",
+     "title": "Reference Frame",
+     "type": "string"
+    }
+   },
+   "required": [
+    "pairs"
+   ],
+   "title": "CompareRequest",
+   "type": "object"
+  },
+  "CompareResponse": {
+   "properties": {
+    "episodes": {
+     "items": {
+      "$ref": "#/components/schemas/EpisodeOut"
+     },
+     "title": "Episodes",
+     "type": "array"
+    }
+   },
+   "required": [
+    "episodes"
+   ],
+   "title": "CompareResponse",
+   "type": "object"
+  },
+  "ConcentrationOut": {
+   "properties": {
+    "hhi_country": {
+     "title": "Hhi Country",
+     "type": "number"
+    },
+    "hhi_decade": {
+     "title": "Hhi Decade",
+     "type": "number"
+    },
+    "n_countries": {
+     "title": "N Countries",
+     "type": "integer"
+    },
+    "n_decades": {
+     "title": "N Decades",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "hhi_country",
+    "hhi_decade",
+    "n_countries",
+    "n_decades"
+   ],
+   "title": "ConcentrationOut",
+   "type": "object"
+  },
+  "ContextEventOut": {
+   "properties": {
+    "date_end": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Date End"
+    },
+    "date_start": {
+     "title": "Date Start",
+     "type": "string"
+    },
+    "kind": {
+     "title": "Kind",
+     "type": "string"
+    },
+    "label_fr": {
+     "title": "Label Fr",
+     "type": "string"
+    }
+   },
+   "required": [
+    "kind",
+    "label_fr",
+    "date_start",
+    "date_end"
+   ],
+   "title": "ContextEventOut",
+   "type": "object"
+  },
+  "CountryOut": {
+   "properties": {
+    "in_analog_pool": {
+     "title": "In Analog Pool",
+     "type": "boolean"
+    },
+    "is_core": {
+     "title": "Is Core",
+     "type": "boolean"
+    },
+    "iso3": {
+     "title": "Iso3",
+     "type": "string"
+    },
+    "n_observations": {
+     "title": "N Observations",
+     "type": "integer"
+    },
+    "name_en": {
+     "title": "Name En",
+     "type": "string"
+    },
+    "name_fr": {
+     "title": "Name Fr",
+     "type": "string"
+    },
+    "year_max": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Year Max"
+    },
+    "year_min": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Year Min"
+    }
+   },
+   "required": [
+    "iso3",
+    "name_fr",
+    "name_en",
+    "is_core",
+    "in_analog_pool",
+    "year_min",
+    "year_max",
+    "n_observations"
+   ],
+   "title": "CountryOut",
+   "type": "object"
+  },
+  "CoverageCellOut": {
+   "properties": {
+    "country_iso3": {
+     "title": "Country Iso3",
+     "type": "string"
+    },
+    "decade": {
+     "title": "Decade",
+     "type": "integer"
+    },
+    "indicator_code": {
+     "title": "Indicator Code",
+     "type": "string"
+    },
+    "n_observed": {
+     "title": "N Observed",
+     "type": "integer"
+    },
+    "n_possible": {
+     "title": "N Possible",
+     "type": "integer"
+    },
+    "pct": {
+     "title": "Pct",
+     "type": "number"
+    }
+   },
+   "required": [
+    "country_iso3",
+    "indicator_code",
+    "decade",
+    "n_observed",
+    "n_possible",
+    "pct"
+   ],
+   "title": "CoverageCellOut",
+   "type": "object"
+  },
+  "DailyCount": {
+   "properties": {
+    "date": {
+     "title": "Date",
+     "type": "string"
+    },
+    "unique_devices": {
+     "title": "Unique Devices",
+     "type": "integer"
+    },
+    "views": {
+     "title": "Views",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "date",
+    "views",
+    "unique_devices"
+   ],
+   "title": "DailyCount",
+   "type": "object"
+  },
+  "EpisodeOut": {
+   "properties": {
+    "country": {
+     "title": "Country",
+     "type": "string"
+    },
+    "events": {
+     "items": {
+      "$ref": "#/components/schemas/EventOut"
+     },
+     "title": "Events",
+     "type": "array"
+    },
+    "series": {
+     "additionalProperties": {
+      "items": {
+       "$ref": "#/components/schemas/ObservationOut"
+      },
+      "type": "array"
+     },
+     "title": "Series",
+     "type": "object"
+    },
+    "sources": {
+     "items": {
+      "$ref": "#/components/schemas/SourceRefOut"
+     },
+     "title": "Sources",
+     "type": "array"
+    },
+    "state": {
+     "anyOf": [
+      {
+       "$ref": "#/components/schemas/StateVectorOut"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "year": {
+     "title": "Year",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "country",
+    "year",
+    "state",
+    "series",
+    "events",
+    "sources"
+   ],
+   "title": "EpisodeOut",
+   "type": "object"
+  },
+  "EpisodePair": {
+   "properties": {
+    "country": {
+     "title": "Country",
+     "type": "string"
+    },
+    "year": {
+     "title": "Year",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "country",
+    "year"
+   ],
+   "title": "EpisodePair",
+   "type": "object"
+  },
+  "EventOut": {
+   "properties": {
+    "country_iso3": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Country Iso3"
+    },
+    "date_end": {
+     "anyOf": [
+      {
+       "format": "date",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Date End"
+    },
+    "date_start": {
+     "format": "date",
+     "title": "Date Start",
+     "type": "string"
+    },
+    "id": {
+     "title": "Id",
+     "type": "integer"
+    },
+    "kind": {
+     "title": "Kind",
+     "type": "string"
+    },
+    "label_en": {
+     "title": "Label En",
+     "type": "string"
+    },
+    "label_fr": {
+     "title": "Label Fr",
+     "type": "string"
+    },
+    "notes_fr": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Notes Fr"
+    },
+    "severity": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Severity"
+    },
+    "source_id": {
+     "title": "Source Id",
+     "type": "string"
+    },
+    "source_url": {
+     "title": "Source Url",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "country_iso3",
+    "date_start",
+    "date_end",
+    "kind",
+    "label_fr",
+    "label_en",
+    "severity",
+    "source_id",
+    "source_url",
+    "notes_fr"
+   ],
+   "title": "EventOut",
+   "type": "object"
+  },
+  "ExcludedOut": {
+   "properties": {
+    "breaks": {
+     "title": "Breaks",
+     "type": "integer"
+    },
+    "incomplete": {
+     "title": "Incomplete",
+     "type": "integer"
+    },
+    "partial_coverage": {
+     "title": "Partial Coverage",
+     "type": "integer"
+    },
+    "self_adjacent": {
+     "title": "Self Adjacent",
+     "type": "integer"
+    },
+    "too_recent": {
+     "title": "Too Recent",
+     "type": "integer"
+    },
+    "user_excluded": {
+     "title": "User Excluded",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "incomplete",
+    "self_adjacent",
+    "too_recent",
+    "breaks",
+    "partial_coverage",
+    "user_excluded"
+   ],
+   "title": "ExcludedOut",
+   "type": "object"
+  },
+  "FiltersSpec": {
+   "properties": {
+    "countries": {
+     "anyOf": [
+      {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Countries"
+    },
+    "exclude_wartime": {
+     "default": false,
+     "title": "Exclude Wartime",
+     "type": "boolean"
+    },
+    "include_breaks": {
+     "default": false,
+     "title": "Include Breaks",
+     "type": "boolean"
+    },
+    "include_partial_coverage": {
+     "default": false,
+     "title": "Include Partial Coverage",
+     "type": "boolean"
+    },
+    "year_max": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Year Max"
+    },
+    "year_min": {
+     "default": 1870,
+     "title": "Year Min",
+     "type": "integer"
+    }
+   },
+   "title": "FiltersSpec",
+   "type": "object"
+  },
+  "FlagsOut": {
+   "properties": {
+    "break": {
+     "title": "Break",
+     "type": "boolean"
+    },
+    "conflict": {
+     "title": "Conflict",
+     "type": "boolean"
+    },
+    "interpolated": {
+     "title": "Interpolated",
+     "type": "boolean"
+    },
+    "spliced": {
+     "title": "Spliced",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "interpolated",
+    "spliced",
+    "break",
+    "conflict"
+   ],
+   "title": "FlagsOut",
+   "type": "object"
+  },
+  "HTTPValidationError": {
+   "properties": {
+    "detail": {
+     "items": {
+      "$ref": "#/components/schemas/ValidationError"
+     },
+     "title": "Detail",
+     "type": "array"
+    }
+   },
+   "title": "HTTPValidationError",
+   "type": "object"
+  },
+  "IndicatorOut": {
+   "properties": {
+    "code": {
+     "title": "Code",
+     "type": "string"
+    },
+    "definition_fr": {
+     "title": "Definition Fr",
+     "type": "string"
+    },
+    "derivation": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Derivation"
+    },
+    "family": {
+     "title": "Family",
+     "type": "string"
+    },
+    "higher_is_worse": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Higher Is Worse"
+    },
+    "is_derived": {
+     "title": "Is Derived",
+     "type": "boolean"
+    },
+    "label_en": {
+     "title": "Label En",
+     "type": "string"
+    },
+    "label_fr": {
+     "title": "Label Fr",
+     "type": "string"
+    },
+    "unit": {
+     "title": "Unit",
+     "type": "string"
+    }
+   },
+   "required": [
+    "code",
+    "label_fr",
+    "label_en",
+    "family",
+    "unit",
+    "is_derived",
+    "derivation",
+    "higher_is_worse",
+    "definition_fr"
+   ],
+   "title": "IndicatorOut",
+   "type": "object"
+  },
+  "LoginRequest": {
+   "properties": {
+    "token": {
+     "title": "Token",
+     "type": "string"
+    }
+   },
+   "required": [
+    "token"
+   ],
+   "title": "LoginRequest",
+   "type": "object"
+  },
+  "LoginResponse": {
+   "properties": {
+    "ok": {
+     "title": "Ok",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "ok"
+   ],
+   "title": "LoginResponse",
+   "type": "object"
+  },
+  "ObservationKey": {
+   "properties": {
+    "country": {
+     "title": "Country",
+     "type": "string"
+    },
+    "freq": {
+     "default": "A",
+     "title": "Freq",
+     "type": "string"
+    },
+    "indicator": {
+     "title": "Indicator",
+     "type": "string"
+    },
+    "period": {
+     "format": "date",
+     "title": "Period",
+     "type": "string"
+    }
+   },
+   "required": [
+    "country",
+    "indicator",
+    "period"
+   ],
+   "title": "ObservationKey",
+   "type": "object"
+  },
+  "ObservationOut": {
+   "properties": {
+    "conflict": {
+     "title": "Conflict",
+     "type": "boolean"
+    },
+    "country_iso3": {
+     "title": "Country Iso3",
+     "type": "string"
+    },
+    "coverage_partial": {
+     "title": "Coverage Partial",
+     "type": "boolean"
+    },
+    "freq": {
+     "title": "Freq",
+     "type": "string"
+    },
+    "indicator_code": {
+     "title": "Indicator Code",
+     "type": "string"
+    },
+    "is_break": {
+     "title": "Is Break",
+     "type": "boolean"
+    },
+    "is_interpolated": {
+     "title": "Is Interpolated",
+     "type": "boolean"
+    },
+    "is_spliced": {
+     "title": "Is Spliced",
+     "type": "boolean"
+    },
+    "period_start": {
+     "format": "date",
+     "title": "Period Start",
+     "type": "string"
+    },
+    "source_id": {
+     "title": "Source Id",
+     "type": "string"
+    },
+    "value": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Value"
+    }
+   },
+   "required": [
+    "country_iso3",
+    "indicator_code",
+    "period_start",
+    "freq",
+    "value",
+    "source_id",
+    "is_interpolated",
+    "is_spliced",
+    "is_break",
+    "conflict",
+    "coverage_partial"
+   ],
+   "title": "ObservationOut",
+   "type": "object"
+  },
+  "OutcomeAggregateOut": {
+   "properties": {
+    "count_true": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Count True"
+    },
+    "max": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Max"
+    },
+    "median": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Median"
+    },
+    "min": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Min"
+    },
+    "n": {
+     "title": "N",
+     "type": "integer"
+    },
+    "q1": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Q1"
+    },
+    "q3": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Q3"
+    },
+    "share_negative": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Share Negative"
+    }
+   },
+   "required": [
+    "n"
+   ],
+   "title": "OutcomeAggregateOut",
+   "type": "object"
+  },
+  "RawFileOut": {
+   "properties": {
+    "archive_url": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Archive Url"
+    },
+    "downloaded_at": {
+     "title": "Downloaded At",
+     "type": "string"
+    },
+    "filename": {
+     "title": "Filename",
+     "type": "string"
+    },
+    "id": {
+     "title": "Id",
+     "type": "integer"
+    },
+    "media_type": {
+     "title": "Media Type",
+     "type": "string"
+    },
+    "origin_url": {
+     "title": "Origin Url",
+     "type": "string"
+    },
+    "sha256": {
+     "title": "Sha256",
+     "type": "string"
+    },
+    "size_bytes": {
+     "title": "Size Bytes",
+     "type": "integer"
+    },
+    "source_id": {
+     "title": "Source Id",
+     "type": "string"
+    },
+    "vintage": {
+     "title": "Vintage",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "source_id",
+    "vintage",
+    "filename",
+    "media_type",
+    "sha256",
+    "size_bytes",
+    "origin_url",
+    "downloaded_at",
+    "archive_url"
+   ],
+   "title": "RawFileOut",
+   "type": "object"
+  },
+  "RawFileRefOut": {
+   "properties": {
+    "downloaded_at": {
+     "title": "Downloaded At",
+     "type": "string"
+    },
+    "filename": {
+     "title": "Filename",
+     "type": "string"
+    },
+    "origin_url": {
+     "title": "Origin Url",
+     "type": "string"
+    },
+    "sha256": {
+     "title": "Sha256",
+     "type": "string"
+    }
+   },
+   "required": [
+    "filename",
+    "sha256",
+    "downloaded_at",
+    "origin_url"
+   ],
+   "title": "RawFileRefOut",
+   "type": "object"
+  },
+  "ReceiptRequest": {
+   "properties": {
+    "build_id": {
+     "title": "Build Id",
+     "type": "string"
+    },
+    "context": {
+     "anyOf": [
+      {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Context"
+    },
+    "keys": {
+     "items": {
+      "$ref": "#/components/schemas/ObservationKey"
+     },
+     "title": "Keys",
+     "type": "array"
+    }
+   },
+   "required": [
+    "build_id",
+    "keys"
+   ],
+   "title": "ReceiptRequest",
+   "type": "object"
+  },
+  "ReceiptResponse": {
+   "properties": {
+    "build_id": {
+     "title": "Build Id",
+     "type": "string"
+    },
+    "checksum": {
+     "title": "Checksum",
+     "type": "string"
+    },
+    "generated_at": {
+     "title": "Generated At",
+     "type": "string"
+    },
+    "rows": {
+     "items": {
+      "$ref": "#/components/schemas/ReceiptRowOut"
+     },
+     "title": "Rows",
+     "type": "array"
+    },
+    "sources_summary": {
+     "items": {
+      "$ref": "#/components/schemas/SourceSummaryOut"
+     },
+     "title": "Sources Summary",
+     "type": "array"
+    }
+   },
+   "required": [
+    "build_id",
+    "generated_at",
+    "rows",
+    "sources_summary",
+    "checksum"
+   ],
+   "title": "ReceiptResponse",
+   "type": "object"
+  },
+  "ReceiptRowOut": {
+   "properties": {
+    "country": {
+     "title": "Country",
+     "type": "string"
+    },
+    "flags": {
+     "$ref": "#/components/schemas/FlagsOut"
+    },
+    "indicator": {
+     "title": "Indicator",
+     "type": "string"
+    },
+    "locator": {
+     "additionalProperties": true,
+     "title": "Locator",
+     "type": "object"
+    },
+    "period": {
+     "title": "Period",
+     "type": "string"
+    },
+    "raw_file": {
+     "anyOf": [
+      {
+       "$ref": "#/components/schemas/RawFileRefOut"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "raw_value_text": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Raw Value Text"
+    },
+    "source": {
+     "$ref": "#/components/schemas/SourceRefOut"
+    },
+    "source_page": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Source Page"
+    },
+    "transform_chain": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Transform Chain",
+     "type": "array"
+    },
+    "unit": {
+     "title": "Unit",
+     "type": "string"
+    },
+    "value": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Value"
+    }
+   },
+   "required": [
+    "country",
+    "indicator",
+    "period",
+    "value",
+    "raw_value_text",
+    "unit",
+    "transform_chain",
+    "flags",
+    "source",
+    "raw_file",
+    "locator",
+    "source_page"
+   ],
+   "title": "ReceiptRowOut",
+   "type": "object"
+  },
+  "ShockSpec": {
+   "properties": {
+    "base": {
+     "$ref": "#/components/schemas/AnchorSpec"
+    },
+    "deltas": {
+     "additionalProperties": {
+      "type": "number"
+     },
+     "title": "Deltas",
+     "type": "object"
+    }
+   },
+   "required": [
+    "base",
+    "deltas"
+   ],
+   "title": "ShockSpec",
+   "type": "object"
+  },
+  "SourceOut": {
+   "properties": {
+    "citation": {
+     "title": "Citation",
+     "type": "string"
+    },
+    "file_sha256": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "File Sha256"
+    },
+    "full_name": {
+     "title": "Full Name",
+     "type": "string"
+    },
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "licence": {
+     "title": "Licence",
+     "type": "string"
+    },
+    "notes": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Notes"
+    },
+    "priority": {
+     "title": "Priority",
+     "type": "integer"
+    },
+    "retrieved_at": {
+     "format": "date",
+     "title": "Retrieved At",
+     "type": "string"
+    },
+    "url": {
+     "title": "Url",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "full_name",
+    "url",
+    "citation",
+    "licence",
+    "priority",
+    "retrieved_at",
+    "file_sha256",
+    "notes"
+   ],
+   "title": "SourceOut",
+   "type": "object"
+  },
+  "SourceRefOut": {
+   "properties": {
+    "citation": {
+     "title": "Citation",
+     "type": "string"
+    },
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "licence": {
+     "title": "Licence",
+     "type": "string"
+    },
+    "url": {
+     "title": "Url",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "citation",
+    "url",
+    "licence"
+   ],
+   "title": "SourceRefOut",
+   "type": "object"
+  },
+  "SourceSummaryOut": {
+   "properties": {
+    "citation": {
+     "title": "Citation",
+     "type": "string"
+    },
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "n_rows": {
+     "title": "N Rows",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "id",
+    "n_rows",
+    "citation"
+   ],
+   "title": "SourceSummaryOut",
+   "type": "object"
+  },
+  "StateFeatureOut": {
+   "properties": {
+    "feature_code": {
+     "title": "Feature Code",
+     "type": "string"
+    },
+    "pct_rank": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Pct Rank"
+    },
+    "raw_value": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Raw Value"
+    }
+   },
+   "required": [
+    "feature_code",
+    "raw_value",
+    "pct_rank"
+   ],
+   "title": "StateFeatureOut",
+   "type": "object"
+  },
+  "StateVectorFeatureOut": {
+   "properties": {
+    "feature_code": {
+     "title": "Feature Code",
+     "type": "string"
+    },
+    "pct_rank": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Pct Rank"
+    },
+    "raw_value": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Raw Value"
+    }
+   },
+   "required": [
+    "feature_code",
+    "raw_value",
+    "pct_rank"
+   ],
+   "title": "StateVectorFeatureOut",
+   "type": "object"
+  },
+  "StateVectorOut": {
+   "properties": {
+    "country_iso3": {
+     "title": "Country Iso3",
+     "type": "string"
+    },
+    "coverage_partial": {
+     "title": "Coverage Partial",
+     "type": "boolean"
+    },
+    "features": {
+     "items": {
+      "$ref": "#/components/schemas/StateVectorFeatureOut"
+     },
+     "title": "Features",
+     "type": "array"
+    },
+    "is_break": {
+     "title": "Is Break",
+     "type": "boolean"
+    },
+    "is_complete": {
+     "title": "Is Complete",
+     "type": "boolean"
+    },
+    "reference_frame": {
+     "title": "Reference Frame",
+     "type": "string"
+    },
+    "sources": {
+     "items": {
+      "$ref": "#/components/schemas/SourceRefOut"
+     },
+     "title": "Sources",
+     "type": "array"
+    },
+    "year": {
+     "title": "Year",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "country_iso3",
+    "year",
+    "reference_frame",
+    "is_complete",
+    "is_break",
+    "coverage_partial",
+    "features",
+    "sources"
+   ],
+   "title": "StateVectorOut",
+   "type": "object"
+  },
+  "StatusOut": {
+   "properties": {
+    "announcement": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Announcement"
+    },
+    "maintenance_message": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Maintenance Message"
+    },
+    "maintenance_mode": {
+     "title": "Maintenance Mode",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "maintenance_mode",
+    "maintenance_message",
+    "announcement"
+   ],
+   "title": "StatusOut",
+   "type": "object"
+  },
+  "StatusUpdate": {
+   "properties": {
+    "announcement": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Announcement"
+    },
+    "maintenance_message": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Maintenance Message"
+    },
+    "maintenance_mode": {
+     "title": "Maintenance Mode",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "maintenance_mode"
+   ],
+   "title": "StatusUpdate",
+   "type": "object"
+  },
+  "ValidationError": {
+   "properties": {
+    "ctx": {
+     "title": "Context",
+     "type": "object"
+    },
+    "input": {
+     "title": "Input"
+    },
+    "loc": {
+     "items": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "integer"
+       }
+      ]
+     },
+     "title": "Location",
+     "type": "array"
+    },
+    "msg": {
+     "title": "Message",
+     "type": "string"
+    },
+    "type": {
+     "title": "Error Type",
+     "type": "string"
+    }
+   },
+   "required": [
+    "loc",
+    "msg",
+    "type"
+   ],
+   "title": "ValidationError",
+   "type": "object"
+  },
+  "ViewPing": {
+   "properties": {
+    "client_id": {
+     "maxLength": 100,
+     "title": "Client Id",
+     "type": "string"
+    },
+    "path": {
+     "anyOf": [
+      {
+       "maxLength": 100,
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Path"
+    }
+   },
+   "required": [
+    "client_id"
+   ],
+   "title": "ViewPing",
+   "type": "object"
+  }
+ }
+}

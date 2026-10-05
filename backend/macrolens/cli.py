@@ -43,6 +43,10 @@ def _cmd_etl_run_all(_args: argparse.Namespace) -> int:
             f"remplacées={r.replaced_by_higher_priority} "
             f"écartées={r.rejected_lower_priority} conflits={len(r.conflicts)}"
         )
+    if report.asset_observations is None:
+        print("asset_returns: ECHEC (non bloquant, voir les journaux)")
+    else:
+        print(f"asset_returns: lignes={report.asset_observations}")
     print(
         f"total observations={report.n_observations} "
         f"coverage={report.coverage_report_path} conflicts={report.conflicts_report_path}"

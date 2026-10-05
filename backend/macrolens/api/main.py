@@ -7,7 +7,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from macrolens.api.deps import get_pool
-from macrolens.api.routers import admin, analogs, episodes, events, meta, provenance, series
+from macrolens.api.routers import (
+    admin,
+    analogs,
+    asset_returns,
+    episodes,
+    events,
+    meta,
+    provenance,
+    series,
+)
 
 logger = logging.getLogger("macrolens.admin")
 
@@ -61,6 +70,7 @@ app.include_router(analogs.router, prefix="/api/v1")
 app.include_router(episodes.router, prefix="/api/v1")
 app.include_router(provenance.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
+app.include_router(asset_returns.router, prefix="/api/v1")
 
 
 @app.get("/health")
