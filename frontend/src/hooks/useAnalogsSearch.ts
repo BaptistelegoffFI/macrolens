@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { ApiError } from "../api/client";
 import { searchAnalogs } from "../api/endpoints";
 import type { AnalogsSearchRequest, AnalogsSearchResponse } from "../api/types";
+import { logSearch } from "../lib/usageLog";
 
 export interface AnalogsSearchState {
   data: AnalogsSearchResponse | null;
@@ -25,6 +26,7 @@ export function useAnalogsSearch() {
     try {
       const data = await searchAnalogs(request);
       setState({ data, loading: false, error: null, elapsedMs: performance.now() - start });
+      logSearch(request);
     } catch (err) {
       const message =
         err instanceof ApiError

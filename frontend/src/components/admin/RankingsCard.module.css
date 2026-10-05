@@ -1,0 +1,102 @@
+.card {
+  border: 1px solid var(--rule-light);
+  background: var(--bg-chrome);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-secondary);
+}
+
+.chips {
+  display: flex;
+  gap: 4px;
+}
+
+.chip {
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--rule);
+  background: var(--bg-app);
+  color: var(--fg);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.chip[data-active="true"] {
+  background: var(--bg-selected);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.error {
+  font-size: 12px;
+  color: var(--neg);
+}
+
+.listTitle {
+  margin: 0 0 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-secondary);
+}
+
+.empty {
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: baseline;
+  padding: 3px 0 5px;
+  font-size: 12px;
+}
+
+.rank {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-muted);
+}
+
+.name {
+  overflow-wrap: anywhere;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-secondary);
+}
+
+.bar {
+  grid-column: 2 / 4;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0.55;
+}
