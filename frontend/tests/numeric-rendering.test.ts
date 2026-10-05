@@ -28,7 +28,7 @@ import { describe, expect, it } from "vitest";
  * - pixel arithmetic for drag-resize (ResizableColumns/Rows) — never
  *   displayed to the user at all.
  *
- * SVG `<text>` labels in Timeline.tsx/EventFrieze.tsx are a separate,
+ * SVG `<text>` labels in Timeline.tsx/EpisodeTimeline.tsx are a separate,
  * inline-documented exception (`<Num>`'s `<span>` output is not valid SVG
  * content) — they don't call `.toFixed()`/`Math.round()` so they never
  * reach this allowlist.

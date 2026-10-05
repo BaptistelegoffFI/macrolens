@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 
+import { getEvents } from "../api/endpoints";
+import type { EventOut } from "../api/types";
 import appStyles from "../App.module.css";
-import { EventFrieze } from "../components/charts/EventFrieze";
+import { EpisodeTimeline } from "../components/charts/EpisodeTimeline";
 import { SeriesSparkline } from "../components/charts/SeriesSparkline";
 import { EmptyState } from "../components/shell/EmptyState";
 import { Panel } from "../components/shell/Panel";
@@ -26,6 +28,27 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
   const [year, setYear] = useState(initialYear);
   const [expanded, setExpanded] = useState<string | null>(null);
   const { data, loading, error, run } = useEpisode();
+
+  // Historique complet des événements du pays (la frise va du premier au dernier). L'API de
+  // l'épisode ne renvoie que ceux proches de la fenêtre : on s'en sert seulement en repli si cet
+  // appel échoue, pour que la page n'en dépende jamais.
+  const [allEvents, setAllEvents] = useState<EventOut[] | null>(null);
+  const episodeCountry = data?.country;
+  useEffect(() => {
+    if (!episodeCountry) return;
+    let cancelled = false;
+    setAllEvents(null);
+    getEvents({ country: episodeCountry })
+      .then((rows) => {
+        if (!cancelled && Array.isArray(rows)) setAllEvents(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setAllEvents(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [episodeCountry]);
 
   useEffect(() => {
     void run(initialCountry, initialYear);
@@ -113,11 +136,11 @@ export function EpisodeView({ initialCountry = "SWE", initialYear = 1991 }: Epis
                 </div>
               ))}
             </div>
-            <EventFrieze
-              events={data.events}
+            <EpisodeTimeline
+              events={allEvents ?? data.events}
               anchorYear={data.year}
-              rangeStart={data.year - 10}
-              rangeEnd={data.year + 10}
+              windowStart={data.year - 10}
+              windowEnd={data.year + 10}
             />
             {data.sources.length > 0 && (
               <div style={{ padding: "8px 16px", fontSize: 11, color: "var(--fg-muted)" }}>
