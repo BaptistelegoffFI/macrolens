@@ -225,6 +225,25 @@ class PageView(Base):
     path: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
+class UsageEvent(Base):
+    """Journal d'usage du panneau admin (ADR 0028) : page ouverte ou recherche lancée. Table
+    additive, séparée de `page_views` (qui reste le compteur de chargements, inchangé).
+    `client_id` est le même UUID navigateur que `page_views` ; il n'est jamais renvoyé tel quel."""
+
+    __tablename__ = "usage_events"
+    __table_args__ = (
+        Index("ix_usage_events_occurred_at", "occurred_at"),
+        Index("ix_usage_events_kind_name", "kind", "name"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    client_id: Mapped[str] = mapped_column(Text, nullable=False)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    kind: Mapped[str] = mapped_column(Text, nullable=False)  # "page" | "search"
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+    detail: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
 class AssetSeries(Base):
     """Métadonnées d'une série de rendements d'actifs (ADR 0021, 0022). Table
     additive, hors périmètre du plan : aucun endpoint déjà déployé ne la lit.

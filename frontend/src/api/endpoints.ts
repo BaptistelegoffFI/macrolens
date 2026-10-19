@@ -1,5 +1,8 @@
 import { apiGet, apiGetAuth, apiPost, apiPostAuth, apiPutAuth } from "./client";
 import type {
+  ActivityOut,
+  EventPing,
+  RankingsOut,
   AnalogsSearchRequest,
   AnalogsSearchResponse,
   AnalyticsOut,
@@ -78,7 +81,17 @@ export const admin = {
   login: (token: string) => apiPostAuth<{ ok: boolean }>("/admin/login", { token }, token),
   updateStatus: (token: string, body: StatusOut) => apiPutAuth<StatusOut>("/admin/status", body, token),
   analytics: (token: string) => apiGetAuth<AnalyticsOut>("/admin/analytics", token),
+  activity: (token: string, limit = 150) =>
+    apiGetAuth<ActivityOut>(`/admin/activity?limit=${limit}`, token),
+  rankings: (token: string, days: number) =>
+    apiGetAuth<RankingsOut>(`/admin/rankings?days=${days}`, token),
 };
+
+/** Journal d'usage (ADR 0028) : page ouverte ou recherche lancée. Fire-and-forget, une seule
+ * tentative : une erreur ne doit jamais se voir. */
+export function recordEvent(body: EventPing) {
+  return apiPost<void>("/analytics/event", body, { retry: false });
+}
 
 /** Ping de fréquentation anonyme (§ADR 0011) : fire-and-forget, ne doit
  * jamais bloquer ni faire échouer le chargement de l'application. */

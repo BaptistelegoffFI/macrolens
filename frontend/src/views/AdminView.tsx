@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { admin, getStatus } from "../api/endpoints";
 import { ApiError } from "../api/client";
 import type { AnalyticsOut, StatusOut } from "../api/types";
+import { ActivityLog } from "../components/admin/ActivityLog";
+import { RankingsCard } from "../components/admin/RankingsCard";
 import { useLanguage } from "../i18n/LanguageContext";
 import { S } from "../i18n/strings";
 import styles from "./AdminView.module.css";
@@ -78,7 +80,7 @@ export function AdminView() {
         </button>
       </div>
 
-      <div className={styles.body}>
+      <div className={token ? styles.bodyWide : styles.body}>
         <a className={styles.backLink} href="/">
           {t(S.admin.backToApp)}
         </a>
@@ -215,6 +217,9 @@ export function AdminView() {
             )}
           </div>
         )}
+
+        {token && <RankingsCard token={token} />}
+        {token && <ActivityLog token={token} />}
       </div>
     </div>
   );
