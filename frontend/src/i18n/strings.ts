@@ -338,6 +338,59 @@ export const S = {
     },
   },
 
+  // Avertissements d'une recherche d'analogues, affichés dans la colonne de droite. L'API les
+  // renvoie en français ; lib/searchWarnings.ts les décode, ces gabarits les rendent dans la
+  // langue choisie.
+  warnings: {
+    panelTitle: { fr: "Avertissements", en: "Warnings" },
+    placeholder: {
+      fr: "Lancez une recherche pour voir ses avertissements.",
+      en: "Run a search to see its warnings.",
+    },
+    none: { fr: "Aucun avertissement pour cette recherche.", en: "No warnings for this search." },
+    epochTitle: { fr: "Analogues éloignés dans le temps", en: "Analogues far apart in time" },
+    epochBody: {
+      fr: (count: number, min: number, max: number) =>
+        count === 1
+          ? `L'analogue est distant de ${min} ans de la requête.`
+          : min === max
+            ? `${count} analogues sont distants de ${min} ans de la requête.`
+            : `${count} analogues sont distants de ${min} à ${max} ans de la requête.`,
+      en: (count: number, min: number, max: number) =>
+        count === 1
+          ? `The analogue is ${min} years from the query.`
+          : min === max
+            ? `${count} analogues are ${min} years from the query.`
+            : `${count} analogues are ${min} to ${max} years from the query.`,
+    },
+    epochExplain: {
+      fr: "Le rapprochement porte sur des positions relatives, pas sur des niveaux comparables : les structures économiques sont très différentes.",
+      en: "The match rests on relative positions, not comparable levels: the economic structures are very different.",
+    },
+    smallNTitle: { fr: "Peu d'analogues", en: "Few analogues" },
+    smallNBody: {
+      fr: (n: number) =>
+        `Seulement ${n} analogue(s) trouvé(s) : la distribution est affichée, les agrégats sont peu fiables.`,
+      en: (n: number) =>
+        `Only ${n} analogue(s) found: the distribution is shown, but the aggregates are unreliable.`,
+    },
+    concentratedTitle: { fr: "Analogues concentrés", en: "Concentrated analogues" },
+    concentratedBody: {
+      fr: (countries: number, decades: number) =>
+        `Analogues concentrés sur ${countries} pays et ${decades} décennie(s) : plusieurs analogues peuvent correspondre à un même épisode historique plutôt qu'à des précédents indépendants.`,
+      en: (countries: number, decades: number) =>
+        `Analogues concentrated in ${countries} countries and ${decades} decade(s): several analogues may be the same historical episode rather than independent precedents.`,
+    },
+    hhiTitle: { fr: "Concentration élevée", en: "High concentration" },
+    hhiBody: {
+      fr: (country: string, decade: string) =>
+        `Indice de concentration élevé (HHI pays = ${country}, HHI décennie = ${decade}) : plusieurs analogues peuvent appartenir au même épisode historique.`,
+      en: (country: string, decade: string) =>
+        `High concentration index (country HHI = ${country}, decade HHI = ${decade}): several analogues may belong to the same historical episode.`,
+    },
+    otherTitle: { fr: "Avertissement", en: "Warning" },
+  },
+
   announcement: {
     dismiss: { fr: "Masquer", en: "Dismiss" },
   },

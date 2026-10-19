@@ -8,6 +8,7 @@ import { Timeline } from "./components/charts/Timeline";
 import { BordereauPanel } from "./components/provenance/BordereauPanel";
 import { AssetReturnsBlock } from "./components/scenario/AssetReturnsBlock";
 import { FeatureValueInputs } from "./components/scenario/FeatureValueInputs";
+import { SearchWarnings } from "./components/scenario/SearchWarnings";
 import { WeightSlider } from "./components/scenario/WeightSlider";
 import { CommandPalette } from "./components/shell/CommandPalette";
 import { EmptyState } from "./components/shell/EmptyState";
@@ -32,6 +33,7 @@ import { FAMILY_LABELS, FEATURE_FAMILIES, featuresByFamily } from "./lib/feature
 import type { FeatureFamily } from "./lib/features";
 import { getClientId } from "./lib/clientId";
 import { readPermalinkParam, setPermalinkParam } from "./lib/permalink";
+import { parseWarnings } from "./lib/searchWarnings";
 import { keysForAnalogsSearch } from "./lib/provenanceKeys";
 import { AssetClassesView } from "./views/AssetClassesView";
 import type { AssetClassesPrefill } from "./views/AssetClassesView";
@@ -219,14 +221,9 @@ function ScenarioView({
       </Panel>
 
       <Panel title={t(S.scenario.analoguesPanelTitle)} meta={data ? String(data.analogs.length) : "0"}>
-        <ResizableRows storageKey="ml.scenario.rows" defaultHeights={[240, 460, 240]}>
+        <ResizableRows storageKey="ml.scenario.rows" defaultHeights={[240, 240]}>
           <div>
             {error && <div className={styles.errorBanner}>{error}</div>}
-            {data?.warnings.map((w, i) => (
-              <div key={i} className={styles.warningBanner}>
-                ⚑ {w}
-              </div>
-            ))}
             {loading && <EmptyState>{t(S.scenario.searching)}</EmptyState>}
             {!loading && !error && !data && <EmptyState>{t(S.scenario.noSearchYet)}</EmptyState>}
             {!loading && data && data.analogs.length === 0 && (
@@ -236,11 +233,6 @@ function ScenarioView({
               <Table columns={columns} rows={data.analogs} getRowKey={(r) => `${r.country}-${r.year}`} />
             )}
           </div>
-          <AssetReturnsBlock
-            analogs={assetAnalogs}
-            anchor={assetAnchor}
-            onOpenAssetClasses={onOpenAssetClasses}
-          />
           {data && data.analogs.length > 0 ? (
             <FanChart data={data} variable="out_growth_cum" variableLabel={t(S.scenario.fanChartVariableLabel)} />
           ) : (
@@ -252,11 +244,25 @@ function ScenarioView({
             <EmptyState>{t(S.scenario.timelinePlaceholder)}</EmptyState>
           )}
         </ResizableRows>
+        {/* Sous tout le reste, à pleine hauteur : le panneau défile, le bloc n'est plus comprimé. */}
+        <AssetReturnsBlock
+          analogs={assetAnalogs}
+          anchor={assetAnchor}
+          onOpenAssetClasses={onOpenAssetClasses}
+        />
       </Panel>
 
-      <Panel title={t(S.scenario.bordereauPanelTitle)}>
-        <ScenarioBordereau data={data} />
-      </Panel>
+      <ResizableRows storageKey="ml.scenario.side" defaultHeights={[260]}>
+        <Panel
+          title={t(S.warnings.panelTitle)}
+          meta={data && data.warnings.length > 0 ? String(parseWarnings(data.warnings).length) : undefined}
+        >
+          <SearchWarnings warnings={data ? data.warnings : null} />
+        </Panel>
+        <Panel title={t(S.scenario.bordereauPanelTitle)}>
+          <ScenarioBordereau data={data} />
+        </Panel>
+      </ResizableRows>
     </ResizableColumns>
   );
 }
