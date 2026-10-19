@@ -311,6 +311,38 @@ export interface AnalyticsOut {
   daily: DailyCount[];
 }
 
+export interface EventPing {
+  client_id: string;
+  kind: "page" | "search";
+  name: string;
+  detail?: string | null;
+}
+
+export interface ActivityItem {
+  at: string;
+  kind: "visit" | "page" | "search";
+  name: string | null;
+  detail: string | null;
+  device: string;
+}
+
+export interface ActivityOut {
+  events: ActivityItem[];
+}
+
+export interface RankItem {
+  name: string;
+  count: number;
+  devices: number;
+}
+
+export interface RankingsOut {
+  days: number;
+  pages: RankItem[];
+  searches: RankItem[];
+  countries: RankItem[];
+}
+
 // ---- asset_returns.py — hors périmètre du plan, voir docs/decisions/0015 à 0024 ----
 export type AssetReturnBasis = "real_total_return" | "nominal_fx_return" | "cpi_change";
 export type AssetSection = "core" | "housing" | "fx" | "inflation";

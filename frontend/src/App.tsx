@@ -34,6 +34,7 @@ import type { FeatureFamily } from "./lib/features";
 import { getClientId } from "./lib/clientId";
 import { readPermalinkParam, setPermalinkParam } from "./lib/permalink";
 import { parseWarnings } from "./lib/searchWarnings";
+import { logPage } from "./lib/usageLog";
 import { keysForAnalogsSearch } from "./lib/provenanceKeys";
 import { AssetClassesView } from "./views/AssetClassesView";
 import type { AssetClassesPrefill } from "./views/AssetClassesView";
@@ -341,6 +342,11 @@ export function App() {
   useEffect(() => {
     void recordView({ client_id: getClientId() }).catch(() => {});
   }, []);
+
+  // ADR 0028 : une ligne de journal par page ouverte (la page initiale comprise).
+  useEffect(() => {
+    logPage(activeView);
+  }, [activeView]);
 
   function setWeight(family: FeatureFamily, value: number) {
     setWeights((prev) => ({

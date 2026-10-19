@@ -6,25 +6,31 @@ authentification multi-utilisateur — proportionné à l'usage réel."""
 
 from __future__ import annotations
 
+import hashlib
 import os
 import secrets
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, Header, HTTPException
-from sqlalchemy import func, select
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.orm import Session
 
 from macrolens.api.deps import get_db
 from macrolens.api.schemas.admin import (
+    ActivityItem,
+    ActivityOut,
     AnalyticsOut,
     DailyCount,
+    EventPing,
     LoginRequest,
     LoginResponse,
+    RankingsOut,
+    RankItem,
     StatusOut,
     StatusUpdate,
     ViewPing,
 )
-from macrolens.db.models import PageView, SiteStatus
+from macrolens.db.models import PageView, SiteStatus, UsageEvent
 
 router = APIRouter(tags=["admin"])
 
@@ -148,6 +154,108 @@ def get_analytics(session: Session = Depends(get_db)) -> AnalyticsOut:
         views_last_7_days=views_7d,
         unique_devices_last_7_days=unique_7d,
         daily=daily,
+    )
+
+
+@router.post("/analytics/event", status_code=204)
+def record_event(body: EventPing, session: Session = Depends(get_db)) -> None:
+    """Public, comme `/analytics/view` : une page ouverte ou une recherche lancée (ADR 0028)."""
+    session.add(
+        UsageEvent(
+            client_id=body.client_id,
+            occurred_at=datetime.now(UTC),
+            kind=body.kind,
+            name=body.name,
+            detail=body.detail,
+        )
+    )
+    session.commit()
+
+
+def _device_label(client_id: str) -> str:
+    """Empreinte de six caractères : distingue les visiteurs entre eux sans exposer l'UUID."""
+    return hashlib.sha256(client_id.encode()).hexdigest()[:6]
+
+
+@router.get("/admin/activity", response_model=ActivityOut, dependencies=[Depends(require_admin)])
+def get_activity(
+    limit: int = Query(100, ge=1, le=500), session: Session = Depends(get_db)
+) -> ActivityOut:
+    """Journal horodaté, du plus récent au plus ancien : chargements du site, pages ouvertes,
+    recherches. Fusion de `page_views` (historique déjà collecté) et de `usage_events`."""
+    views = session.execute(
+        select(PageView).order_by(PageView.viewed_at.desc(), PageView.id.desc()).limit(limit)
+    ).scalars()
+    events = session.execute(
+        select(UsageEvent)
+        .order_by(UsageEvent.occurred_at.desc(), UsageEvent.id.desc())
+        .limit(limit)
+    ).scalars()
+    items = [
+        ActivityItem(
+            at=v.viewed_at,
+            kind="visit",
+            name=v.path,
+            detail=None,
+            device=_device_label(v.client_id),
+        )
+        for v in views
+    ] + [
+        ActivityItem(
+            at=e.occurred_at,
+            kind="search" if e.kind == "search" else "page",
+            name=e.name,
+            detail=e.detail,
+            device=_device_label(e.client_id),
+        )
+        for e in events
+    ]
+    items.sort(key=lambda i: i.at, reverse=True)
+    return ActivityOut(events=items[:limit])
+
+
+def _ranking(
+    session: Session,
+    kind: str,
+    since: datetime | None,
+    name_expr: ColumnElement[str] | None = None,
+    only_country_labels: bool = False,
+    top: int = 10,
+) -> list[RankItem]:
+    name_col = name_expr if name_expr is not None else UsageEvent.name
+    stmt = (
+        select(
+            name_col.label("n"),
+            func.count().label("c"),
+            func.count(func.distinct(UsageEvent.client_id)).label("d"),
+        )
+        .where(UsageEvent.kind == kind)
+        .group_by(name_col)
+        .order_by(func.count().desc(), name_col)
+        .limit(top)
+    )
+    if since is not None:
+        stmt = stmt.where(UsageEvent.occurred_at >= since)
+    if only_country_labels:
+        # « SWE 1991 » compte pour SWE ; « manual » n'a pas de pays et reste hors du classement.
+        stmt = stmt.where(UsageEvent.name.op("~")("^[A-Z]{3}( |$)"))
+    return [RankItem(name=r.n, count=r.c, devices=r.d) for r in session.execute(stmt).all()]
+
+
+@router.get("/admin/rankings", response_model=RankingsOut, dependencies=[Depends(require_admin)])
+def get_rankings(
+    days: int = Query(30, ge=0, le=3650), session: Session = Depends(get_db)
+) -> RankingsOut:
+    """Classements : pages les plus ouvertes, recherches les plus lancées (étiquette complète),
+    pays les plus recherchés. `days=0` : depuis le début."""
+    since = datetime.now(UTC) - timedelta(days=days) if days else None
+    # Pays : premier mot d'une étiquette de recherche (« SWE 1991 » → « SWE »).
+    country = func.split_part(UsageEvent.name, " ", 1)
+    return RankingsOut(
+        days=days,
+        pages=_ranking(session, "page", since),
+        searches=_ranking(session, "search", since),
+        countries=_ranking(session, "search", since, name_expr=country, only_country_labels=True),
     )
 
 
