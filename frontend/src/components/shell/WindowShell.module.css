@@ -6,24 +6,21 @@
 }
 
 .tabs {
-  height: var(--panel-title-h);
+  height: var(--menubar-h);
   display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 0 4px;
-  background: var(--bg-chrome);
-  border-bottom: 1px solid var(--rule);
+  align-items: stretch;
+  padding: 0 var(--sp-1);
+  background: var(--sep-tint);
+  border-bottom: var(--sep-rule);
   flex: 0 0 auto;
 }
 
 .tab {
-  height: 100%;
+  composes: label from "../../styles/typography.module.css";
   display: flex;
   align-items: center;
-  padding: 0 10px;
-  font-size: 11px;
-  color: var(--fg-secondary);
-  border-right: 1px solid var(--rule-light);
+  padding: 0 var(--sp-3);
+  border-right: var(--sep-hairline);
   cursor: pointer;
 }
 
@@ -31,11 +28,6 @@
   background: var(--bg-app);
   color: var(--fg);
   border-bottom: 1px solid var(--bg-app);
-}
-
-.shortcut {
-  color: var(--fg-muted);
-  margin-left: 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
+  position: relative;
+  top: 1px;
 }

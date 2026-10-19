@@ -9,15 +9,16 @@
   height: var(--menubar-h);
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 8px;
-  background: var(--bg-chrome);
-  border-bottom: 1px solid var(--rule);
+  gap: var(--space-inline);
+  padding: 0 var(--sp-2);
+  background: var(--sep-tint);
+  border-bottom: var(--sep-rule);
 }
 
 .title {
-  font-size: 12px;
-  font-weight: 600;
+  composes: label from "../styles/typography.module.css";
+  color: var(--fg);
+  font-weight: var(--weight-strong);
 }
 
 .spacer {
@@ -25,35 +26,23 @@
 }
 
 .langBtn {
-  height: 20px;
-  padding: 0 8px;
-  font: inherit;
-  font-size: 10px;
-  color: var(--fg-secondary);
-  background: transparent;
-  border: 1px solid var(--rule);
-  cursor: pointer;
-}
-
-.langBtn[data-active="true"] {
-  background: var(--accent);
-  color: var(--bg-app);
+  composes: chip from "../styles/surfaces.module.css";
 }
 
 .body {
   max-width: 560px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: var(--sp-8) var(--sp-4);
 }
 
 /* Connecté : deux colonnes. Cartes à gauche, journal d'activité à droite (ADR 0028). */
 .bodyWide {
   max-width: 1160px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: var(--sp-8) var(--sp-4);
   display: grid;
   grid-template-columns: minmax(0, 560px) minmax(320px, 1fr);
-  gap: 16px;
+  gap: var(--sp-4);
   align-items: start;
 }
 
@@ -83,10 +72,9 @@
 }
 
 .backLink {
+  composes: btnLink from "../styles/surfaces.module.css";
   display: inline-block;
-  margin-bottom: 16px;
-  font-size: 12px;
-  color: var(--accent);
+  margin-bottom: var(--sp-4);
   text-decoration: none;
 }
 
@@ -95,144 +83,128 @@
 }
 
 .card {
-  border: 1px solid var(--rule-light);
-  background: var(--bg-chrome);
-  padding: 16px;
+  border: var(--sep-hairline);
+  background: var(--sep-tint);
+  padding: var(--space-sub);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-inset);
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-1);
 }
 
 .fieldLabel {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--fg-secondary);
+  composes: colhead from "../styles/typography.module.css";
 }
 
 .input,
 .textarea {
-  border: 1px solid var(--rule);
+  border: var(--sep-rule);
   background: var(--bg-app);
-  font: inherit;
-  font-size: 13px;
-  padding: 6px 8px;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  padding: var(--sp-2);
   color: var(--fg);
 }
 
 .textarea {
   resize: vertical;
-  font-family: var(--font-sans);
 }
 
 .checkboxField {
+  composes: body from "../styles/typography.module.css";
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: var(--sp-2);
 }
 
 .primaryBtn {
   height: 32px;
-  padding: 0 16px;
+  padding: 0 var(--sp-4);
   border: 1px solid var(--accent);
   background: var(--accent);
   color: var(--bg-app);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-strong);
   cursor: pointer;
   align-self: flex-start;
 }
 
 .linkBtn {
-  border: none;
-  background: transparent;
-  color: var(--accent);
-  font: inherit;
-  font-size: 12px;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
+  composes: btnLink from "../styles/surfaces.module.css";
 }
 
 .sessionRow {
+  composes: label from "../styles/typography.module.css";
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12px;
-  color: var(--fg-secondary);
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--rule);
+  padding-bottom: var(--sp-1);
+  border-bottom: var(--sep-rule);
 }
 
 .error {
-  font-size: 12px;
+  composes: body from "../styles/typography.module.css";
   color: var(--neg);
 }
 
 .success {
-  font-size: 12px;
+  composes: body from "../styles/typography.module.css";
   color: var(--pos);
 }
 
 .statsRow {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: var(--space-inset);
 }
 
 .stat {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 10px;
-  border: 1px solid var(--rule-light);
+  gap: var(--sp-1);
+  padding: var(--space-inset);
+  border: var(--sep-hairline);
   background: var(--bg-app);
 }
 
 .statValue {
-  font-family: var(--font-mono);
-  font-size: 20px;
-  font-weight: 600;
+  composes: num from "../styles/typography.module.css";
+  font-size: var(--text-title);
+  font-weight: var(--weight-strong);
   color: var(--fg);
 }
 
 .statLabel {
-  font-size: 10px;
+  composes: meta from "../styles/typography.module.css";
   color: var(--fg-secondary);
 }
 
 .dailyTableScroll {
-  max-height: 240px;
-  overflow-y: auto;
+  /* Pas de défilement imbriqué : la page défile. */
 }
 
 .dailyTable {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: var(--text-body);
   font-family: var(--font-mono);
 }
 
 .dailyTable th,
 .dailyTable td {
   text-align: left;
-  padding: 4px 8px;
-  border-bottom: 1px solid var(--rule-light);
+  padding: var(--sp-1) var(--sp-2);
+  border-bottom: var(--sep-hairline);
 }
 
-.dailyTable th {
-  font-family: var(--font-sans);
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--fg-secondary);
-  text-transform: uppercase;
+.dailyTh {
+  composes: colhead from "../styles/typography.module.css";
 }
 
 .dailyTable td:not(:first-child),

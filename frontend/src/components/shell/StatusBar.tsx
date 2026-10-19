@@ -60,7 +60,6 @@ export function StatusBar({ buildId, poolSize, excluded, n, hhiCountry, elapsedM
     <div className={styles.bar} role="status">
       {items.map((item, i) => (
         <span key={i} className={styles.item}>
-          {i > 0 && <span className={styles.sep}>· </span>}
           {item}
         </span>
       ))}

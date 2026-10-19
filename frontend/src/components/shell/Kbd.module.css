@@ -1,0 +1,7 @@
+/* Raccourci clavier : une seule apparence partout (onglets, boutons, textes d'aide). */
+.kbd {
+  composes: num from "../../styles/typography.module.css";
+  font-size: var(--text-meta);
+  color: var(--fg-muted);
+  margin-left: var(--sp-1);
+}

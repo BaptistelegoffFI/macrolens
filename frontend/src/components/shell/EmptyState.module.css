@@ -1,11 +1,11 @@
 .empty {
+  composes: meta from "../../styles/typography.module.css";
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
   min-height: 80px;
-  padding: 16px;
+  padding: var(--sp-4);
   text-align: center;
-  color: var(--fg-muted);
-  font-size: 12px;
+  font-size: var(--text-body);
 }

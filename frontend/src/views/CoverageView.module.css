@@ -6,59 +6,71 @@
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
-  border-bottom: 1px solid var(--rule);
-  background: var(--bg-chrome);
+  gap: var(--space-inline);
+  padding: var(--sp-2);
+  border-bottom: var(--sep-rule);
+  background: var(--sep-tint);
+}
+
+.toolbarLabel {
+  composes: colhead from "../styles/typography.module.css";
 }
 
 .select {
-  height: var(--control-h);
-  border: 1px solid var(--rule);
-  background: var(--bg-app);
-  font-size: 11px;
-  padding: 0 4px;
+  composes: select from "../styles/surfaces.module.css";
 }
 
 .table {
   border-collapse: collapse;
-  font-size: 11px;
 }
 
 .rowHeader {
+  composes: label from "../styles/typography.module.css";
   position: sticky;
   left: 0;
-  background: var(--bg-chrome);
-  border-right: 1px solid var(--rule);
-  padding: 2px 8px;
+  background: var(--sep-tint);
+  border-right: var(--sep-rule);
+  padding: var(--sp-1) var(--sp-2);
   text-align: left;
   white-space: nowrap;
   z-index: 1;
+  color: var(--fg);
+}
+
+.cornerHeader {
+  composes: colhead from "../styles/typography.module.css";
+  position: sticky;
+  left: 0;
+  top: 0;
+  background: var(--sep-tint);
+  border-right: var(--sep-rule);
+  border-bottom: var(--sep-rule);
+  padding: var(--sp-1) var(--sp-2);
+  text-align: left;
+  z-index: 2;
 }
 
 .colHeader {
+  composes: colhead num from "../styles/typography.module.css";
   position: sticky;
   top: 0;
-  background: var(--bg-chrome);
-  border-bottom: 1px solid var(--rule);
-  padding: 2px 6px;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+  background: var(--sep-tint);
+  border-bottom: var(--sep-rule);
+  padding: var(--sp-1) var(--sp-2);
   z-index: 1;
 }
 
 .cell {
+  composes: num from "../styles/typography.module.css";
+  font-size: var(--text-body);
   width: 44px;
-  height: 22px;
+  height: 24px;
   text-align: center;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  border: 1px solid var(--rule-light);
-  color: var(--fg-secondary);
+  border: var(--sep-hairline);
+  color: var(--fg);
 }
 
 .legend {
-  padding: 8px;
-  font-size: 10px;
-  color: var(--fg-muted);
+  composes: meta from "../styles/typography.module.css";
+  padding: var(--sp-2);
 }

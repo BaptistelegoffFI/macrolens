@@ -3,17 +3,20 @@ import { useEffect, useMemo, useState } from "react";
 import { getState, getStatus, recordView } from "./api/endpoints";
 import type { AnalogOut, AnalogsSearchRequest, StateVectorOut, StatusOut } from "./api/types";
 import styles from "./App.module.css";
+import surfaces from "./styles/surfaces.module.css";
 import { FanChart } from "./components/charts/FanChart";
 import { Timeline } from "./components/charts/Timeline";
 import { BordereauPanel } from "./components/provenance/BordereauPanel";
 import { AssetReturnsBlock } from "./components/scenario/AssetReturnsBlock";
 import { FeatureValueInputs } from "./components/scenario/FeatureValueInputs";
 import { SearchWarnings } from "./components/scenario/SearchWarnings";
+import { StateVector } from "./components/scenario/StateVector";
 import { WeightSlider } from "./components/scenario/WeightSlider";
 import { CommandPalette } from "./components/shell/CommandPalette";
 import { EmptyState } from "./components/shell/EmptyState";
 import { FailSafe } from "./components/shell/FailSafe";
 import { Panel } from "./components/shell/Panel";
+import { Section } from "./components/shell/Section";
 import { ResizableColumns } from "./components/shell/ResizableColumns";
 import { ResizableRows } from "./components/shell/ResizableRows";
 import { StatusBar } from "./components/shell/StatusBar";
@@ -29,7 +32,7 @@ import { useProvenanceReceipt } from "./hooks/useProvenanceReceipt";
 import { useLanguage } from "./i18n/LanguageContext";
 import { S } from "./i18n/strings";
 import type { ParsedCommand } from "./lib/commandParser";
-import { FAMILY_LABELS, FEATURE_FAMILIES, featuresByFamily } from "./lib/features";
+import { FAMILY_LABELS, FEATURE_FAMILIES } from "./lib/features";
 import type { FeatureFamily } from "./lib/features";
 import { getClientId } from "./lib/clientId";
 import { readPermalinkParam, setPermalinkParam } from "./lib/permalink";
@@ -116,13 +119,14 @@ function ScenarioView({
 
   const columns: ColumnDef<AnalogOut>[] = useMemo(() => {
     const base: ColumnDef<AnalogOut>[] = [
-      { key: "country", label: t(S.scenario.tableCountry), accessor: (r) => r.country },
+      { key: "country", label: t(S.scenario.tableCountry), mono: true, accessor: (r) => r.country },
       { key: "year", label: t(S.scenario.tableYear), numeric: true, decimals: 0, accessor: (r) => r.year },
-      { key: "similarity", label: t(S.scenario.tableSimilarity), numeric: true, decimals: 1, accessor: (r) => r.similarity },
+      { key: "similarity", label: t(S.scenario.tableSimilarity), title: t(S.scenario.simHelp), numeric: true, decimals: 1, accessor: (r) => r.similarity },
     ];
     const growthCols: ColumnDef<AnalogOut>[] = horizons.map((h) => ({
       key: `growth_${h}`,
       label: t(S.scenario.growthColumn)(h),
+      title: t(S.scenario.growthHelp)(h),
       numeric: true,
       decimals: 1,
       sign: true,
@@ -133,13 +137,16 @@ function ScenarioView({
       ? {
           key: "crisis",
           label: t(S.scenario.crisisColumn)(lastHorizon),
+          title: t(S.scenario.crisisHelp)(lastHorizon),
           accessor: (r) => r.outcomes[String(lastHorizon)]?.out_banking_crisis ?? null,
           render: (r) => {
             const v = r.outcomes[String(lastHorizon)]?.out_banking_crisis;
             return v === true ? (
-              <span className={styles.crisisMarker}>●</span>
+              <span className={styles.crisisMarker} role="img" aria-label={t(S.scenario.crisisYes)}>
+                ●
+              </span>
             ) : (
-              <span className="num" style={{ color: "var(--fg-muted)" }}>
+              <span className="num" style={{ color: "var(--fg-muted)" }} role="img" aria-label={t(S.scenario.crisisNo)}>
                 —
               </span>
             );
@@ -150,7 +157,7 @@ function ScenarioView({
   }, [horizons, lastHorizon, t]);
 
   return (
-    <ResizableColumns storageKey="ml.scenario.cols" defaultWidths={[220, 760]}>
+    <ResizableColumns storageKey="ml.scenario.cols.v2" defaultWidths={[240, 320]} fillIndex={1}>
       <Panel title={t(S.scenario.panelTitle)}>
         <div className={styles.scenarioLeft}>
           {(toolbar.mode === "anchor" || toolbar.mode === "shock") && (
@@ -186,26 +193,7 @@ function ScenarioView({
             <FeatureValueInputs values={shockDeltas} onChange={onShockChange} />
           )}
 
-          {queryState &&
-            featuresByFamily(lang).map((group) => (
-              <div key={group.family} className={styles.fieldGroup}>
-                <div className={styles.fieldGroupTitle}>{group.label}</div>
-                {group.features.map((f) => {
-                  const sv = queryState.features.find((x) => x.feature_code === f.code);
-                  return (
-                    <div key={f.code} className={styles.field}>
-                      <span className={styles.fieldLabel}>{f.label}</span>
-                      <span style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                        <Num value={sv?.raw_value} decimals={2} />
-                        <span className={styles.rank}>
-                          r=<Num value={sv?.pct_rank} decimals={2} />
-                        </span>
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
+          {queryState && <StateVector features={queryState.features} showLegend />}
 
           <div className={styles.fieldGroup}>
             <div className={styles.fieldGroupTitle}>{t(S.common.weights)}</div>
@@ -222,38 +210,44 @@ function ScenarioView({
       </Panel>
 
       <Panel title={t(S.scenario.analoguesPanelTitle)} meta={data ? String(data.analogs.length) : "0"}>
-        <ResizableRows storageKey="ml.scenario.rows" defaultHeights={[240, 240]}>
-          <div>
-            {error && <div className={styles.errorBanner}>{error}</div>}
+        <div className={styles.main}>
+          {error && <div className={styles.errorBanner}>{error}</div>}
+
+          <Section level="group" title={t(S.scenario.groupMatch)} meta={t(S.scenario.groupMatchMeta)}>
             {loading && <EmptyState>{t(S.scenario.searching)}</EmptyState>}
             {!loading && !error && !data && <EmptyState>{t(S.scenario.noSearchYet)}</EmptyState>}
             {!loading && data && data.analogs.length === 0 && (
               <EmptyState>{t(S.scenario.noAnalogFound)}</EmptyState>
             )}
             {!loading && data && data.analogs.length > 0 && (
-              <Table columns={columns} rows={data.analogs} getRowKey={(r) => `${r.country}-${r.year}`} />
+              <>
+                <Table columns={columns} rows={data.analogs} getRowKey={(r) => `${r.country}-${r.year}`} />
+                {lastHorizon && <p className={styles.legend}>{t(S.scenario.tableLegend)(lastHorizon)}</p>}
+                <div className={styles.timelineRow}>
+                  <Timeline analogs={data.analogs} anchorYear={year} />
+                </div>
+              </>
             )}
-          </div>
-          {data && data.analogs.length > 0 ? (
-            <FanChart data={data} variable="out_growth_cum" variableLabel={t(S.scenario.fanChartVariableLabel)} />
-          ) : (
-            <EmptyState>{t(S.scenario.fanChartPlaceholder)}</EmptyState>
-          )}
-          {data && data.analogs.length > 0 ? (
-            <Timeline analogs={data.analogs} anchorYear={year} />
-          ) : (
-            <EmptyState>{t(S.scenario.timelinePlaceholder)}</EmptyState>
-          )}
-        </ResizableRows>
-        {/* Sous tout le reste, à pleine hauteur : le panneau défile, le bloc n'est plus comprimé. */}
-        <AssetReturnsBlock
-          analogs={assetAnalogs}
-          anchor={assetAnchor}
-          onOpenAssetClasses={onOpenAssetClasses}
-        />
+          </Section>
+
+          <Section level="group" title={t(S.scenario.groupNext)} meta={t(S.scenario.groupNextMeta)}>
+            {data && data.analogs.length > 0 ? (
+              <div className={styles.charts}>
+                <FanChart data={data} variable="out_growth_cum" variableLabel={t(S.scenario.fanChartVariableLabel)} />
+              </div>
+            ) : (
+              <EmptyState>{t(S.scenario.fanChartPlaceholder)}</EmptyState>
+            )}
+            <AssetReturnsBlock
+              analogs={assetAnalogs}
+              anchor={assetAnchor}
+              onOpenAssetClasses={onOpenAssetClasses}
+            />
+          </Section>
+        </div>
       </Panel>
 
-      <ResizableRows storageKey="ml.scenario.side" defaultHeights={[260]}>
+      <ResizableRows storageKey="ml.scenario.side" defaultHeights={[300]}>
         <Panel
           title={t(S.warnings.panelTitle)}
           meta={data && data.warnings.length > 0 ? String(parseWarnings(data.warnings).length) : undefined}
@@ -282,15 +276,14 @@ function ScenarioBordereau({ data }: { data: ReturnType<typeof useAnalogsSearch>
 
   if (!opened) {
     return (
-      <div style={{ padding: 8 }}>
-        <div style={{ fontSize: 11, color: "var(--fg-muted)", marginBottom: 8 }}>
+      <div className={styles.bordereau}>
+        <div className={styles.bordereauMeta}>
           {data.sources_summary.map((s) => s.id).join(", ") || t(S.common.noSource)} —{" "}
-          <Num value={data.pool_size} decimals={0} /> {t(S.statusBar.candidates)}
+          <Num value={data.pool_size} decimals={0} size="meta" /> {t(S.statusBar.candidates)}
         </div>
         <button
           type="button"
-          className={styles.textInput}
-          style={{ width: "100%", cursor: "pointer" }}
+          className={surfaces.btn}
           onClick={() => {
             setOpened(true);
             void receipt.run({ build_id: data.build_id, keys: keysForAnalogsSearch(data) });

@@ -6,6 +6,7 @@ import { axisNumericStyle, baseChartOption, fanChartSeriesStyle } from "../../ch
 import { useLanguage } from "../../i18n/LanguageContext";
 import { S } from "../../i18n/strings";
 import { downloadDataUrl } from "../../lib/csv";
+import { ChartFrame } from "./ChartFrame";
 import { EChart } from "./EChart";
 import type { EChartHandle } from "./EChart";
 
@@ -99,8 +100,7 @@ export function FanChart({ data, variable, variableLabel }: FanChartProps) {
 
     return {
       ...baseChartOption,
-      title: { text: t(S.fanChart.title)(variableLabel), left: 0, top: 0, textStyle: { fontSize: 11, fontWeight: "normal" } },
-      grid: { left: 48, right: 16, top: 32, bottom: 32 },
+      grid: { left: 48, right: 16, top: 12, bottom: 32 },
       xAxis: {
         ...axisNumericStyle.x,
         type: "value" as const,
@@ -113,7 +113,7 @@ export function FanChart({ data, variable, variableLabel }: FanChartProps) {
       legend: { show: false },
       series: [q1Series, q3MinusQ1Series, ...analogSeries, medianSeries],
     };
-  }, [data, variable, variableLabel, t]);
+  }, [data, variable, t]);
 
   function exportPng() {
     const url = chartRef.current?.getDataUrl();
@@ -121,30 +121,18 @@ export function FanChart({ data, variable, variableLabel }: FanChartProps) {
   }
 
   return (
-    <div>
-      <EChart ref={chartRef} option={option} height={200} />
-      {/* §11.5 : chaque graphique porte en pied source(s), build_id, export. */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          padding: "2px 8px",
-          fontSize: 9,
-          color: "var(--fg-muted)",
-        }}
-      >
-        <span>
+    <ChartFrame
+      title={t(S.fanChart.title)(variableLabel)}
+      footnote={
+        <>
           {data.sources_summary.map((s) => s.id).join(", ") || t(S.common.noSource)} · build{" "}
           {data.build_id.slice(0, 8)}
-        </span>
-        <button
-          type="button"
-          onClick={exportPng}
-          style={{ border: "none", background: "transparent", color: "var(--accent)", cursor: "pointer", fontSize: 9 }}
-        >
-          {t(S.seriesExplorer.exportPng)}
-        </button>
-      </div>
-    </div>
+        </>
+      }
+      onExport={exportPng}
+      height="clamp(220px, 16vw, 340px)"
+    >
+      <EChart ref={chartRef} option={option} />
+    </ChartFrame>
   );
 }

@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 
 import { SeriesSparkline } from "../components/charts/SeriesSparkline";
+import { StateVector } from "../components/scenario/StateVector";
 import { EmptyState } from "../components/shell/EmptyState";
 import { Num } from "../components/table/Num";
 import { useCompare } from "../hooks/useCompare";
 import { useLanguage } from "../i18n/LanguageContext";
 import { S } from "../i18n/strings";
+import { mostDivergent } from "../lib/compare";
 import { rawIndicators } from "../lib/indicators";
 import styles from "./CompareView.module.css";
 
@@ -44,7 +46,12 @@ export function CompareView({ externalPairs }: CompareViewProps) {
   function updatePair(i: number, field: "country" | "year", value: string) {
     setPairs((prev) =>
       prev.map((p, idx) =>
-        idx === i ? { ...p, [field]: field === "year" ? Number(value) : value.toUpperCase() } : p,
+        idx === i
+          ? {
+              ...p,
+              [field]: field === "year" ? Number(value) : value.toUpperCase(),
+            }
+          : p,
       ),
     );
   }
@@ -58,6 +65,10 @@ export function CompareView({ externalPairs }: CompareViewProps) {
     if (pairs.length <= 2) return;
     setPairs((prev) => prev.filter((_, idx) => idx !== i));
   }
+
+  const divergent = data
+    ? mostDivergent(data.episodes.map((ep) => ep.state?.features ?? null))
+    : null;
 
   return (
     <div className={styles.wrapper}>
@@ -82,63 +93,84 @@ export function CompareView({ externalPairs }: CompareViewProps) {
                 className={styles.removeBtn}
                 onClick={() => removePair(i)}
                 title={t(S.compare.removeTitle)}
+                aria-label={t(S.compare.removeTitle)}
               >
                 ×
               </button>
             )}
           </div>
         ))}
-        <button type="button" className={styles.addBtn} onClick={addPair} disabled={pairs.length >= 6}>
+        <button
+          type="button"
+          className={styles.addBtn}
+          onClick={addPair}
+          disabled={pairs.length >= 6}
+        >
           {t(S.compare.add)}
         </button>
-        <button type="button" className={styles.runBtn} onClick={() => void run(pairs)}>
+        <button
+          type="button"
+          className={styles.runBtn}
+          onClick={() => void run(pairs)}
+        >
           {t(S.compare.run)}
         </button>
       </div>
 
-      {error && <div style={{ color: "var(--neg)", padding: 8, fontSize: 11 }}>{error}</div>}
+      {error && <div className={styles.error}>{error}</div>}
       {loading && <EmptyState>{t(S.common.loading)}</EmptyState>}
-      {!loading && !data && !error && <EmptyState>{t(S.compare.emptyPrompt)}</EmptyState>}
+      {!loading && !data && !error && (
+        <EmptyState>{t(S.compare.emptyPrompt)}</EmptyState>
+      )}
       {!loading && data && (
-        <div className={styles.grid}>
-          {data.episodes.map((ep) => (
-            <div key={`${ep.country}-${ep.year}`} className={styles.column}>
-              <div className={styles.columnHeader}>
-                {ep.country} <Num value={ep.year} decimals={0} />
-              </div>
-              {ep.state ? (
-                ep.state.features.map((f) => (
-                  <div key={f.feature_code} className={styles.featureRow}>
-                    <span>{f.feature_code}</span>
-                    <span className={styles.featureValues}>
-                      <Num value={f.raw_value} decimals={2} />
-                      <span className={styles.featureRank}>
-                        r=<Num value={f.pct_rank} decimals={2} />
-                      </span>
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <div className={styles.featureRow}>
-                  <span style={{ color: "var(--fg-muted)" }}>{t(S.compare.stateUnavailable)}</span>
+        <>
+          <div className={styles.legends}>
+            <p className={styles.legend}>{t(S.compare.divergenceLegend)}</p>
+            <p className={styles.legend}>{t(S.stateVector.rankLegend)}</p>
+          </div>
+          <div className={styles.grid}>
+            {data.episodes.map((ep) => (
+              <div key={`${ep.country}-${ep.year}`} className={styles.column}>
+                <div className={styles.columnHeader}>
+                  {ep.country}&nbsp;
+                  <Num value={ep.year} decimals={0} size="body" />
                 </div>
-              )}
-              {["gdp_real_pc", "cpi"].map((code) => {
-                const ind = rawIndicators(lang).find((r) => r.code === code);
-                if (!ind) return null;
-                return (
-                  <SeriesSparkline
-                    key={code}
-                    label={ind.label}
-                    unit={ind.unit}
-                    observations={ep.series[code] ?? []}
-                    anchorYear={ep.year}
-                  />
-                );
-              })}
-            </div>
-          ))}
-        </div>
+                <div className={styles.body}>
+                  <div className={styles.state}>
+                    {ep.state ? (
+                      <StateVector
+                        features={ep.state.features}
+                        highlight={divergent ?? undefined}
+                      />
+                    ) : (
+                      <div className={styles.unavailable}>
+                        {t(S.compare.stateUnavailable)}
+                      </div>
+                    )}
+                  </div>
+                  <div className={styles.charts}>
+                    {["gdp_real_pc", "cpi"].map((code) => {
+                      const ind = rawIndicators(lang).find(
+                        (r) => r.code === code,
+                      );
+                      if (!ind) return null;
+                      return (
+                        <SeriesSparkline
+                          key={code}
+                          label={ind.label}
+                          unit={ind.unit}
+                          observations={ep.series[code] ?? []}
+                          anchorYear={ep.year}
+                          height="clamp(200px, 30vh, 480px)"
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

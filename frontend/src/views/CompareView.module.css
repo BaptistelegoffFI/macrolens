@@ -6,87 +6,99 @@
 .pairsBar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
-  border-bottom: 1px solid var(--rule);
-  background: var(--bg-chrome);
+  gap: var(--space-inline);
+  padding: var(--sp-2);
+  border-bottom: var(--sep-rule);
+  background: var(--sep-tint);
   flex-wrap: wrap;
-}
-
-.pairInput {
-  width: 56px;
-  height: var(--control-h);
-  border: 1px solid var(--rule);
-  padding: 0 4px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  text-align: center;
 }
 
 .pairGroup {
   display: flex;
   align-items: center;
-  gap: 2px;
-  border: 1px solid var(--rule-light);
-  padding: 2px;
+  gap: var(--sp-1);
+}
+
+.pairInput {
+  composes: input from "../styles/surfaces.module.css";
+  width: 64px;
+  padding: 0 var(--sp-1);
+  text-align: center;
 }
 
 .removeBtn {
-  border: none;
-  background: transparent;
-  color: var(--neg);
-  cursor: pointer;
-  font-size: 12px;
+  composes: btnLink from "../styles/surfaces.module.css";
+  text-decoration: none;
+  color: var(--fg-muted);
+  font-size: var(--text-body);
 }
 
 .addBtn,
 .runBtn {
-  height: var(--control-h);
-  padding: 0 8px;
-  border: 1px solid var(--rule);
-  background: var(--bg-app);
-  color: var(--accent);
-  font-size: 11px;
-  cursor: pointer;
+  composes: btn from "../styles/surfaces.module.css";
+}
+
+.legends {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-2) var(--space-sub);
+  border-bottom: var(--sep-hairline);
+}
+
+.legend {
+  composes: meta from "../styles/typography.module.css";
+  margin: 0;
+}
+
+.error {
+  composes: label from "../styles/typography.module.css";
+  color: var(--neg);
+  padding: var(--sp-2);
 }
 
 .grid {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(200px, 1fr);
+  grid-auto-columns: minmax(280px, 1fr);
 }
 
 .column {
-  border-right: 1px solid var(--rule-light);
+  min-width: 0;
+  padding-bottom: var(--space-sub);
+  border-right: var(--sep-hairline);
 }
 
 .columnHeader {
-  height: var(--panel-title-h);
+  composes: section num from "../styles/typography.module.css";
   display: flex;
   align-items: center;
-  padding: 0 8px;
-  background: var(--bg-chrome);
-  border-bottom: 1px solid var(--rule);
-  font-size: 12px;
+  height: var(--panel-title-h);
+  padding: 0 var(--sp-2);
+  background: var(--sep-tint);
+  border-bottom: var(--sep-rule);
 }
 
-.featureRow {
+/* Liste d'état et courbes côte à côte quand la colonne est assez large, empilées sinon. */
+.body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: var(--space-sub);
+  padding: var(--sp-2);
+}
+
+.state {
+  min-width: 0;
+}
+
+.unavailable {
+  composes: meta from "../styles/typography.module.css";
+  padding: var(--sp-2);
+}
+
+.charts {
   display: flex;
-  justify-content: space-between;
-  height: var(--row-h);
-  padding: 0 8px;
-  font-size: 11px;
-  border-bottom: 1px solid var(--rule-light);
-}
-
-/* §8.2.5 : double affichage obligatoire — valeur brute + rang percentile. */
-.featureValues {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.featureRank {
-  color: var(--fg-muted);
-  font-size: 10px;
+  flex-direction: column;
+  gap: var(--space-sub);
+  min-width: 0;
 }

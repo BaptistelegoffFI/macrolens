@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(22, 25, 28, 0.3);
+  background: var(--scrim);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -10,35 +10,32 @@
 }
 
 .box {
+  composes: panel from "../../styles/surfaces.module.css";
   width: 480px;
-  background: var(--bg-app);
-  border: 1px solid var(--rule);
 }
 
 .input {
   width: 100%;
   height: 36px;
   border: none;
-  border-bottom: 1px solid var(--rule);
-  padding: 0 12px;
+  border-bottom: var(--sep-rule);
+  padding: 0 var(--space-inset);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-section);
   outline: none;
 }
 
 .hint {
-  padding: 8px 12px;
-  font-size: 11px;
-  color: var(--fg-muted);
+  composes: meta from "../../styles/typography.module.css";
+  padding: var(--sp-2) var(--space-inset);
 }
 
 .examples {
-  padding: 0 12px 8px;
-  font-size: 11px;
-  color: var(--fg-secondary);
+  composes: label from "../../styles/typography.module.css";
+  padding: 0 var(--space-inset) var(--sp-2);
 }
 
 .example {
-  font-family: var(--font-mono);
+  composes: num from "../../styles/typography.module.css";
   color: var(--fg-muted);
 }

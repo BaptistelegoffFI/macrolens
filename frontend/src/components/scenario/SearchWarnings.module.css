@@ -1,25 +1,22 @@
 .list {
   list-style: none;
   margin: 0;
-  padding: 8px;
+  padding: var(--space-inset);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-inset);
 }
 
 .item {
-  padding: 8px 10px;
-  border-left: 2px solid var(--flag);
-  background: var(--bg-app);
+  composes: calloutWarn from "../../styles/surfaces.module.css";
 }
 
 .title {
+  composes: body from "../../styles/typography.module.css";
   display: flex;
   align-items: baseline;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--fg);
+  gap: var(--sp-2);
+  font-weight: var(--weight-strong);
 }
 
 .flag {
@@ -27,21 +24,17 @@
 }
 
 .body {
-  margin: 4px 0 0;
-  font-size: 11px;
-  line-height: 1.45;
-  color: var(--fg);
+  composes: prose from "../../styles/typography.module.css";
+  margin: var(--sp-1) 0 0;
 }
 
 .note {
-  margin: 4px 0 0;
-  font-size: 10px;
-  line-height: 1.45;
-  color: var(--fg-secondary);
+  composes: meta from "../../styles/typography.module.css";
+  margin: var(--sp-1) 0 0;
+  max-width: var(--measure);
 }
 
 .none {
-  padding: 12px 10px;
-  font-size: 11px;
-  color: var(--fg-secondary);
+  composes: label from "../../styles/typography.module.css";
+  padding: var(--space-inset);
 }

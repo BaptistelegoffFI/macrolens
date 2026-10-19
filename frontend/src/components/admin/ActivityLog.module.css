@@ -1,13 +1,13 @@
 .panel {
-  border: 1px solid var(--rule-light);
-  background: var(--bg-chrome);
-  padding: 12px;
+  border: var(--sep-hairline);
+  background: var(--sep-tint);
+  padding: var(--space-inset);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--sp-2);
   position: sticky;
-  top: 16px;
-  max-height: calc(100vh - 32px - var(--menubar-h));
+  top: var(--sp-4);
+  max-height: calc(100vh - var(--sp-8) - var(--menubar-h));
   min-height: 0;
 }
 
@@ -15,89 +15,70 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--space-inline);
 }
 
 .title {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--fg-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  composes: colhead from "../../styles/typography.module.css";
 }
 
 .refresh {
-  border: none;
-  background: transparent;
-  color: var(--accent);
-  font: inherit;
-  font-size: 11px;
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
+  composes: btnLink from "../../styles/surfaces.module.css";
 }
 
 .updated,
 .note {
-  font-size: 10px;
-  color: var(--fg-muted);
+  composes: meta from "../../styles/typography.module.css";
 }
 
 .error {
-  font-size: 11px;
+  composes: label from "../../styles/typography.module.css";
   color: var(--neg);
 }
 
 .empty {
-  font-size: 12px;
+  composes: body from "../../styles/typography.module.css";
   color: var(--fg-secondary);
-  padding: 8px 0;
+  padding: var(--sp-2) 0;
 }
 
 .list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 var(--sp-3) 0 0;
   overflow-y: auto;
-  padding-right: 10px;
   flex: 1 1 auto;
   min-height: 0;
 }
 
 .day {
+  composes: colhead from "../../styles/typography.module.css";
   position: sticky;
   top: 0;
-  background: var(--bg-chrome);
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--fg-secondary);
-  padding: 8px 0 3px;
-  border-bottom: 1px solid var(--rule);
+  background: var(--sep-tint);
+  padding: var(--sp-2) 0 var(--sp-1);
+  border-bottom: var(--sep-rule);
 }
 
 .row {
   display: grid;
-  grid-template-columns: 62px 66px minmax(0, 1fr) 50px;
+  grid-template-columns: 64px 72px minmax(0, 1fr) 52px;
   align-items: baseline;
-  gap: 6px;
-  padding: 4px 0;
-  border-bottom: 1px solid var(--rule-light);
-  font-size: 11px;
+  gap: var(--sp-2);
+  padding: var(--sp-1) 0;
+  border-bottom: var(--sep-hairline);
 }
 
 .time {
-  font-family: var(--font-mono);
+  composes: num from "../../styles/typography.module.css";
+  font-size: var(--text-label);
   color: var(--fg);
 }
 
 .badge {
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--fg-secondary);
-  border: 1px solid var(--rule);
-  padding: 0 4px;
+  composes: badge from "../../styles/surfaces.module.css";
   justify-self: start;
+  text-transform: uppercase;
 }
 
 .badge[data-kind="search"] {
@@ -106,6 +87,7 @@
 }
 
 .what {
+  composes: body from "../../styles/typography.module.css";
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -113,14 +95,11 @@
 }
 
 .detail {
-  font-size: 10px;
-  color: var(--fg-muted);
+  composes: meta from "../../styles/typography.module.css";
 }
 
 .device {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--fg-muted);
+  composes: meta num from "../../styles/typography.module.css";
 }
 
 @media (max-width: 900px) {

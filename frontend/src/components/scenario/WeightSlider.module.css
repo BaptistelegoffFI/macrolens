@@ -1,14 +1,13 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-inline);
   height: var(--row-h);
 }
 
 .label {
+  composes: label from "../../styles/typography.module.css";
   flex: 0 0 64px;
-  font-size: 11px;
-  color: var(--fg-secondary);
 }
 
 .rail {

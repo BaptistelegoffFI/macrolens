@@ -2,21 +2,29 @@
   height: var(--statusbar-h);
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 0 8px;
-  background: var(--bg-chrome);
-  border-top: 1px solid var(--rule);
+  gap: var(--sp-4);
+  padding: 0 var(--space-cell-x);
+  background: var(--sep-tint);
+  border-top: var(--sep-rule);
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 11px;
+  font-size: var(--text-label);
   color: var(--fg-secondary);
   flex: 0 0 auto;
+}
+
+/* Bande terse : les nombres prennent la taille de la bande. */
+.bar :global(.num) {
+  font-size: inherit;
 }
 
 .item {
   white-space: nowrap;
 }
 
-.sep {
+/* Séparateur décoratif : contenu CSS, donc ni texte lu ni texte soumis au contraste. */
+.item + .item::before {
+  content: "·";
   color: var(--rule);
+  margin-right: var(--sp-2);
 }

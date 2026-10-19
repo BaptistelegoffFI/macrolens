@@ -5,8 +5,12 @@ import styles from "./ResizableColumns.module.css";
 
 export interface ResizableColumnsProps {
   storageKey: string;
-  defaultWidths: number[]; // px, for every column except the last (which fills remaining space)
+  /** px, pour toutes les colonnes sauf celle qui remplit l'espace restant (dans l'ordre). */
+  defaultWidths: number[];
   minWidth?: number;
+  /** Indice de la colonne fluide ; par défaut la dernière. Une colonne fixe à droite (barre
+   * latérale) se redimensionne depuis son bord gauche. */
+  fillIndex?: number;
   children: ReactNode[];
 }
 
@@ -29,8 +33,12 @@ export function ResizableColumns({
   storageKey,
   defaultWidths,
   minWidth = 160,
+  fillIndex,
   children,
 }: ResizableColumnsProps) {
+  const fill = fillIndex ?? children.length - 1;
+  // Indice dans `widths` de la colonne fixe d'indice `i` (la colonne fluide n'a pas de largeur).
+  const widthIndex = (i: number) => (i < fill ? i : i - 1);
   const [widths, setWidths] = useState<number[]>(() => readWidths(storageKey, defaultWidths));
   const wrapperRef = useRef<HTMLDivElement>(null);
   const dragIndex = useRef<number | null>(null);
@@ -48,9 +56,17 @@ export function ResizableColumns({
       const idx = dragIndex.current;
       if (idx === null || !wrapperRef.current) return;
       const rect = wrapperRef.current.getBoundingClientRect();
-      const priorWidth = widths.slice(0, idx).reduce((a, b) => a + b, 0);
-      const next = Math.max(minWidth, Math.round(e.clientX - rect.left - priorWidth));
-      setWidths((w) => w.map((v, i) => (i === idx ? next : v)));
+      if (idx < fill) {
+        // Séparateur à droite d'une colonne fixe : on mesure depuis le bord gauche.
+        const prior = widths.slice(0, widthIndex(idx)).reduce((a, b) => a + b, 0);
+        const next = Math.max(minWidth, Math.round(e.clientX - rect.left - prior));
+        setWidths((w) => w.map((v, i) => (i === widthIndex(idx) ? next : v)));
+      } else {
+        // Séparateur à gauche d'une colonne fixe à droite : on mesure depuis le bord droit.
+        const later = widths.slice(widthIndex(idx + 1) + 1).reduce((a, b) => a + b, 0);
+        const next = Math.max(minWidth, Math.round(rect.right - e.clientX - later));
+        setWidths((w) => w.map((v, i) => (i === widthIndex(idx + 1) ? next : v)));
+      }
     }
     function onUp() {
       dragIndex.current = null;
@@ -61,15 +77,17 @@ export function ResizableColumns({
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
     };
-  }, [widths, minWidth]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [widths, minWidth, fill]);
 
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
       {children.map((child, i) => {
+        const isFill = i === fill;
         const isLast = i === children.length - 1;
         return (
-          <div key={i} style={isLast ? { display: "flex", flex: 1, minWidth: 0 } : { display: "flex" }}>
-            <div className={styles.column} style={isLast ? { flex: 1 } : { width: widths[i] }}>
+          <div key={i} style={isFill ? { display: "flex", flex: 1, minWidth: 0 } : { display: "flex" }}>
+            <div className={styles.column} style={isFill ? { flex: 1 } : { width: widths[widthIndex(i)] }}>
               {child}
             </div>
             {!isLast && (

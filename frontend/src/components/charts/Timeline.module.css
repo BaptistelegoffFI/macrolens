@@ -1,19 +1,6 @@
-.wrapper {
-  padding: 8px 16px;
-  height: 100%;
-}
-
-.title {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--fg-secondary);
-  margin-bottom: 8px;
-}
-
 .svg {
-  width: 100%;
   display: block;
+  width: 100%;
 }
 
 .tick {
@@ -21,6 +8,8 @@
   stroke-width: 1.5;
 }
 
+/* Repère d'ancre : trait plus long ET plus épais que les analogues (la forme le distingue, pas
+   seulement la couleur). */
 .tickAnchor {
   stroke: var(--crisis);
   stroke-width: 2;
@@ -32,7 +21,7 @@
 }
 
 .label {
-  font-family: var(--font-mono);
-  font-size: 9px;
+  composes: num from "../../styles/typography.module.css";
+  font-size: var(--text-meta);
   fill: var(--fg-muted);
 }

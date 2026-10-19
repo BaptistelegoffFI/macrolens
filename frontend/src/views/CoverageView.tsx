@@ -5,14 +5,20 @@ import type { CountryOut, CoverageCellOut, IndicatorOut } from "../api/types";
 import { EmptyState } from "../components/shell/EmptyState";
 import { Num } from "../components/table/Num";
 import { useLanguage } from "../i18n/LanguageContext";
+import { indicatorDefinition } from "../i18n/dataStrings";
 import { S } from "../i18n/strings";
 import styles from "./CoverageView.module.css";
 
-/** §11.3 Vue Couverture (F7) : matrice pays × indicateur × décennie.
- * L'infobulle de définition (`ind.definition_fr`) reste en français quel que
- * soit `lang` — il n'existe pas de `definition_en` en base (docs/limitations.md). */
+/** Opacité maximale du remplissage (100 % de complétude). Plafonnée à 0,7 : au-delà, le texte sombre
+ * descend sous 4,5:1 (4,23:1 au pire à 0,8 d'opacité, aucun des deux textes, blanc ou sombre, ne
+ * passe). À 0,7 le contraste du texte sombre reste ≥ 5,1:1 sur toute la plage. */
+const MAX_ALPHA = 0.7;
+
+/** §11.3 Vue Couverture (F7) : matrice pays × indicateur × décennie. L'infobulle de définition suit la
+ * langue : le français vient de la base (`definition_fr`), l'anglais de i18n/dataStrings.ts (il
+ * n'existe pas de `definition_en` en base, et rien n'y a été ajouté). */
 export function CoverageView() {
-  const { t, pick } = useLanguage();
+  const { t, pick, lang } = useLanguage();
   const [countries, setCountries] = useState<CountryOut[]>([]);
   const [indicators, setIndicators] = useState<IndicatorOut[]>([]);
   const [coverage, setCoverage] = useState<CoverageCellOut[]>([]);
@@ -56,7 +62,7 @@ export function CoverageView() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.toolbar}>
-        <span className="micro-label">{t(S.coverage.country)}</span>
+        <span className={styles.toolbarLabel}>{t(S.coverage.country)}</span>
         <select className={styles.select} value={country} onChange={(e) => setCountry(e.target.value)}>
           {countries.map((c) => (
             <option key={c.iso3} value={c.iso3}>
@@ -68,7 +74,7 @@ export function CoverageView() {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th className={styles.rowHeader}>{t(S.coverage.indicator)}</th>
+            <th className={styles.cornerHeader}>{t(S.coverage.indicator)}</th>
             {decades.map((d) => (
               <th key={d} className={styles.colHeader}>
                 <Num value={d} decimals={0} />
@@ -79,7 +85,7 @@ export function CoverageView() {
         <tbody>
           {indicators.map((ind) => (
             <tr key={ind.code}>
-              <th className={styles.rowHeader} title={ind.definition_fr}>
+              <th className={styles.rowHeader} title={indicatorDefinition(ind.code, ind.definition_fr, lang)}>
                 {pick(ind.label_fr, ind.label_en)}
               </th>
               {decades.map((d) => {
@@ -89,7 +95,7 @@ export function CoverageView() {
                   <td
                     key={d}
                     className={styles.cell}
-                    style={{ background: pct > 0 ? `rgba(11, 95, 165, ${pct / 100})` : undefined }}
+                    style={{ background: pct > 0 ? `rgba(11, 95, 165, ${(pct / 100) * MAX_ALPHA})` : undefined }}
                     title={cell ? `${cell.n_observed}/${cell.n_possible} (${pct.toFixed(0)}%)` : t(S.coverage.noData)}
                   >
                     <Num value={cell ? pct : null} decimals={0} />

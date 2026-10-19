@@ -1,19 +1,19 @@
+/* Colonne de gauche des pages Scénario et Épisode, et champs de saisie partagés. */
 .scenarioLeft {
-  padding: 8px;
+  padding: var(--space-inset);
 }
 
+/* Groupe de champs : en-tête teinté (il ne doit pas rivaliser avec les valeurs) + rangées. */
 .fieldGroup {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sub);
 }
 
 .fieldGroupTitle {
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--fg-muted);
-  border-bottom: 1px solid var(--rule-light);
-  padding-bottom: 2px;
-  margin-bottom: 4px;
+  composes: colhead from "./styles/typography.module.css";
+  padding: var(--sp-1) var(--sp-2);
+  background: var(--sep-tint);
+  border-bottom: var(--sep-hairline);
+  margin-bottom: var(--sp-1);
 }
 
 .field {
@@ -21,26 +21,20 @@
   align-items: center;
   justify-content: space-between;
   height: var(--row-h);
-  font-size: 11px;
+  padding: 0 var(--sp-2);
 }
 
 .fieldLabel {
-  color: var(--fg-secondary);
+  composes: label from "./styles/typography.module.css";
 }
 
 .textInput {
+  composes: input from "./styles/surfaces.module.css";
   width: 88px;
-  height: var(--control-h);
-  border: 1px solid var(--rule);
-  background: var(--bg-app);
-  padding: 0 6px;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 12px;
   text-align: right;
 }
 
-/* Unité de saisie affichée à l'intérieur du champ, à droite (colonne de 220px :
+/* Unité de saisie affichée à l'intérieur du champ, à droite (colonne étroite :
    pas de place pour une troisième colonne à côté du champ). */
 .unitField {
   position: relative;
@@ -63,21 +57,20 @@
 }
 
 .unitSuffix {
+  composes: num from "./styles/typography.module.css";
   position: absolute;
-  right: 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
+  right: var(--sp-2);
+  font-size: var(--text-meta);
   color: var(--fg-muted);
   pointer-events: none;
 }
 
 .errorBanner {
-  margin: 8px;
-  padding: 6px 8px;
-  border: 1px solid var(--neg);
+  composes: calloutWarn from "./styles/surfaces.module.css";
+  margin: var(--sp-2);
+  border-left-color: var(--neg);
   color: var(--neg);
-  font-size: 11px;
-  background: var(--bg-app);
+  font-size: var(--text-label);
 }
 
 .rank {
@@ -95,43 +88,73 @@
 }
 
 .maintenanceBox {
+  composes: panel from "./styles/surfaces.module.css";
   max-width: 420px;
   text-align: center;
-  padding: 32px;
-  border: 1px solid var(--rule);
+  padding: var(--sp-8);
 }
 
 .maintenanceTitle {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: var(--fg);
+  composes: title from "./styles/typography.module.css";
+  margin-bottom: var(--sp-3);
 }
 
 .announcementBanner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 12px;
+  gap: var(--space-inset);
+  padding: var(--sp-2) var(--space-inset);
   background: var(--bg-selected);
   border-bottom: 1px solid var(--accent);
-  font-size: 12px;
+  font-size: var(--text-body);
   color: var(--fg);
 }
 
 .announcementDismiss {
+  composes: btnLink from "./styles/surfaces.module.css";
   flex: 0 0 auto;
-  border: none;
-  background: transparent;
-  color: var(--accent);
-  font: inherit;
-  font-size: 11px;
-  cursor: pointer;
-  text-decoration: underline;
 }
 
+/* Marqueur de crise bancaire : un disque PLEIN ; son absence est un tiret. Doublé d'un libellé
+   accessible et de l'explication de la colonne : la couleur n'est jamais seule porteuse. */
 .crisisMarker {
+  composes: num from "./styles/typography.module.css";
   color: var(--crisis);
-  font-family: var(--font-mono);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Colonne centrale de Scénario : un seul défilement, deux groupes titrés. */
+.main {
+  padding: var(--space-sub);
+}
+
+.charts {
+  margin-bottom: var(--space-sub);
+}
+
+.timelineRow {
+  margin-top: var(--space-sub);
+}
+
+.legend {
+  composes: meta from "./styles/typography.module.css";
+  margin: var(--sp-2) 0 0;
+}
+
+.bordereau {
+  padding: var(--space-inset);
+}
+
+.bordereauMeta {
+  composes: meta from "./styles/typography.module.css";
+  margin-bottom: var(--sp-2);
 }

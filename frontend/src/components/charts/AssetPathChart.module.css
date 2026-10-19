@@ -1,0 +1,18 @@
+.legend {
+  display: flex;
+  gap: var(--space-sub);
+  margin-bottom: var(--space-row);
+}
+
+.legendItem {
+  composes: label from "../../styles/typography.module.css";
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.swatch {
+  display: inline-block;
+  width: 16px;
+  height: 2px;
+}

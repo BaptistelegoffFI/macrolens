@@ -15,14 +15,11 @@
 }
 
 .th {
+  composes: colhead from "../../styles/typography.module.css";
   height: var(--table-header-h);
-  background: var(--bg-chrome);
-  border-bottom: 1px solid var(--rule);
+  background: var(--sep-tint);
+  border-bottom: var(--sep-rule);
   padding: 0 var(--cell-pad-x);
-  font-size: var(--text-micro);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--fg-secondary);
   text-align: left;
   white-space: nowrap;
   cursor: pointer;
@@ -34,7 +31,7 @@
 }
 
 .sortIndicator {
-  margin-left: 4px;
+  margin-left: var(--sp-1);
   color: var(--fg-muted);
 }
 
@@ -55,23 +52,26 @@
 }
 
 .td {
+  composes: body from "../../styles/typography.module.css";
   padding: var(--cell-pad-y) var(--cell-pad-x);
-  border-bottom: 1px solid var(--rule-light);
-  font-size: 12px;
+  border-bottom: var(--sep-hairline);
   white-space: nowrap;
 }
 
 .tdNum {
+  composes: num from "../../styles/typography.module.css";
   text-align: right;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
 }
 
-/* §11.4 : filet vertical 2px en bord gauche — border-left, jamais box-shadow
+.tdMono {
+  composes: num from "../../styles/typography.module.css";
+}
+
+/* §11.4 : filet vertical en bord gauche — border-left, jamais box-shadow
    (interdit bloquant §11.0, testé automatiquement en §11.8). */
 .tdFlagged {
-  border-left: 2px solid var(--flag);
-  padding-left: calc(var(--cell-pad-x) - 2px);
+  border-left: var(--callout-bar) solid var(--flag);
+  padding-left: calc(var(--cell-pad-x) - var(--callout-bar));
 }
 
 .muted {

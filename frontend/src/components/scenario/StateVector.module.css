@@ -1,0 +1,51 @@
+.group {
+  margin-bottom: var(--space-sub);
+}
+
+.groupTitle {
+  composes: colhead from "../../styles/typography.module.css";
+  padding: var(--sp-1) var(--sp-2);
+  background: var(--sep-tint);
+  border-bottom: var(--sep-hairline);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-inline);
+  height: var(--row-h);
+  padding: 0 var(--sp-2);
+  border-bottom: var(--sep-hairline);
+}
+
+.row[data-highlight="true"] {
+  background: var(--bg-selected);
+}
+
+.label {
+  composes: label from "../../styles/typography.module.css";
+}
+
+.row[data-highlight="true"] .label {
+  color: var(--fg);
+}
+
+.values {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+
+/* §8.2.5 : double affichage obligatoire — valeur brute + rang percentile, jamais l'un sans
+   l'autre. La valeur domine ; le rang est une annexe (métadonnée). */
+.rank {
+  composes: meta from "../../styles/typography.module.css";
+  cursor: help;
+}
+
+.legend {
+  composes: meta from "../../styles/typography.module.css";
+  margin: 0 0 var(--space-sub);
+  padding: 0 var(--sp-2);
+}

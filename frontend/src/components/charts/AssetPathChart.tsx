@@ -6,6 +6,7 @@ import { axisNumericStyle, baseChartOption, tokens } from "../../charts/theme";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { S } from "../../i18n/strings";
 import { CLASS_LABELS, axisPercent, tooltipPercent } from "../../lib/assetReturns";
+import styles from "./AssetPathChart.module.css";
 import { EChart } from "./EChart";
 
 export interface AssetPathChartProps {
@@ -98,17 +99,10 @@ export function AssetPathChart({ paths }: AssetPathChartProps) {
 
   return (
     <div>
-      <div style={{ display: "flex", gap: 16, fontSize: 11, marginBottom: 4 }}>
+      <div className={styles.legend}>
         {paths.map((path, i) => (
-          <span key={path.class_id} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <span
-              style={{
-                display: "inline-block",
-                width: 14,
-                height: 2,
-                background: tokens.series[i % tokens.series.length],
-              }}
-            />
+          <span key={path.class_id} className={styles.legendItem}>
+            <span className={styles.swatch} style={{ background: tokens.series[i % tokens.series.length] }} />
             {CLASS_LABELS[path.class_id]?.[lang] ?? path.class_id}
           </span>
         ))}
