@@ -5,159 +5,167 @@
    Les contrôles (boutons, puces, segments, champs) sont définis ici une fois ; aucune page ne
    redessine le sien. */
 
-.hairlineBelow {
-  border-bottom: var(--sep-hairline);
-}
+/* Ordre des couches (ADR 0030) : `base` < `system` < styles de composants (hors couche). Une règle
+   de composant gagne donc TOUJOURS sur une règle partagée composée, quel que soit l'ordre de
+   chargement des feuilles. Répété en tête de chaque fichier qui ouvre une couche : le premier
+   rencontré fixe l'ordre. */
+@layer base, system;
 
-.ruleBelow {
-  border-bottom: var(--sep-rule);
-}
+@layer system {
+  .hairlineBelow {
+    border-bottom: var(--sep-hairline);
+  }
 
-.ruleAbove {
-  border-top: var(--sep-rule);
-}
+  .ruleBelow {
+    border-bottom: var(--sep-rule);
+  }
 
-.tint {
-  background: var(--sep-tint);
-}
+  .ruleAbove {
+    border-top: var(--sep-rule);
+  }
 
-/* Panneau bordé : colonnes de premier niveau, fenêtres flottantes. Jamais imbriqué. */
-.panel {
-  border: var(--sep-panel);
-  background: var(--bg-app);
-}
+  .tint {
+    background: var(--sep-tint);
+  }
 
-/* Encadré : liseré gauche + texte. `warn` = avertissement ou caveat ; `statement` = énoncé
-   délibéré de la méthode (ex. exclusion du capital-investissement). */
-.callout {
-  border-left: var(--callout-bar) solid var(--rule);
-  padding: var(--sp-2) var(--sp-3);
-}
+  /* Panneau bordé : colonnes de premier niveau, fenêtres flottantes. Jamais imbriqué. */
+  .panel {
+    border: var(--sep-panel);
+    background: var(--bg-app);
+  }
 
-.calloutWarn {
-  composes: callout;
-  border-left-color: var(--flag);
-}
+  /* Encadré : liseré gauche + texte. `warn` = avertissement ou caveat ; `statement` = énoncé
+     délibéré de la méthode (ex. exclusion du capital-investissement). */
+  .callout {
+    border-left: var(--callout-bar) solid var(--rule);
+    padding: var(--sp-2) var(--sp-3);
+  }
 
-.calloutStatement {
-  composes: callout;
-  border-left-color: var(--accent);
-  background: var(--sep-tint);
-}
+  .calloutWarn {
+    composes: callout;
+    border-left-color: var(--flag);
+  }
 
-/* ── Contrôles ─────────────────────────────────────────────────────────────────────────── */
+  .calloutStatement {
+    composes: callout;
+    border-left-color: var(--accent);
+    background: var(--sep-tint);
+  }
 
-.btn {
-  height: var(--control-h);
-  padding: 0 var(--sp-3);
-  border: var(--sep-rule);
-  background: var(--bg-app);
-  color: var(--accent);
-  font-family: var(--font-sans);
-  font-size: var(--text-label);
-  cursor: pointer;
-}
+  /* ── Contrôles ─────────────────────────────────────────────────────────────────────────── */
 
-.btn:hover:not(:disabled) {
-  background: var(--bg-hover);
-}
+  .btn {
+    height: var(--control-h);
+    padding: 0 var(--sp-3);
+    border: var(--sep-rule);
+    background: var(--bg-app);
+    color: var(--accent);
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    cursor: pointer;
+  }
 
-.btn:disabled {
-  color: var(--fg-muted);
-  background: var(--bg-chrome);
-  cursor: not-allowed;
-}
+  .btn:hover:not(:disabled) {
+    background: var(--bg-hover);
+  }
 
-.btnLink {
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: var(--accent);
-  font-family: var(--font-sans);
-  font-size: var(--text-label);
-  text-decoration: underline;
-  cursor: pointer;
-}
+  .btn:disabled {
+    color: var(--fg-muted);
+    background: var(--bg-chrome);
+    cursor: not-allowed;
+  }
 
-/* Puce ou segment : sélection exclusive ou bascule. Actif = fond de sélection + accent. */
-.chip {
-  height: var(--control-h);
-  padding: 0 var(--sp-2);
-  border: var(--sep-rule);
-  background: var(--bg-app);
-  color: var(--fg);
-  font-family: var(--font-sans);
-  font-size: var(--text-label);
-  cursor: pointer;
-}
+  .btnLink {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--accent);
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    text-decoration: underline;
+    cursor: pointer;
+  }
 
-.chip[data-active="true"] {
-  background: var(--bg-selected);
-  color: var(--accent);
-  border-color: var(--accent);
-}
+  /* Puce ou segment : sélection exclusive ou bascule. Actif = fond de sélection + accent. */
+  .chip {
+    height: var(--control-h);
+    padding: 0 var(--sp-2);
+    border: var(--sep-rule);
+    background: var(--bg-app);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    cursor: pointer;
+  }
 
-.chip:disabled {
-  color: var(--fg-muted);
-  background: var(--bg-chrome);
-  cursor: not-allowed;
-}
+  .chip[data-active="true"] {
+    background: var(--bg-selected);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
 
-.seg {
-  display: inline-flex;
-  height: var(--control-h);
-  border: var(--sep-rule);
-}
+  .chip:disabled {
+    color: var(--fg-muted);
+    background: var(--bg-chrome);
+    cursor: not-allowed;
+  }
 
-.segBtn {
-  padding: 0 var(--sp-2);
-  border: none;
-  border-right: var(--sep-rule);
-  background: var(--bg-app);
-  color: var(--fg);
-  font-family: var(--font-sans);
-  font-size: var(--text-label);
-  cursor: pointer;
-}
+  .seg {
+    display: inline-flex;
+    height: var(--control-h);
+    border: var(--sep-rule);
+  }
 
-.segBtn:last-child {
-  border-right: none;
-}
+  .segBtn {
+    padding: 0 var(--sp-2);
+    border: none;
+    border-right: var(--sep-rule);
+    background: var(--bg-app);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    cursor: pointer;
+  }
 
-.segBtn[data-active="true"] {
-  background: var(--bg-selected);
-  color: var(--accent);
-}
+  .segBtn:last-child {
+    border-right: none;
+  }
 
-.input {
-  height: var(--control-h);
-  padding: 0 var(--sp-2);
-  border: var(--sep-rule);
-  background: var(--bg-app);
-  color: var(--fg);
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: var(--text-body);
-}
+  .segBtn[data-active="true"] {
+    background: var(--bg-selected);
+    color: var(--accent);
+  }
 
-.select {
-  height: var(--control-h);
-  padding: 0 var(--sp-1);
-  border: var(--sep-rule);
-  background: var(--bg-app);
-  color: var(--fg);
-  font-family: var(--font-sans);
-  font-size: var(--text-label);
-}
+  .input {
+    height: var(--control-h);
+    padding: 0 var(--sp-2);
+    border: var(--sep-rule);
+    background: var(--bg-app);
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-body);
+  }
 
-/* Pastille de type de donnée : T1, INDEX… */
-.badge {
-  display: inline-block;
-  padding: 0 var(--sp-1);
-  border: var(--sep-rule);
-  background: var(--bg-chrome);
-  color: var(--fg-secondary);
-  font-family: var(--font-mono);
-  font-size: var(--text-meta);
-  line-height: var(--lh-ui);
+  .select {
+    height: var(--control-h);
+    padding: 0 var(--sp-1);
+    border: var(--sep-rule);
+    background: var(--bg-app);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+  }
+
+  /* Pastille de type de donnée : T1, INDEX… */
+  .badge {
+    display: inline-block;
+    padding: 0 var(--sp-1);
+    border: var(--sep-rule);
+    background: var(--bg-chrome);
+    color: var(--fg-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    line-height: var(--lh-ui);
+  }
 }

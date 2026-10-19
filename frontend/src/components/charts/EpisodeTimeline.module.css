@@ -73,11 +73,19 @@
   fill: var(--fg);
 }
 
+/* Libellé réduit à une année (crises bancaires) : un nombre, donc mono. */
+.eventYear {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  fill: var(--fg);
+}
+
 .item {
   cursor: default;
 }
 
-.item:hover .eventLabel {
+.item:hover .eventLabel,
+.item:hover .eventYear {
   font-weight: var(--weight-strong);
 }
 

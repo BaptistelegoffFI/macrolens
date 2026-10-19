@@ -46,7 +46,12 @@ export function CompareView({ externalPairs }: CompareViewProps) {
   function updatePair(i: number, field: "country" | "year", value: string) {
     setPairs((prev) =>
       prev.map((p, idx) =>
-        idx === i ? { ...p, [field]: field === "year" ? Number(value) : value.toUpperCase() } : p,
+        idx === i
+          ? {
+              ...p,
+              [field]: field === "year" ? Number(value) : value.toUpperCase(),
+            }
+          : p,
       ),
     );
   }
@@ -61,7 +66,9 @@ export function CompareView({ externalPairs }: CompareViewProps) {
     setPairs((prev) => prev.filter((_, idx) => idx !== i));
   }
 
-  const divergent = data ? mostDivergent(data.episodes.map((ep) => ep.state?.features ?? null)) : null;
+  const divergent = data
+    ? mostDivergent(data.episodes.map((ep) => ep.state?.features ?? null))
+    : null;
 
   return (
     <div className={styles.wrapper}>
@@ -93,17 +100,28 @@ export function CompareView({ externalPairs }: CompareViewProps) {
             )}
           </div>
         ))}
-        <button type="button" className={styles.addBtn} onClick={addPair} disabled={pairs.length >= 6}>
+        <button
+          type="button"
+          className={styles.addBtn}
+          onClick={addPair}
+          disabled={pairs.length >= 6}
+        >
           {t(S.compare.add)}
         </button>
-        <button type="button" className={styles.runBtn} onClick={() => void run(pairs)}>
+        <button
+          type="button"
+          className={styles.runBtn}
+          onClick={() => void run(pairs)}
+        >
           {t(S.compare.run)}
         </button>
       </div>
 
       {error && <div className={styles.error}>{error}</div>}
       {loading && <EmptyState>{t(S.common.loading)}</EmptyState>}
-      {!loading && !data && !error && <EmptyState>{t(S.compare.emptyPrompt)}</EmptyState>}
+      {!loading && !data && !error && (
+        <EmptyState>{t(S.compare.emptyPrompt)}</EmptyState>
+      )}
       {!loading && data && (
         <>
           <div className={styles.legends}>
@@ -117,28 +135,37 @@ export function CompareView({ externalPairs }: CompareViewProps) {
                   {ep.country}&nbsp;
                   <Num value={ep.year} decimals={0} size="body" />
                 </div>
-                <div className={styles.state}>
-                  {ep.state ? (
-                    <StateVector features={ep.state.features} highlight={divergent ?? undefined} />
-                  ) : (
-                    <div className={styles.unavailable}>{t(S.compare.stateUnavailable)}</div>
-                  )}
-                </div>
-                <div className={styles.charts}>
-                  {["gdp_real_pc", "cpi"].map((code) => {
-                    const ind = rawIndicators(lang).find((r) => r.code === code);
-                    if (!ind) return null;
-                    return (
-                      <SeriesSparkline
-                        key={code}
-                        label={ind.label}
-                        unit={ind.unit}
-                        observations={ep.series[code] ?? []}
-                        anchorYear={ep.year}
-                        height="clamp(160px, 20vh, 320px)"
+                <div className={styles.body}>
+                  <div className={styles.state}>
+                    {ep.state ? (
+                      <StateVector
+                        features={ep.state.features}
+                        highlight={divergent ?? undefined}
                       />
-                    );
-                  })}
+                    ) : (
+                      <div className={styles.unavailable}>
+                        {t(S.compare.stateUnavailable)}
+                      </div>
+                    )}
+                  </div>
+                  <div className={styles.charts}>
+                    {["gdp_real_pc", "cpi"].map((code) => {
+                      const ind = rawIndicators(lang).find(
+                        (r) => r.code === code,
+                      );
+                      if (!ind) return null;
+                      return (
+                        <SeriesSparkline
+                          key={code}
+                          label={ind.label}
+                          unit={ind.unit}
+                          observations={ep.series[code] ?? []}
+                          anchorYear={ep.year}
+                          height="clamp(200px, 30vh, 480px)"
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             ))}

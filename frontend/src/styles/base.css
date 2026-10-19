@@ -1,66 +1,82 @@
 /* Réinitialisation + règles globales (§11.0, §11.8). Interdits bloquants :
    border-radius > 2px, box-shadow, dégradés, animation > 120ms. */
-* {
-  box-sizing: border-box;
-}
 
-html,
-body,
-#root {
-  height: 100%;
-}
+/* Ordre des couches (ADR 0030) : `base` < `system` < styles de composants (hors couche). Une règle
+   de composant gagne donc TOUJOURS sur une règle partagée composée, quel que soit l'ordre de
+   chargement des feuilles. Répété en tête de chaque fichier qui ouvre une couche : le premier
+   rencontré fixe l'ordre. */
+@layer base, system;
 
-body {
-  margin: 0;
-  background: var(--bg-app);
-  color: var(--fg);
-  font-family: var(--font-sans);
-  font-size: var(--text-body);
-  line-height: var(--lh-ui);
-  -webkit-font-smoothing: antialiased;
-}
-
-/* §11.1 : toute valeur numérique en chasse fixe tabulaire, sans exception. */
-.num,
-.tabular-nums {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: var(--text-body);
-}
-
-/* Un nombre dans une métadonnée (IQR, N, fenêtres) prend la taille de la métadonnée : la valeur
-   dominante et ses annexes ne partagent jamais la même taille. */
-.num-meta {
-  font-size: var(--text-meta);
-}
-
-/* Un nombre dans un libellé de contrôle reste à la taille du contrôle. */
-.num-label {
-  font-size: var(--text-label);
-}
-
-button,
-input,
-select {
-  font-family: inherit;
-  font-size: var(--text-label);
-}
-
-/* §11.8 : le focus clavier ne se supprime jamais. */
-:focus-visible {
-  outline: var(--focus-ring) solid var(--accent);
-  outline-offset: 1px;
-}
-
-@media (prefers-reduced-motion: reduce) {
+@layer base {
   * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+    box-sizing: border-box;
   }
-}
 
-/* Largeur minimale : en dessous, la page défile horizontalement au lieu de
-   se masquer (l'ancienne barrière à 1280px laissait une page blanche). */
-#root {
-  min-width: 960px;
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg-app);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--lh-ui);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* §11.1 : toute valeur numérique en chasse fixe tabulaire, sans exception. */
+  .num,
+  .tabular-nums {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-body);
+  }
+
+  /* Un nombre dans une métadonnée (IQR, N, fenêtres) prend la taille de la métadonnée : la valeur
+     dominante et ses annexes ne partagent jamais la même taille. */
+  .num-meta {
+    font-size: var(--text-meta);
+  }
+
+  /* Un nombre dans un libellé de contrôle reste à la taille du contrôle. */
+  .num-label {
+    font-size: var(--text-label);
+  }
+
+  /* Le gras du navigateur (700) n'est pas une graisse du système : trois graisses seulement. */
+  strong,
+  b,
+  th {
+    font-weight: var(--weight-strong);
+  }
+
+  button,
+  input,
+  select {
+    font-family: inherit;
+    font-size: var(--text-label);
+  }
+
+  /* §11.8 : le focus clavier ne se supprime jamais. */
+  :focus-visible {
+    outline: var(--focus-ring) solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Largeur minimale : en dessous, la page défile horizontalement au lieu de
+     se masquer (l'ancienne barrière à 1280px laissait une page blanche). */
+  #root {
+    min-width: 960px;
+  }
 }

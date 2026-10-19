@@ -80,6 +80,17 @@ describe("design system : feuilles de style", () => {
   });
 });
 
+describe("design system : couches CSS", () => {
+  it.each(["typography.module.css", "surfaces.module.css", "base.css"])(
+    "%s est dans une couche : une règle de composant gagne toujours dessus",
+    (name) => {
+      const css = readFileSync(join(SRC, "styles", name), "utf-8");
+      expect(css).toMatch(/@layer base, system;/);
+      expect(css).toMatch(name === "base.css" ? /@layer base \{/ : /@layer system \{/);
+    },
+  );
+});
+
 describe("design system : composes", () => {
   it.each(sheets.map((f) => [relative(SRC, f), f]))("%s : `composes` seulement sur un sélecteur de classe simple", (_name, file) => {
     // CSS Modules refuse `composes` dans « .a th » ou « .a, .b » : le build échouerait alors que les

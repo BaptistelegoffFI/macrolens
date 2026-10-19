@@ -8,7 +8,6 @@
 /* height="fill" : le cadre prend tout l'espace restant de son parent flex, le graphique aussi. */
 .frame[data-fill="true"] {
   flex: 1 1 auto;
-  min-height: 0;
 }
 
 .head {

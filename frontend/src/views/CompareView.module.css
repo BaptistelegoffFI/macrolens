@@ -79,8 +79,16 @@
   border-bottom: var(--sep-rule);
 }
 
+/* Liste d'état et courbes côte à côte quand la colonne est assez large, empilées sinon. */
+.body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: var(--space-sub);
+  padding: var(--sp-2);
+}
+
 .state {
-  padding-top: var(--sp-2);
+  min-width: 0;
 }
 
 .unavailable {
@@ -88,10 +96,9 @@
   padding: var(--sp-2);
 }
 
-/* Courbes sous la liste : plusieurs par rangée quand la colonne est large. */
 .charts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--space-sub);
-  padding: var(--space-sub) var(--sp-2) 0;
+  min-width: 0;
 }

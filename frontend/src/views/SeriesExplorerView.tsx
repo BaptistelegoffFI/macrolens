@@ -559,10 +559,10 @@ export function SeriesExplorerView() {
           </div>
         </div>
 
-        <div className={styles.control}>
-          <span className={styles.controlLabel}>
-            {t(S.assets.explorerOverlayTitle)}
-          </span>
+        <details className={styles.overlay}>
+          <summary className={styles.overlaySummary}>
+            {t(S.assets.explorerOverlayTitle)} ({overlays.length})
+          </summary>
           <div className={styles.overlayGrid}>
             <div className={styles.overlayHeading}>
               {t(S.assets.explorerAssetGroup)}
@@ -607,7 +607,7 @@ export function SeriesExplorerView() {
               </button>
             </p>
           )}
-        </div>
+        </details>
       </div>
 
       {error && <div className={styles.error}>{error}</div>}

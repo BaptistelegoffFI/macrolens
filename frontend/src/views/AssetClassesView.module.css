@@ -55,6 +55,12 @@
   composes: chip from "../styles/surfaces.module.css";
 }
 
+/* Puces T1, T2, T3 : des codes, donc mono. */
+.tierChip {
+  composes: chip from "../styles/surfaces.module.css";
+  font-family: var(--font-mono);
+}
+
 .prefilled {
   composes: label from "../styles/typography.module.css";
   display: inline-block;

@@ -416,7 +416,7 @@ export function AssetClassesView({ prefill }: AssetClassesViewProps) {
               <button
                 key={tier}
                 type="button"
-                className={styles.chip}
+                className={styles.tierChip}
                 data-active={tiers.has(tier)}
                 aria-pressed={tiers.has(tier)}
                 title={t(S.assets.tierTitle)(tier)}

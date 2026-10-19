@@ -22,6 +22,9 @@
   white-space: nowrap;
 }
 
-.sep {
+/* Séparateur décoratif : contenu CSS, donc ni texte lu ni texte soumis au contraste. */
+.item + .item::before {
+  content: "·";
   color: var(--rule);
+  margin-right: var(--sp-2);
 }

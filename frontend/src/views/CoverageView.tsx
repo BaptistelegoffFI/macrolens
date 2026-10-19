@@ -74,7 +74,7 @@ export function CoverageView() {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th className={styles.rowHeader}>{t(S.coverage.indicator)}</th>
+            <th className={styles.cornerHeader}>{t(S.coverage.indicator)}</th>
             {decades.map((d) => (
               <th key={d} className={styles.colHeader}>
                 <Num value={d} decimals={0} />

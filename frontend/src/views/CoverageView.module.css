@@ -37,6 +37,19 @@
   color: var(--fg);
 }
 
+.cornerHeader {
+  composes: colhead from "../styles/typography.module.css";
+  position: sticky;
+  left: 0;
+  top: 0;
+  background: var(--sep-tint);
+  border-right: var(--sep-rule);
+  border-bottom: var(--sep-rule);
+  padding: var(--sp-1) var(--sp-2);
+  text-align: left;
+  z-index: 2;
+}
+
 .colHeader {
   composes: colhead num from "../styles/typography.module.css";
   position: sticky;

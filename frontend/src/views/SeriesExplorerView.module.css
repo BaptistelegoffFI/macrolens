@@ -91,7 +91,18 @@
   font-family: var(--font-mono);
 }
 
-/* Séries superposées : grille à colonnes automatiques, sans barre de défilement. */
+/* Séries superposées : repliées par défaut (le graphique reste visible sans défiler), puis grille à
+   colonnes automatiques, sans barre de défilement. */
+.overlay {
+  min-width: 0;
+}
+
+.overlaySummary {
+  composes: colhead from "../styles/typography.module.css";
+  cursor: pointer;
+  padding: var(--sp-1) 0;
+}
+
 .overlayGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -133,9 +144,12 @@
   flex-direction: column;
 }
 
+/* Tableau des séries : métadonnée du graphique, à largeur de lecture. */
 .legend {
   border-collapse: collapse;
   width: 100%;
+  max-width: 720px;
+  flex: 0 0 auto;
 }
 
 .legendCell {

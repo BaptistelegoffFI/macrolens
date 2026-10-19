@@ -148,7 +148,7 @@ export function EpisodeTimeline({
           x={p.labelX}
           y={cy + 3.5}
           textAnchor={p.labelSide === "right" ? "start" : "end"}
-          className={styles.eventLabel}
+          className={/^\d{4}$/.test(p.item.label) ? styles.eventYear : styles.eventLabel}
         >
           {p.item.label}
         </text>
