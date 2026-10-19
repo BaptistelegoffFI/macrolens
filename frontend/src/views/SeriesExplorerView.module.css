@@ -1,192 +1,136 @@
+/* Page Séries : barre de contrôles en haut (tout est atteignable sans défiler), le graphique prend
+   toute la hauteur restante, le tableau des séries est ancré en bas. Aucun défilement imbriqué. */
 .layout {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-sub);
   height: 100%;
-  gap: 16px;
-  padding: 16px;
-  box-sizing: border-box;
-  overflow: hidden;
+  padding: var(--space-sub);
+  overflow: auto;
 }
 
 .controls {
-  flex: 0 0 300px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  overflow: auto;
+  gap: var(--space-sub);
+  flex: 0 0 auto;
 }
 
-.content {
-  flex: 1 1 auto;
+.controlRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-sub) var(--space-region);
+}
+
+.control {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--sp-1);
   min-width: 0;
-  overflow: auto;
 }
 
-.card {
-  border: 1px solid var(--rule-light);
-  background: var(--bg-chrome);
-  padding: 16px;
-}
-
-.cardTitle {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--fg);
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 6px;
-  margin-bottom: 12px;
+.controlLabel {
+  composes: colhead from "../styles/typography.module.css";
 }
 
 .select {
-  width: 100%;
-  height: var(--control-h);
-  border: 1px solid var(--rule);
-  background: var(--bg-app);
-  font-size: 11px;
+  composes: select from "../styles/surfaces.module.css";
+  min-width: 280px;
 }
 
-.periodRow {
+.periodFields {
   display: flex;
-  gap: 12px;
-}
-
-.periodField {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.periodFieldLabel {
-  font-size: 10px;
-  color: var(--fg-secondary);
+  align-items: center;
+  gap: var(--sp-2);
 }
 
 .yearInput {
-  width: 100%;
-  height: var(--control-h);
-  border: 1px solid var(--rule);
-  background: var(--bg-app);
-  font: inherit;
-  font-size: 11px;
-  font-family: var(--font-mono);
-  padding: 0 8px;
-  box-sizing: border-box;
+  composes: input from "../styles/surfaces.module.css";
+  width: 72px;
 }
 
 .periodResetBtn {
-  margin-top: 10px;
-  border: none;
-  background: transparent;
-  color: var(--accent);
-  font-size: 11px;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
+  composes: btnLink from "../styles/surfaces.module.css";
 }
 
-.scaleGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
+.seg {
+  composes: seg from "../styles/surfaces.module.css";
 }
 
-.scaleBtn {
-  height: var(--control-h);
-  border: 1px solid var(--rule);
-  background: var(--bg-app);
-  color: var(--fg);
-  font: inherit;
-  font-size: 11px;
-  cursor: pointer;
+.segBtn {
+  composes: segBtn from "../styles/surfaces.module.css";
 }
 
-.scaleBtn[data-active="true"] {
-  background: var(--bg-selected);
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-.scaleBtn:disabled {
+.segBtn:disabled {
   color: var(--fg-muted);
-  background: var(--bg-chrome);
+  background: var(--sep-tint);
   cursor: not-allowed;
 }
 
-.scaleHelp {
-  margin: 10px 0 0;
-  font-size: 11px;
-  line-height: 1.45;
-  color: var(--fg-secondary);
+.hint {
+  composes: meta from "../styles/typography.module.css";
+  margin: 0;
+  max-width: var(--measure);
 }
 
-.scaleWarn {
-  margin: 8px 0 0;
-  font-size: 11px;
+.warn {
+  composes: meta from "../styles/typography.module.css";
   color: var(--flag);
+  margin: 0;
 }
 
-.countryList {
-  max-height: 320px;
-  overflow: auto;
-  border: 1px solid var(--rule-light);
-  background: var(--bg-app);
+.countries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
 }
 
-.countryRow {
+.countryChip {
+  composes: chip from "../styles/surfaces.module.css";
+  font-family: var(--font-mono);
+}
+
+/* Séries superposées : grille à colonnes automatiques, sans barre de défilement. */
+.overlayGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0 var(--sp-4);
+}
+
+.overlayHeading {
+  composes: colhead from "../styles/typography.module.css";
+  grid-column: 1 / -1;
+  padding: var(--sp-1) 0;
+  border-bottom: var(--sep-hairline);
+}
+
+.overlayRow {
+  composes: label from "../styles/typography.module.css";
   display: flex;
   align-items: center;
-  gap: 6px;
-  height: 24px;
-  padding: 0 8px;
-  font-size: 11px;
-}
-
-.countryRow:nth-child(even) {
-  background: var(--bg-row-alt);
-}
-
-.chartCard {
-  border: 1px solid var(--rule-light);
-  background: var(--bg-app);
-  padding: 16px;
-  flex: 1 1 auto;
-  min-height: 320px;
-  display: flex;
-  flex-direction: column;
-}
-
-.chartHeader {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.chartTitle {
-  font-size: 13px;
-  font-weight: 600;
+  gap: var(--sp-2);
+  height: var(--row-h);
   color: var(--fg);
 }
 
-.unitBadge {
-  display: inline-block;
-  padding: 2px 6px;
-  border: 1px solid var(--rule);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: var(--fg-secondary);
-  background: var(--bg-chrome);
+.note {
+  composes: calloutWarn from "../styles/surfaces.module.css";
+  composes: label from "../styles/typography.module.css";
+  color: var(--fg);
 }
 
-.chartBody {
-  flex: 1 1 auto;
-  min-height: 260px;
+.error {
+  composes: label from "../styles/typography.module.css";
+  color: var(--neg);
+}
+
+/* Le graphique : tout l'espace vertical restant, avec une hauteur minimale lisible. */
+.chart {
+  flex: 1 1 320px;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
 }
 
 .legend {
@@ -195,66 +139,30 @@
 }
 
 .legendCell {
-  padding: 6px 10px;
-  font-size: 11px;
-  border-top: 1px solid var(--rule);
-}
-
-.legend tr:first-child .legendCell {
-  border-top: none;
+  composes: body from "../styles/typography.module.css";
+  padding: var(--sp-1) var(--sp-2);
+  border-top: var(--sep-hairline);
 }
 
 .legendNum {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+  composes: num from "../styles/typography.module.css";
   text-align: right;
 }
 
 .swatch {
   display: inline-block;
-  width: 10px;
+  width: 16px;
   height: 2px;
-  margin-right: 6px;
+  margin-right: var(--sp-2);
+  vertical-align: middle;
 }
 
 .exportBar {
   display: flex;
-  gap: 8px;
+  gap: var(--sp-2);
+  flex: 0 0 auto;
 }
 
 .exportBtn {
-  height: var(--control-h);
-  padding: 0 10px;
-  border: 1px solid var(--rule);
-  background: var(--bg-app);
-  color: var(--accent);
-  font-size: 11px;
-  cursor: pointer;
-}
-
-.overlayHeading {
-  padding: 4px 8px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--fg-secondary);
-  background: var(--bg-chrome);
-  border-bottom: 1px solid var(--rule-light);
-}
-
-.mixedHint {
-  margin: 10px 0 0;
-  font-size: 11px;
-  line-height: 1.45;
-  color: var(--fg-secondary);
-}
-
-.assetNote {
-  margin: 0 0 8px;
-  padding: 6px 8px;
-  border-left: 2px solid var(--flag);
-  background: var(--bg-chrome);
-  font-size: 11px;
-  color: var(--fg);
+  composes: btn from "../styles/surfaces.module.css";
 }

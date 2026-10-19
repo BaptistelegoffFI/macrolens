@@ -121,7 +121,7 @@ describe("AssetReturnsBlock", () => {
     mockFetch(async () => ({ ok: true, json: async () => ASSET_RETURNS_FIXTURE }));
     renderBlock();
     const title = await screen.findByText(/Trajectoire médiane sur 10 ans/);
-    const chartBlock = title.parentElement as HTMLElement;
+    const chartBlock = title.closest("figure") as HTMLElement;
     expect(within(chartBlock).getByText("Actions")).toBeInTheDocument();
     expect(within(chartBlock).getByText("Obligations d'État")).toBeInTheDocument();
   });

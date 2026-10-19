@@ -1,224 +1,197 @@
 .layout {
-  display: flex;
   height: 100%;
-  gap: 16px;
-  padding: 16px;
-  box-sizing: border-box;
-  overflow: hidden;
+  overflow: auto;
+  padding: var(--space-sub) var(--space-sub) var(--space-region);
 }
 
+.pageTitle {
+  composes: title from "../styles/typography.module.css";
+  margin: 0 0 var(--sp-2);
+}
+
+.intro {
+  composes: prose from "../styles/typography.module.css";
+  margin: 0 0 var(--space-sub);
+}
+
+/* Contrôles en barre : mêmes jeux de contrôles que la page Séries. */
 .controls {
-  flex: 0 0 260px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-sub) var(--space-region);
+  margin-bottom: var(--space-sub);
+}
+
+.control {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  overflow: auto;
+  gap: var(--sp-1);
 }
 
-.content {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: auto;
+.controlLabel {
+  composes: colhead from "../styles/typography.module.css";
 }
 
-.card {
-  border: 1px solid var(--rule-light);
-  background: var(--bg-chrome);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.cardTitle {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 6px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1 1 0;
-}
-
-.fieldLabel {
-  font-size: 10px;
-  color: var(--fg-secondary);
-}
-
-.select,
-.yearInput {
-  width: 100%;
-  height: var(--control-h);
-  border: 1px solid var(--rule);
-  background: var(--bg-app);
-  font: inherit;
-  font-size: 11px;
-  padding: 0 8px;
-  box-sizing: border-box;
+.select {
+  composes: select from "../styles/surfaces.module.css";
 }
 
 .yearInput {
-  font-family: var(--font-mono);
+  composes: input from "../styles/surfaces.module.css";
+  width: 72px;
 }
 
 .yearInput[aria-invalid="true"] {
   border-color: var(--neg);
 }
 
-.periodRow {
-  display: flex;
-  gap: 12px;
-}
-
 .chips {
   display: flex;
-  gap: 6px;
+  gap: var(--sp-1);
 }
 
 .chip {
-  height: var(--control-h);
-  padding: 0 10px;
-  border: 1px solid var(--rule);
-  background: var(--bg-app);
-  color: var(--fg);
-  font: inherit;
-  font-size: 11px;
-  cursor: pointer;
-}
-
-.chip[data-active="true"] {
-  background: var(--bg-selected);
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-.intro {
-  margin: 0 0 8px;
-  font-size: 11px;
-  line-height: 1.45;
-  color: var(--fg-secondary);
-  max-width: 760px;
+  composes: chip from "../styles/surfaces.module.css";
 }
 
 .prefilled {
+  composes: label from "../styles/typography.module.css";
   display: inline-block;
-  margin-bottom: 8px;
-  padding: 2px 8px;
+  margin-bottom: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2);
   border: 1px solid var(--accent);
   color: var(--accent);
-  font-size: 11px;
 }
 
 .notice {
-  font-size: 11px;
-  color: var(--fg-secondary);
-  padding: 8px 0;
+  composes: label from "../styles/typography.module.css";
+  padding: var(--sp-2) 0;
 }
 
+/* Tableau de lecture : largeur plafonnée pour que les colonnes restent proches de leur libellé. */
 .table {
   width: 100%;
+  max-width: var(--w-table-max);
+  table-layout: fixed;
   border-collapse: collapse;
 }
 
 .colHead {
+  composes: colhead from "../styles/typography.module.css";
   text-align: left;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--fg-secondary);
-  padding: 4px 8px;
-  border-bottom: 1px solid var(--rule);
+  height: var(--table-header-h);
+  padding: 0 var(--sp-2);
+  background: var(--sep-tint);
+  border-bottom: var(--sep-rule);
   position: sticky;
   top: 0;
-  background: var(--bg-app);
+}
+
+.colHead:nth-child(1) {
+  width: 30%;
+}
+
+.colHead:nth-child(2) {
+  width: 6%;
 }
 
 .row > * {
-  border-bottom: 1px solid var(--rule-light);
+  border-bottom: var(--sep-hairline);
   vertical-align: top;
 }
 
 .row[data-depth="0"] > .label {
-  font-weight: 600;
+  font-weight: var(--weight-strong);
 }
 
 .label {
+  composes: body from "../styles/typography.module.css";
+  font-weight: var(--weight-medium);
   text-align: left;
-  font-size: 11px;
-  font-weight: 500;
-  padding: 6px 8px;
+  padding: var(--sp-2);
   white-space: nowrap;
 }
 
 .chevron {
+  composes: btnLink from "../styles/surfaces.module.css";
   width: 16px;
-  border: none;
-  background: transparent;
-  color: var(--accent);
-  font-size: 11px;
-  cursor: pointer;
-  padding: 0;
-  margin-right: 2px;
+  text-decoration: none;
+  margin-right: var(--sp-1);
 }
 
 .chevronSpacer {
   display: inline-block;
-  width: 18px;
+  width: 20px;
 }
 
 .tierCell {
-  padding: 6px 8px;
-  width: 44px;
+  padding: var(--sp-2);
 }
 
 .tier {
-  display: inline-block;
-  padding: 0 4px;
-  border: 1px solid var(--rule);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--fg-secondary);
-  background: var(--bg-chrome);
+  composes: badge from "../styles/surfaces.module.css";
   cursor: help;
 }
 
 .numCell {
-  padding: 6px 8px;
-  font-size: 11px;
+  composes: body from "../styles/typography.module.css";
+  padding: var(--sp-2);
 }
 
 .coverage {
-  font-family: var(--font-mono);
+  composes: num from "../styles/typography.module.css";
 }
 
 .sub {
-  font-size: 10px;
-  color: var(--fg-muted);
+  composes: meta num from "../styles/typography.module.css";
 }
 
 .unavailable {
-  padding: 6px 8px;
+  padding: var(--sp-2);
   background: var(--bg-row-alt);
 }
 
 .unavailableLabel {
-  font-size: 11px;
-  font-style: italic;
-  color: var(--fg-muted);
+  composes: meta from "../styles/typography.module.css";
 }
 
 .reason {
-  font-size: 10px;
-  color: var(--fg-muted);
-  margin-top: 2px;
-  max-width: 560px;
+  composes: meta from "../styles/typography.module.css";
+  margin-top: var(--sp-1);
+  max-width: var(--measure);
   white-space: normal;
-  line-height: 1.4;
+}
+
+/* Exclusion du capital-investissement et de la dette privée : un énoncé délibéré de la méthode. */
+.statementCell {
+  padding: var(--space-sub) 0 var(--sp-2);
+  border-bottom: none;
+  text-align: left;
+  font-weight: var(--weight-regular);
+}
+
+.statement {
+  composes: calloutStatement from "../styles/surfaces.module.css";
+}
+
+.statementTitle {
+  composes: body from "../styles/typography.module.css";
+  font-weight: var(--weight-strong);
+}
+
+.statementTag {
+  composes: badge from "../styles/surfaces.module.css";
+  margin-left: var(--sp-2);
+  text-transform: uppercase;
+}
+
+.statementBody {
+  composes: prose from "../styles/typography.module.css";
+  margin: var(--sp-1) 0 0;
+}
+
+.legendLine {
+  composes: meta from "../styles/typography.module.css";
+  margin: var(--sp-2) 0 0;
 }

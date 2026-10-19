@@ -7,7 +7,11 @@ import styles from "./Table.module.css";
 export interface ColumnDef<T> {
   key: string;
   label: string;
+  /** Explication de la colonne, au survol de l'en-tête. */
+  title?: string;
   numeric?: boolean;
+  /** Valeur textuelle qui est un code (pays, ticker) : mono, comme tout identifiant. */
+  mono?: boolean;
   width?: number;
   accessor: (row: T) => unknown;
   render?: (row: T) => ReactNode;
@@ -95,6 +99,7 @@ export function Table<T>({ columns, rows, getRowKey, onRowActivate }: TableProps
                 key={c.key}
                 className={`${styles.th} ${c.numeric ? styles.thNum : ""}`}
                 style={c.width ? { width: c.width } : undefined}
+                title={c.title}
                 onClick={() => cycleSort(c.key)}
                 role="columnheader"
                 aria-sort={
@@ -130,7 +135,7 @@ export function Table<T>({ columns, rows, getRowKey, onRowActivate }: TableProps
                 const usesNum = c.numeric && !c.render;
                 const cellClass = [
                   styles.td,
-                  c.numeric ? styles.tdNum : "",
+                  c.numeric ? styles.tdNum : c.mono ? styles.tdMono : "",
                   flagged ? styles.tdFlagged : "",
                   usesNum ? "" : isMissing ? styles.muted : tone === "neg" ? styles.neg : tone === "pos" ? styles.pos : "",
                 ]

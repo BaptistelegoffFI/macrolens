@@ -10,23 +10,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 8px;
-  background: var(--bg-chrome);
-  border-bottom: 1px solid var(--rule);
+  padding: 0 var(--space-cell-x);
+  background: var(--sep-tint);
+  border-bottom: var(--sep-rule);
   flex: 0 0 auto;
 }
 
 .title {
-  font-size: var(--text-micro);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--fg-secondary);
+  composes: colhead from "../../styles/typography.module.css";
 }
 
 .meta {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 11px;
+  composes: num from "../../styles/typography.module.css";
+  font-size: var(--text-meta);
   color: var(--fg-muted);
 }
 
@@ -37,5 +33,5 @@
 }
 
 .stack > .panel:not(:last-child) {
-  border-bottom: 1px solid var(--rule);
+  border-bottom: var(--sep-rule);
 }

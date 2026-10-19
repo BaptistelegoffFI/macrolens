@@ -47,6 +47,6 @@ describe("App", () => {
     expect(screen.getByRole("tab", { name: /Scénario/ })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "EN" }));
     expect(screen.getByRole("tab", { name: /^Scenario/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Search [F5]" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Search\s*F5$/ })).toBeInTheDocument();
   });
 });

@@ -1,36 +1,20 @@
-.wrapper {
-  padding: 12px 16px 8px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.title {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--fg-secondary);
-  margin-bottom: 8px;
-}
-
-.span {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--fg-muted);
-}
-
-.empty {
-  font-size: 11px;
-  color: var(--fg-muted);
-}
-
 .svg {
   display: block;
   max-width: 100%;
+}
+
+.span {
+  composes: num from "../../styles/typography.module.css";
+  font-size: var(--text-meta);
+  font-weight: var(--weight-regular);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--fg-muted);
+  margin-left: var(--sp-2);
+}
+
+.empty {
+  composes: meta from "../../styles/typography.module.css";
 }
 
 .laneBgA {
@@ -48,7 +32,7 @@
 
 .windowLabel {
   font-family: var(--font-sans);
-  font-size: 9px;
+  font-size: var(--text-meta);
   fill: var(--accent);
 }
 
@@ -65,27 +49,27 @@
 
 .yearLabel {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-meta);
   fill: var(--fg-muted);
 }
 
 .laneTitle {
   font-family: var(--font-sans);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-size: var(--text-meta);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--track-caps);
   fill: var(--fg-secondary);
 }
 
 .laneCount {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: var(--text-meta);
   fill: var(--fg-muted);
 }
 
 .eventLabel {
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: var(--text-meta);
   fill: var(--fg);
 }
 
@@ -94,7 +78,7 @@
 }
 
 .item:hover .eventLabel {
-  font-weight: 600;
+  font-weight: var(--weight-strong);
 }
 
 .bar,
@@ -130,7 +114,7 @@
 
 .anchorLabel {
   font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: var(--text-meta);
+  font-weight: var(--weight-strong);
   fill: var(--accent);
 }

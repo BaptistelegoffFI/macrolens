@@ -1,77 +1,32 @@
-.block {
-  padding: 8px 12px 12px;
-  border-top: 1px solid var(--rule);
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--fg);
-}
-
-.subtitle {
-  font-size: 10px;
-  color: var(--fg-secondary);
-  margin-top: 2px;
+/* Bloc « Ce qui s'est produit pour les actifs » : la médiane domine (12 px, gras, couleur de
+   signe) ; IQR, N et fréquence de réussite sont des métadonnées (10 px, gris, mono). */
+.sub {
+  composes: meta from "../../styles/typography.module.css";
+  margin: 0 0 var(--space-row);
 }
 
 .controls {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex: 0 0 auto;
+  gap: var(--space-sub);
 }
 
 .segmented {
-  display: inline-flex;
-  border: 1px solid var(--rule);
+  composes: seg from "../../styles/surfaces.module.css";
 }
 
 .segmentedBtn {
-  height: var(--control-h);
-  padding: 0 8px;
-  border: none;
-  border-right: 1px solid var(--rule);
-  background: var(--bg-app);
-  color: var(--fg);
-  font: inherit;
-  font-size: 10px;
-  cursor: pointer;
-}
-
-.segmentedBtn:last-child {
-  border-right: none;
-}
-
-.segmentedBtn[data-active="true"] {
-  background: var(--bg-selected);
-  color: var(--accent);
+  composes: segBtn from "../../styles/surfaces.module.css";
 }
 
 .linkBtn {
-  border: none;
-  background: transparent;
-  color: var(--accent);
-  font: inherit;
-  font-size: 11px;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
+  composes: btnLink from "../../styles/surfaces.module.css";
   white-space: nowrap;
 }
 
 .notice {
-  font-size: 11px;
-  color: var(--fg-secondary);
-  padding: 8px 0;
+  composes: label from "../../styles/typography.module.css";
+  padding: var(--sp-2) 0;
 }
 
 .table {
@@ -81,14 +36,12 @@
 }
 
 .colHead {
+  composes: colhead from "../../styles/typography.module.css";
   text-align: left;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--fg-secondary);
-  padding: 4px 8px;
-  border-bottom: 1px solid var(--rule);
+  padding: var(--cell-pad-y) var(--cell-pad-x);
+  height: var(--table-header-h);
+  background: var(--sep-tint);
+  border-bottom: var(--sep-rule);
 }
 
 .colHead:first-child {
@@ -96,19 +49,19 @@
 }
 
 .rowLabel {
+  composes: body from "../../styles/typography.module.css";
+  font-weight: var(--weight-medium);
   text-align: left;
-  font-size: 11px;
-  font-weight: 500;
-  padding: 6px 8px;
+  padding: var(--sp-2);
   vertical-align: top;
-  border-bottom: 1px solid var(--rule-light);
+  border-bottom: var(--sep-hairline);
 }
 
 .cell {
   vertical-align: top;
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--rule-light);
-  border-left: 1px solid var(--rule-light);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: var(--sep-hairline);
+  border-left: var(--sep-hairline);
 }
 
 .cell[data-empty="true"] {
@@ -118,48 +71,34 @@
 .median {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 15px;
-  line-height: 20px;
+  gap: var(--sp-1);
+  font-weight: var(--weight-strong);
 }
 
-.iqr {
-  font-size: 10px;
-  color: var(--fg-secondary);
-}
-
+.iqr,
 .nLine {
-  font-size: 10px;
-  color: var(--fg-muted);
+  composes: meta num from "../../styles/typography.module.css";
 }
 
 .reasons {
-  font-size: 10px;
+  composes: meta from "../../styles/typography.module.css";
   color: var(--flag);
-  margin-top: 2px;
+  margin-top: var(--sp-1);
 }
 
 .unavailable {
-  font-size: 11px;
-  color: var(--fg-muted);
-  font-style: italic;
+  composes: meta from "../../styles/typography.module.css";
 }
 
 .flag {
-  font-size: 10px;
   color: var(--flag);
+  font-size: var(--text-meta);
   cursor: help;
 }
 
 .tier {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 0 4px;
-  border: 1px solid var(--rule);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--fg-secondary);
-  background: var(--bg-chrome);
+  composes: badge from "../../styles/surfaces.module.css";
+  margin-left: var(--sp-2);
   cursor: help;
 }
 
@@ -168,47 +107,33 @@
   flex: 0 0 auto;
 }
 
-.sectionHousing {
-  background: var(--bg-chrome);
-  border-top: 2px solid var(--rule);
-}
-
-.sectionOther {
-  border-top: 2px solid var(--rule);
-}
-
+/* Sous-groupes du tableau (immobilier, change, inflation) : même bande teintée, même titre. */
 .sectionHead {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--fg-secondary);
-  padding: 6px 8px 2px;
+  composes: colhead from "../../styles/typography.module.css";
+  padding: var(--sp-1) var(--sp-2);
+  background: var(--sep-tint);
+  border-top: var(--sep-rule);
+  border-bottom: var(--sep-hairline);
 }
 
 .sectionCaveat {
-  font-size: 10px;
-  font-weight: 400;
+  composes: meta from "../../styles/typography.module.css";
+  color: var(--flag);
   text-transform: none;
   letter-spacing: 0;
-  color: var(--flag);
-  margin-top: 2px;
+  font-weight: var(--weight-regular);
+  margin-top: var(--sp-1);
 }
 
-.chartBlock {
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 1px solid var(--rule);
-}
-
-.chartTitle {
-  font-size: 11px;
-  font-weight: 600;
-  margin-bottom: 4px;
+/* Tableau et trajectoire médiane côte à côte quand la largeur le permet. */
+.body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(560px, 1fr));
+  gap: var(--space-sub);
+  align-items: start;
 }
 
 .footnote {
-  font-size: 10px;
-  color: var(--fg-muted);
-  margin-top: 6px;
+  composes: meta from "../../styles/typography.module.css";
+  margin-top: var(--sp-2);
 }

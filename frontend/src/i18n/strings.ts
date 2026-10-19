@@ -43,9 +43,9 @@ export const S = {
       fr: "Copier le permalien de la dernière recherche (Ctrl+L)",
       en: "Copy the permalink of the last search (Ctrl+L)",
     },
-    copyPermalink: { fr: "Copier le lien [Ctrl+L]", en: "Copy link [Ctrl+L]" },
+    copyPermalink: { fr: "Copier le lien", en: "Copy link" },
     runTitle: { fr: "Rechercher (F5)", en: "Search (F5)" },
-    run: { fr: "Rechercher [F5]", en: "Search [F5]" },
+    run: { fr: "Rechercher", en: "Search" },
   },
 
   statusBar: {
@@ -94,8 +94,8 @@ export const S = {
     bordereauPanelTitle: { fr: "Bordereau", en: "Provenance" },
     searching: { fr: "Recherche en cours…", en: "Searching…" },
     noSearchYet: {
-      fr: "Aucune recherche exécutée — choisissez une ancre (pays, année) et lancez [F5].",
-      en: "No search run yet — choose an anchor (country, year) and run [F5].",
+      fr: "Aucune recherche exécutée — choisissez une ancre (pays, année) et lancez la recherche (F5).",
+      en: "No search run yet — choose an anchor (country, year) and run the search (F5).",
     },
     noAnalogFound: {
       fr: "Aucun analogue trouvé pour cette requête après exclusions.",
@@ -116,6 +116,33 @@ export const S = {
     dataUsed: { fr: (n: number) => `Données utilisées (${n})`, en: (n: number) => `Data used (${n})` },
     growthColumn: { fr: (h: number) => `ΔPIB ${h}a`, en: (h: number) => `ΔGDP ${h}y` },
     crisisColumn: { fr: (h: number) => `CB ${h}a`, en: (h: number) => `BC ${h}y` },
+    groupMatch: { fr: "1 · La correspondance", en: "1 · The match" },
+    groupMatchMeta: { fr: "Analogues classés par similarité", en: "Analogues ranked by similarity" },
+    groupNext: { fr: "2 · Ce qui s'est passé ensuite", en: "2 · What happened next" },
+    groupNextMeta: {
+      fr: "Résultats observés après chaque précédent",
+      en: "Outcomes observed after each precedent",
+    },
+    simHelp: {
+      fr: "Similarité = 100 × (1 − distance) dans l'espace d'état normalisé : 100 = identique.",
+      en: "Similarity = 100 × (1 − distance) in the normalised state space: 100 = identical.",
+    },
+    growthHelp: {
+      fr: (h: number) => `Variation cumulée du PIB réel par habitant, de l'année de l'analogue à +${h} ans, en %.`,
+      en: (h: number) => `Cumulative change in real GDP per head, from the analogue year to +${h} years, in %.`,
+    },
+    crisisHelp: {
+      fr: (h: number) =>
+        `Crise bancaire dans les ${h} ans qui suivent l'année de l'analogue (au moins une année de crise dans la chronologie des crises). ● = oui, — = non.`,
+      en: (h: number) =>
+        `Banking crisis within ${h} years after the analogue year (at least one crisis year in the crisis chronology). ● = yes, — = no.`,
+    },
+    crisisYes: { fr: "Crise bancaire", en: "Banking crisis" },
+    crisisNo: { fr: "Pas de crise bancaire", en: "No banking crisis" },
+    tableLegend: {
+      fr: (h: number) => `Sim. = similarité (0 à 100) · ΔPIB = variation cumulée du PIB réel par habitant · CB ${h}a : ● = crise bancaire dans les ${h} ans suivants, — = aucune`,
+      en: (h: number) => `Sim. = similarity (0 to 100) · ΔGDP = cumulative change in real GDP per head · BC ${h}y: ● = banking crisis within the next ${h} years, — = none`,
+    },
     tableCountry: { fr: "Pays", en: "Country" },
     tableYear: { fr: "Année", en: "Year" },
     tableSimilarity: { fr: "Sim.", en: "Sim." },
@@ -123,8 +150,8 @@ export const S = {
   },
 
   episode: {
-    expand: { fr: "Agrandir", en: "Expand" },
-    collapse: { fr: "Réduire", en: "Collapse" },
+    expand: { fr: "Plein écran", en: "Full screen" },
+    collapse: { fr: "Fermer", en: "Close" },
     panelTitle: { fr: "Épisode", en: "Episode" },
     searchGroupTitle: { fr: "Recherche", en: "Search" },
     loadButton: { fr: "Charger", en: "Load" },
@@ -190,6 +217,10 @@ export const S = {
   },
 
   compare: {
+    divergenceLegend: {
+      fr: "Lignes surlignées : les 3 variables dont le rang percentile (r) diverge le plus entre les épisodes.",
+      en: "Highlighted rows: the 3 features whose percentile rank (r) differs most between the episodes.",
+    },
     removeTitle: { fr: "Retirer", en: "Remove" },
     add: { fr: "+ Ajouter", en: "+ Add" },
     run: { fr: "Comparer", en: "Compare" },
@@ -215,6 +246,13 @@ export const S = {
     priority: { fr: "priorité", en: "priority" },
     retrievedOn: { fr: "récupéré le", en: "retrieved on" },
     methodTitle: { fr: "Méthode — résumé", en: "Methodology — summary" },
+    tierPrimary: { fr: "Sources primaires", en: "Primary sources" },
+    tierComplementary: { fr: "Sources complémentaires", en: "Complementary sources" },
+    tierSupporting: { fr: "Références et appui", en: "Reference and supporting" },
+    tierHelp: {
+      fr: "Classées par priorité de résolution des conflits : primaires (90 et plus), complémentaires (50 à 89), appui (moins de 50).",
+      en: "Grouped by conflict-resolution priority: primary (90 and above), complementary (50 to 89), supporting (below 50).",
+    },
   },
 
   fanChart: {
@@ -341,6 +379,17 @@ export const S = {
   // Avertissements d'une recherche d'analogues, affichés dans la colonne de droite. L'API les
   // renvoie en français ; lib/searchWarnings.ts les décode, ces gabarits les rendent dans la
   // langue choisie.
+  stateVector: {
+    rankTitle: {
+      fr: "Rang percentile de la valeur dans sa fenêtre de référence : 0 = la plus basse, 1 = la plus haute.",
+      en: "Percentile rank of the value in its reference window: 0 = lowest, 1 = highest.",
+    },
+    rankLegend: {
+      fr: "r = rang percentile de la valeur dans sa fenêtre de référence (0 = la plus basse, 1 = la plus haute).",
+      en: "r = percentile rank of the value in its reference window (0 = lowest, 1 = highest).",
+    },
+  },
+
   warnings: {
     panelTitle: { fr: "Avertissements", en: "Warnings" },
     placeholder: {

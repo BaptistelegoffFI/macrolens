@@ -11,8 +11,8 @@ export const tokens = {
   gridChart: "#eaecef",
   axis: "#8b9298",
   fg: "#16191c",
-  // §11.8 : AA (4.5:1) exigé même à 10px — voir styles/tokens.css --fg-muted.
-  fgMuted: "#6b7278",
+  // §11.8 : AA (4.5:1) sur toutes les surfaces — voir styles/tokens.css --fg-muted.
+  fgMuted: "#646b71",
   fanLine: "#c4c9ce",
   fanBand: "#dce6ef",
   series: ["#1f4e79", "#b3242b", "#4c7a34", "#7a5195", "#00707c", "#a85b00", "#5a6169", "#8c3a6b"],

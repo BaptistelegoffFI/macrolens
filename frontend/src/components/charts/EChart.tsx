@@ -2,6 +2,8 @@ import * as echarts from "echarts";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import type { EChartsOption } from "echarts";
 
+import { tokens } from "../../charts/theme";
+
 export interface EChartProps {
   option: EChartsOption;
   height?: number | string;
@@ -20,7 +22,7 @@ export const EChart = forwardRef<EChartHandle, EChartProps>(function EChart({ op
   const chartRef = useRef<echarts.ECharts | null>(null);
 
   useImperativeHandle(ref, () => ({
-    getDataUrl: () => chartRef.current?.getDataURL({ pixelRatio: 2, backgroundColor: "#ffffff" }) ?? null,
+    getDataUrl: () => chartRef.current?.getDataURL({ pixelRatio: 2, backgroundColor: tokens.bgApp }) ?? null,
   }));
 
   useEffect(() => {

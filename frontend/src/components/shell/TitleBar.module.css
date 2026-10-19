@@ -2,10 +2,10 @@
   height: var(--menubar-h);
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 8px;
+  gap: var(--space-inline);
+  padding: 0 var(--space-cell-x);
   background: var(--bg-app);
-  border-bottom: 1px solid var(--rule);
+  border-bottom: var(--sep-rule);
   flex: 0 0 auto;
 }
 
@@ -14,30 +14,13 @@
 }
 
 .title {
-  color: var(--fg-secondary);
+  composes: label from "../../styles/typography.module.css";
 }
 
 .langSwitch {
-  display: flex;
-  border: 1px solid var(--rule);
+  composes: seg from "../../styles/surfaces.module.css";
 }
 
 .langBtn {
-  height: 20px;
-  padding: 0 8px;
-  font: inherit;
-  font-size: 10px;
-  color: var(--fg-secondary);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.langBtn:hover {
-  background: var(--bg-hover);
-}
-
-.langBtn[data-active="true"] {
-  background: var(--accent);
-  color: var(--bg-app);
+  composes: segBtn from "../../styles/surfaces.module.css";
 }

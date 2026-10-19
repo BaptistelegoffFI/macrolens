@@ -7,17 +7,16 @@
 
 .tabs {
   display: flex;
-  border-bottom: 1px solid var(--rule);
-  background: var(--bg-chrome);
+  border-bottom: var(--sep-rule);
+  background: var(--sep-tint);
   flex: 0 0 auto;
 }
 
 .tab {
-  padding: 4px 10px;
-  font-size: 11px;
-  color: var(--fg-secondary);
+  composes: label from "../../styles/typography.module.css";
+  padding: var(--sp-1) var(--sp-3);
   cursor: pointer;
-  border-right: 1px solid var(--rule-light);
+  border-right: var(--sep-hairline);
 }
 
 .tab[data-active="true"] {
@@ -31,42 +30,36 @@
 }
 
 .card {
-  border: 1px solid var(--rule-light);
-  padding: 6px 8px;
-  margin: 6px;
-  font-size: 11px;
+  border-bottom: var(--sep-hairline);
+  padding: var(--sp-2) var(--space-inset);
 }
 
 .cardTitle {
-  font-size: 12px;
-  margin-bottom: 2px;
+  composes: num from "../../styles/typography.module.css";
+  font-size: var(--text-body);
+  margin-bottom: var(--sp-1);
 }
 
 .cardMeta {
-  color: var(--fg-muted);
+  composes: meta from "../../styles/typography.module.css";
 }
 
 .checksum {
-  padding: 4px 8px;
-  font-size: 10px;
+  composes: num from "../../styles/typography.module.css";
+  padding: var(--sp-1) var(--sp-2);
+  font-size: var(--text-meta);
   color: var(--fg-muted);
-  font-family: var(--font-mono);
-  border-top: 1px solid var(--rule-light);
+  border-top: var(--sep-hairline);
 }
 
 .exportRow {
   display: flex;
-  gap: 6px;
-  padding: 6px;
-  border-top: 1px solid var(--rule);
+  gap: var(--sp-2);
+  padding: var(--sp-2);
+  border-top: var(--sep-rule);
 }
 
 .exportBtn {
-  height: var(--control-h);
-  padding: 0 8px;
-  border: 1px solid var(--rule);
-  background: var(--bg-app);
-  color: var(--accent);
-  font-size: 11px;
-  cursor: pointer;
+  composes: btn from "../../styles/surfaces.module.css";
+  padding: 0 var(--sp-2);
 }

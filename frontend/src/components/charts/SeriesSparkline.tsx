@@ -1,8 +1,10 @@
 import type { EChartsOption } from "echarts";
 import { useMemo } from "react";
+import type { ReactNode } from "react";
 
 import type { ObservationOut } from "../../api/types";
 import { axisNumericStyle, baseChartOption, formatAxisNumber, tokens } from "../../charts/theme";
+import { ChartFrame } from "./ChartFrame";
 import { EChart } from "./EChart";
 
 export interface SeriesSparklineProps {
@@ -10,13 +12,23 @@ export interface SeriesSparklineProps {
   unit: string;
   observations: ObservationOut[];
   anchorYear: number;
-  height?: number;
+  /** Hauteur du corps (nombre, chaîne CSS) ; « fill » remplit le parent flex. */
+  height?: number | string;
+  /** Action affichée à droite de l'en-tête (ex. bouton plein écran). */
+  actions?: ReactNode;
 }
 
-/** Petit multiple (§11.2 « toutes les séries autour d'une année ») — une
- * série brute, marqueur vertical à l'ancre. Points manquants non reliés
- * (connectNulls: false), pas d'interpolation silencieuse (règle 3). */
-export function SeriesSparkline({ label, unit, observations, anchorYear, height = 150 }: SeriesSparklineProps) {
+/** Petit multiple (§11.2 « toutes les séries autour d'une année ») — une série brute, marqueur
+ * vertical à l'ancre. Points manquants non reliés (connectNulls: false), pas d'interpolation
+ * silencieuse (règle 3). Le titre et l'unité sont dans le cadre commun, plus dans le canvas. */
+export function SeriesSparkline({
+  label,
+  unit,
+  observations,
+  anchorYear,
+  height = "clamp(140px, 14vh, 240px)",
+  actions,
+}: SeriesSparklineProps) {
   const option = useMemo<EChartsOption>(() => {
     const data = observations
       .filter((o) => o.value !== null)
@@ -24,15 +36,7 @@ export function SeriesSparkline({ label, unit, observations, anchorYear, height 
 
     return {
       ...baseChartOption,
-      grid: { left: 44, right: 8, top: 20, bottom: 20 },
-      title: {
-        text: label.toUpperCase(),
-        left: 0,
-        top: 0,
-        textStyle: { fontSize: 9, fontWeight: "normal", color: tokens.fgMuted },
-        subtext: unit,
-        subtextStyle: { fontSize: 9 },
-      },
+      grid: { left: 44, right: 8, top: 8, bottom: 20 },
       tooltip: {
         ...baseChartOption.tooltip,
         trigger: "axis" as const,
@@ -44,13 +48,13 @@ export function SeriesSparkline({ label, unit, observations, anchorYear, height 
         min: anchorYear - 10,
         max: anchorYear + 10,
         splitNumber: 4,
-        axisLabel: { ...axisNumericStyle.x.axisLabel, fontSize: 9, formatter: (v: number) => String(Math.round(v)) },
+        axisLabel: { ...axisNumericStyle.x.axisLabel, formatter: (v: number) => String(Math.round(v)) },
       },
       yAxis: {
         ...axisNumericStyle.y,
         type: "value" as const,
         splitNumber: 3,
-        axisLabel: { ...axisNumericStyle.y.axisLabel, fontSize: 9, formatter: formatAxisNumber },
+        axisLabel: { ...axisNumericStyle.y.axisLabel, formatter: formatAxisNumber },
       },
       series: [
         {
@@ -69,7 +73,11 @@ export function SeriesSparkline({ label, unit, observations, anchorYear, height 
         },
       ],
     };
-  }, [observations, label, unit, anchorYear]);
+  }, [observations, anchorYear]);
 
-  return <EChart option={option} height={height} />;
+  return (
+    <ChartFrame title={label} unit={unit || undefined} actions={actions} height={height}>
+      <EChart option={option} />
+    </ChartFrame>
+  );
 }

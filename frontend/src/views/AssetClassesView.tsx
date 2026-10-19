@@ -42,7 +42,9 @@ function initiallyCollapsed(nodes: AssetTreeNode[]): Set<string> {
   const visit = (node: AssetTreeNode) => {
     if (
       node.children.length > 0 &&
-      node.children.every((c) => c.children.length === 0 && c.status === "not_ingested")
+      node.children.every(
+        (c) => c.children.length === 0 && c.status === "not_ingested",
+      )
     ) {
       out.add(node.id);
     }
@@ -64,7 +66,11 @@ function visible(node: AssetTreeNode, tiers: Set<number>): boolean {
 
 function gapsText(summary: AssetRangeSummary): string {
   return summary.gaps
-    .map((g) => (g.start_year === g.end_year ? String(g.start_year) : `${g.start_year}-${g.end_year}`))
+    .map((g) =>
+      g.start_year === g.end_year
+        ? String(g.start_year)
+        : `${g.start_year}-${g.end_year}`,
+    )
     .join(", ");
 }
 
@@ -140,11 +146,11 @@ export function AssetClassesView({ prefill }: AssetClassesViewProps) {
   function renderDataCells(node: AssetTreeNode) {
     const series = node.series_id ? seriesById.get(node.series_id) : undefined;
     const reason = lang === "fr" ? node.reason_fr : node.reason_en;
-    if (node.status === "not_ingested" || node.status === "excluded") {
+    if (node.status === "not_ingested") {
       return (
         <td colSpan={5} className={styles.unavailable}>
           <span className={styles.unavailableLabel}>
-            {node.status === "excluded" ? t(S.assets.excludedRow) : t(S.assets.notAvailable)}
+            {t(S.assets.notAvailable)}
           </span>
           {reason && <div className={styles.reason}>{reason}</div>}
         </td>
@@ -153,7 +159,9 @@ export function AssetClassesView({ prefill }: AssetClassesViewProps) {
     if (node.status === "no_country_data" || !series) {
       return (
         <td colSpan={5} className={styles.unavailable}>
-          <span className={styles.unavailableLabel}>{t(S.assets.noCountrySeries)}</span>
+          <span className={styles.unavailableLabel}>
+            {t(S.assets.noCountrySeries)}
+          </span>
         </td>
       );
     }
@@ -161,7 +169,9 @@ export function AssetClassesView({ prefill }: AssetClassesViewProps) {
     if (!summary.available) {
       return (
         <td colSpan={5} className={styles.unavailable}>
-          <span className={styles.unavailableLabel}>{t(S.assets.notAvailableAtDate)}</span>
+          <span className={styles.unavailableLabel}>
+            {t(S.assets.notAvailableAtDate)}
+          </span>
         </td>
       );
     }
@@ -172,7 +182,9 @@ export function AssetClassesView({ prefill }: AssetClassesViewProps) {
     const isReturn = summary.level_kind === "real_index";
     const nominal = isReturn && basis === "nominal";
     const change = nominal ? summary.nominal_change : summary.change;
-    const annualised = nominal ? summary.nominal_annualised : summary.annualised;
+    const annualised = nominal
+      ? summary.nominal_annualised
+      : summary.annualised;
     const levelEnd = nominal ? summary.nominal_level_end : summary.level_end;
     const levelLabel =
       summary.level_kind === "real_index"
@@ -191,14 +203,19 @@ export function AssetClassesView({ prefill }: AssetClassesViewProps) {
           {summary.start_year !== null && summary.end_year !== null && (
             <div className={styles.sub}>
               {summary.partial_coverage
-                ? t(S.assets.partialCoverage)(summary.start_year, summary.end_year)
+                ? t(S.assets.partialCoverage)(
+                    summary.start_year,
+                    summary.end_year,
+                  )
                 : t(S.assets.window)(summary.start_year, summary.end_year)}
             </div>
           )}
         </td>
         {summary.gaps.length > 0 ? (
           <td colSpan={3} className={styles.unavailable}>
-            <span className={styles.unavailableLabel}>{t(S.assets.gapsIn)(gapsText(summary))}</span>
+            <span className={styles.unavailableLabel}>
+              {t(S.assets.gapsIn)(gapsText(summary))}
+            </span>
           </td>
         ) : (
           <>
@@ -211,13 +228,30 @@ export function AssetClassesView({ prefill }: AssetClassesViewProps) {
               <div className={styles.sub}>{levelLabel}</div>
             </td>
             <td className={styles.numCell}>
-              <Num value={percent(change)} decimals={1} unit="%" sign tone={tone} />
+              <Num
+                value={percent(change)}
+                decimals={1}
+                unit="%"
+                sign
+                tone={tone}
+              />
             </td>
             <td className={styles.numCell}>
-              <Num value={percent(annualised)} decimals={1} unit="%" sign tone={tone} />
+              <Num
+                value={percent(annualised)}
+                decimals={1}
+                unit="%"
+                sign
+                tone={tone}
+              />
               {summary.max_drawdown !== null && !nominal && (
                 <div className={styles.sub}>
-                  {t(S.assets.colDrawdown)} <Num value={percent(summary.max_drawdown)} decimals={1} unit="%" />
+                  {t(S.assets.colDrawdown)}{" "}
+                  <Num
+                    value={percent(summary.max_drawdown)}
+                    decimals={1}
+                    unit="%"
+                  />
                 </div>
               )}
             </td>
@@ -232,10 +266,53 @@ export function AssetClassesView({ prefill }: AssetClassesViewProps) {
     const isGroup = node.children.length > 0;
     const isCollapsed = isGroup && (collapsed ?? new Set()).has(node.id);
     const label = lang === "fr" ? node.label_fr : node.label_en;
+    if (node.status === "excluded") {
+      // Exclusion délibérée du capital-investissement et de la dette privée : un énoncé de méthode,
+      // pas une ligne grisée de bas de tableau.
+      const why = lang === "fr" ? node.reason_fr : node.reason_en;
+      return (
+        <tr
+          key={node.id}
+          className={styles.row}
+          data-depth={depth}
+          data-status={node.status}
+        >
+          <th scope="row" colSpan={6} className={styles.statementCell}>
+            <div className={styles.statement}>
+              <div className={styles.statementTitle}>
+                {label}{" "}
+                <span className={styles.statementTag}>
+                  {t(S.assets.excludedRow)}
+                </span>
+              </div>
+              {why && <p className={styles.statementBody}>{why}</p>}
+            </div>
+          </th>
+        </tr>
+      );
+    }
     const showData = node.status !== "group";
+    // Un groupe replié dont tous les enfants sont indisponibles dit pourquoi au lieu de paraître vide.
+    const collapsedSummary =
+      isGroup &&
+      isCollapsed &&
+      node.children.every(
+        (c) => c.children.length === 0 && c.status === "not_ingested",
+      )
+        ? t(S.assets.groupNotIngested)(node.children.length)
+        : null;
     const rows: React.ReactNode[] = [
-      <tr key={node.id} className={styles.row} data-depth={depth} data-status={node.status}>
-        <th scope="row" className={styles.label} style={{ paddingLeft: 8 + depth * 16 }}>
+      <tr
+        key={node.id}
+        className={styles.row}
+        data-depth={depth}
+        data-status={node.status}
+      >
+        <th
+          scope="row"
+          className={styles.label}
+          style={{ paddingLeft: `calc(var(--sp-2) + ${depth} * var(--sp-4))` }}
+        >
           {isGroup ? (
             <button
               type="button"
@@ -253,12 +330,23 @@ export function AssetClassesView({ prefill }: AssetClassesViewProps) {
         </th>
         <td className={styles.tierCell}>
           {node.tier !== null && (
-            <span className={styles.tier} title={t(S.assets.tierTitle)(node.tier)}>
+            <span
+              className={styles.tier}
+              title={t(S.assets.tierTitle)(node.tier)}
+            >
               {t(S.assets.tierBadge)(node.tier)}
             </span>
           )}
         </td>
-        {showData ? renderDataCells(node) : <td colSpan={4} />}
+        {showData ? (
+          renderDataCells(node)
+        ) : collapsedSummary ? (
+          <td colSpan={4} className={styles.unavailable}>
+            <span className={styles.unavailableLabel}>{collapsedSummary}</span>
+          </td>
+        ) : (
+          <td colSpan={4} />
+        )}
       </tr>,
     ];
     if (isGroup && !isCollapsed) {
@@ -272,124 +360,141 @@ export function AssetClassesView({ prefill }: AssetClassesViewProps) {
 
   return (
     <div className={styles.layout}>
+      <h1 className={styles.pageTitle}>{t(S.viewTabs.assets)}</h1>
+      <p className={styles.intro}>{t(S.assets.pageIntro)}</p>
+
       <div className={styles.controls}>
-        <div className={styles.card}>
-          <div className={styles.cardTitle}>{t(S.assets.pageControls)}</div>
-          <label className={styles.field}>
-            <span className={styles.fieldLabel}>{t(S.assets.country)}</span>
-            <select className={styles.select} value={country} onChange={(e) => setCountry(e.target.value)}>
-              {(countries.length > 0 ? countries : [{ iso3: country } as CountryOut]).map((c) => (
-                <option key={c.iso3} value={c.iso3}>
-                  {c.name_fr ? `${c.iso3} — ${lang === "fr" ? c.name_fr : c.name_en}` : c.iso3}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className={styles.periodRow}>
-            <label className={styles.field}>
-              <span className={styles.fieldLabel}>{t(S.assets.from)}</span>
-              <input
-                type="number"
-                className={styles.yearInput}
-                value={fromYear}
-                aria-invalid={rangeInvalid}
-                onChange={(e) => setFromYear(e.target.value)}
-              />
-            </label>
-            <label className={styles.field}>
-              <span className={styles.fieldLabel}>{t(S.assets.to)}</span>
-              <input
-                type="number"
-                className={styles.yearInput}
-                value={toYear}
-                aria-invalid={rangeInvalidTo}
-                onChange={(e) => setToYear(e.target.value)}
-              />
-            </label>
-          </div>
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>{t(S.assets.tiers)}</span>
-            <div className={styles.chips} role="group" aria-label={t(S.assets.tiers)}>
-              {ALL_TIERS.map((tier) => (
-                <button
-                  key={tier}
-                  type="button"
-                  className={styles.chip}
-                  data-active={tiers.has(tier)}
-                  aria-pressed={tiers.has(tier)}
-                  title={t(S.assets.tierTitle)(tier)}
-                  onClick={() => toggleTier(tier)}
-                >
-                  {t(S.assets.tierBadge)(tier)}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>{t(S.assets.basis)}</span>
-            <div className={styles.chips} role="group" aria-label={t(S.assets.basis)}>
+        <label className={styles.control}>
+          <span className={styles.controlLabel}>{t(S.assets.country)}</span>
+          <select
+            className={styles.select}
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+          >
+            {(countries.length > 0
+              ? countries
+              : [{ iso3: country } as CountryOut]
+            ).map((c) => (
+              <option key={c.iso3} value={c.iso3}>
+                {c.name_fr
+                  ? `${c.iso3} — ${lang === "fr" ? c.name_fr : c.name_en}`
+                  : c.iso3}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className={styles.control}>
+          <span className={styles.controlLabel}>{t(S.assets.from)}</span>
+          <input
+            type="number"
+            className={styles.yearInput}
+            value={fromYear}
+            aria-label={t(S.assets.from)}
+            aria-invalid={rangeInvalid}
+            onChange={(e) => setFromYear(e.target.value)}
+          />
+        </div>
+        <div className={styles.control}>
+          <span className={styles.controlLabel}>{t(S.assets.to)}</span>
+          <input
+            type="number"
+            className={styles.yearInput}
+            value={toYear}
+            aria-label={t(S.assets.to)}
+            aria-invalid={rangeInvalidTo}
+            onChange={(e) => setToYear(e.target.value)}
+          />
+        </div>
+        <div className={styles.control}>
+          <span className={styles.controlLabel}>{t(S.assets.tiers)}</span>
+          <div
+            className={styles.chips}
+            role="group"
+            aria-label={t(S.assets.tiers)}
+          >
+            {ALL_TIERS.map((tier) => (
               <button
+                key={tier}
                 type="button"
                 className={styles.chip}
-                data-active={basis === "real"}
-                aria-pressed={basis === "real"}
-                onClick={() => setBasis("real")}
+                data-active={tiers.has(tier)}
+                aria-pressed={tiers.has(tier)}
+                title={t(S.assets.tierTitle)(tier)}
+                onClick={() => toggleTier(tier)}
               >
-                {t(S.assets.basisReal)}
+                {t(S.assets.tierBadge)(tier)}
               </button>
-              <button
-                type="button"
-                className={styles.chip}
-                data-active={basis === "nominal"}
-                aria-pressed={basis === "nominal"}
-                onClick={() => setBasis("nominal")}
-              >
-                {t(S.assets.basisNominal)}
-              </button>
-            </div>
+            ))}
+          </div>
+        </div>
+        <div className={styles.control}>
+          <span className={styles.controlLabel}>{t(S.assets.basis)}</span>
+          <div
+            className={styles.chips}
+            role="group"
+            aria-label={t(S.assets.basis)}
+          >
+            <button
+              type="button"
+              className={styles.chip}
+              data-active={basis === "real"}
+              aria-pressed={basis === "real"}
+              onClick={() => setBasis("real")}
+            >
+              {t(S.assets.basisReal)}
+            </button>
+            <button
+              type="button"
+              className={styles.chip}
+              data-active={basis === "nominal"}
+              aria-pressed={basis === "nominal"}
+              onClick={() => setBasis("nominal")}
+            >
+              {t(S.assets.basisNominal)}
+            </button>
           </div>
         </div>
       </div>
 
-      <div className={styles.content}>
-        <p className={styles.intro}>{t(S.assets.pageIntro)}</p>
-        {prefill && (
-          <div className={styles.prefilled}>{t(S.assets.prefilteredFrom)(prefill.country, prefill.anchorYear)}</div>
-        )}
-        {loading && <EmptyState>{t(S.assets.pageLoading)}</EmptyState>}
-        {error && (
-          <div className={styles.notice} role="note">
-            {t(S.assets.unavailable)}
-          </div>
-        )}
-        {!loading && !error && data && (
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th scope="col" className={styles.colHead}>
-                  {t(S.assets.colAsset)}
-                </th>
-                <th scope="col" className={styles.colHead}>
-                  {t(S.assets.colTier)}
-                </th>
-                <th scope="col" className={styles.colHead}>
-                  {t(S.assets.colCoverage)}
-                </th>
-                <th scope="col" className={styles.colHead}>
-                  {t(S.assets.colLevel)}
-                </th>
-                <th scope="col" className={styles.colHead}>
-                  {t(S.assets.colChange)}
-                </th>
-                <th scope="col" className={styles.colHead}>
-                  {t(S.assets.colAnnualised)}
-                </th>
-              </tr>
-            </thead>
-            <tbody>{data.tree.map((node) => renderNode(node, 0))}</tbody>
-          </table>
-        )}
-      </div>
+      {prefill && (
+        <div className={styles.prefilled}>
+          {t(S.assets.prefilteredFrom)(prefill.country, prefill.anchorYear)}
+        </div>
+      )}
+      {loading && <EmptyState>{t(S.assets.pageLoading)}</EmptyState>}
+      {error && (
+        <div className={styles.notice} role="note">
+          {t(S.assets.unavailable)}
+        </div>
+      )}
+      {!loading && !error && data && (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th scope="col" className={styles.colHead}>
+                {t(S.assets.colAsset)}
+              </th>
+              <th scope="col" className={styles.colHead}>
+                {t(S.assets.colTier)}
+              </th>
+              <th scope="col" className={styles.colHead}>
+                {t(S.assets.colCoverage)}
+              </th>
+              <th scope="col" className={styles.colHead}>
+                {t(S.assets.colLevel)}
+              </th>
+              <th scope="col" className={styles.colHead}>
+                {t(S.assets.colChange)}
+              </th>
+              <th scope="col" className={styles.colHead}>
+                {t(S.assets.colAnnualised)}
+              </th>
+            </tr>
+          </thead>
+          <tbody>{data.tree.map((node) => renderNode(node, 0))}</tbody>
+        </table>
+      )}
+      <p className={styles.legendLine}>{t(S.assets.tierLegend)}</p>
     </div>
   );
 }

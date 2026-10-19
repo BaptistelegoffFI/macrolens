@@ -68,6 +68,14 @@ export const ASSET_STRINGS = {
       `${k} of ${n} window${n > 1 ? "s" : ""} under the gold standard or Bretton Woods: flat series, then jumps at devaluations`,
   },
   tierBadge: { fr: (tier: number) => `T${tier}`, en: (tier: number) => `T${tier}` },
+  groupNotIngested: {
+    fr: (n: number) => `${n} séries non disponibles (tiers 2 et 3, non ingérés)`,
+    en: (n: number) => `${n} series not available (tiers 2 and 3, not ingested)`,
+  },
+  tierLegend: {
+    fr: "T1 = tier 1 : séries JST 1870 à 2020 · T2 et T3 : non ingérés à ce jour.",
+    en: "T1 = tier 1: JST series, 1870 to 2020 · T2 and T3: not ingested yet.",
+  },
   tierTitle: {
     fr: (tier: number) => `Tier ${tier} : voir l'onglet Sources & méthode`,
     en: (tier: number) => `Tier ${tier}: see the Sources & methodology tab`,

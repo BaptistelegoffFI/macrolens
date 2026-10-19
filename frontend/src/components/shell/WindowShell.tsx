@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { useLanguage } from "../../i18n/LanguageContext";
 import { S } from "../../i18n/strings";
+import { Kbd } from "./Kbd";
 import { TitleBar } from "./TitleBar";
 import { VIEW_TABS } from "./viewTabs";
 import styles from "./WindowShell.module.css";
@@ -39,7 +40,7 @@ export function WindowShell({ activeView, onViewChange, toolbar, statusBar, chil
             }}
           >
             {t(tab.label)}
-            <span className={styles.shortcut}>{tab.shortcut}</span>
+            <Kbd>{tab.shortcut}</Kbd>
           </div>
         ))}
       </div>

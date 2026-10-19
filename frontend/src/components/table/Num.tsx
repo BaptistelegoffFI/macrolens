@@ -17,12 +17,16 @@ export interface NumProps {
   /** Préfixe + explicite pour une variation positive (Δ, contributions). */
   sign?: boolean;
   tone?: "pos" | "neg" | "auto" | "none";
+  /** Taille : « body » (défaut, valeur), « meta » (IQR, N, fenêtres : la valeur dominante et ses
+   * annexes ne partagent jamais la même taille) ou « label » (dans un libellé de contrôle). */
+  size?: "body" | "meta" | "label";
 }
 
-export function Num({ value, decimals = 1, unit, sign = false, tone = "none" }: NumProps) {
+export function Num({ value, decimals = 1, unit, sign = false, tone = "none", size = "body" }: NumProps) {
+  const cls = size === "body" ? "num" : `num num-${size}`;
   if (value === null || value === undefined || Number.isNaN(value)) {
     return (
-      <span className="num" style={{ color: "var(--fg-muted)" }}>
+      <span className={cls} style={{ color: "var(--fg-muted)" }}>
         —
       </span>
     );
@@ -37,7 +41,7 @@ export function Num({ value, decimals = 1, unit, sign = false, tone = "none" }: 
   const formatted = `${sign && value >= 0 ? "+" : ""}${body}${unit ?? ""}`;
 
   return (
-    <span className="num" style={{ color: toneColor }}>
+    <span className={cls} style={{ color: toneColor }}>
       {formatted}
     </span>
   );

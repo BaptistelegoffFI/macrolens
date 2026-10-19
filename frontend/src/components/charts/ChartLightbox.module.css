@@ -1,0 +1,23 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-6);
+  background: var(--scrim);
+}
+
+.box {
+  composes: panel from "../../styles/surfaces.module.css";
+  display: flex;
+  flex-direction: column;
+  width: min(1600px, 100%);
+  height: min(900px, 100%);
+  padding: var(--space-sub);
+}
+
+.close {
+  composes: btn from "../../styles/surfaces.module.css";
+}

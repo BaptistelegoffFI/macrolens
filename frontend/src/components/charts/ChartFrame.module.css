@@ -1,0 +1,51 @@
+.frame {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+}
+
+/* height="fill" : le cadre prend tout l'espace restant de son parent flex, le graphique aussi. */
+.frame[data-fill="true"] {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-inline);
+  margin-bottom: var(--space-row);
+}
+
+.title {
+  composes: colhead from "../../styles/typography.module.css";
+}
+
+.unit {
+  composes: badge from "../../styles/surfaces.module.css";
+}
+
+.actions {
+  margin-left: auto;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* §11.5 : chaque graphique porte en pied source(s), build_id, export. */
+.foot {
+  composes: meta from "../../styles/typography.module.css";
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-inline);
+  margin-top: var(--space-row);
+}
+
+.export {
+  composes: btnLink from "../../styles/surfaces.module.css";
+  font-size: var(--text-meta);
+}

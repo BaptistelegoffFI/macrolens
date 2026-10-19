@@ -2,6 +2,7 @@ import { useLanguage } from "../../i18n/LanguageContext";
 import { S } from "../../i18n/strings";
 import type { Bi } from "../../i18n/strings";
 import { Num } from "../table/Num";
+import { Kbd } from "./Kbd";
 import styles from "./Toolbar.module.css";
 import type { ScenarioMode, ToolbarState } from "./useToolbarState";
 
@@ -70,7 +71,7 @@ export function Toolbar({ value, onChange, onRun, onCopyPermalink }: ToolbarProp
                 })
               }
             >
-              <Num value={h} decimals={0} />
+              <Num value={h} decimals={0} size="label" />
             </button>
           );
         })}
@@ -97,10 +98,12 @@ export function Toolbar({ value, onChange, onRun, onCopyPermalink }: ToolbarProp
           title={t(S.toolbar.copyPermalinkTitle)}
         >
           {t(S.toolbar.copyPermalink)}
+          <Kbd>Ctrl+L</Kbd>
         </button>
       )}
       <button type="button" className={styles.runBtn} onClick={onRun} title={t(S.toolbar.runTitle)}>
         {t(S.toolbar.run)}
+        <Kbd>F5</Kbd>
       </button>
     </div>
   );

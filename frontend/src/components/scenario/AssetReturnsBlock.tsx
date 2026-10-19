@@ -14,7 +14,9 @@ import {
 } from "../../lib/assetReturns";
 import type { AssetMetric } from "../../lib/assetReturns";
 import { AssetPathChart } from "../charts/AssetPathChart";
+import { ChartFrame } from "../charts/ChartFrame";
 import { FailSafe } from "../shell/FailSafe";
+import { Section } from "../shell/Section";
 import { Num } from "../table/Num";
 import styles from "./AssetReturnsBlock.module.css";
 
@@ -28,7 +30,9 @@ const METRICS: { id: AssetMetric; label: Bi }[] = [
 export interface AssetReturnsBlockProps {
   analogs: { country: string; year: number }[] | null;
   anchor: { country: string; year: number } | null;
-  onOpenAssetClasses: (anchor: { country: string; year: number } | null) => void;
+  onOpenAssetClasses: (
+    anchor: { country: string; year: number } | null,
+  ) => void;
 }
 
 function FxPictogram({ pegged, n }: { pegged: number; n: number }) {
@@ -43,7 +47,12 @@ function FxPictogram({ pegged, n }: { pegged: number; n: number }) {
       aria-label={t(S.assets.pegged)(pegged, n)}
     >
       <title>{t(S.assets.pegged)(pegged, n)}</title>
-      <path d="M0 8 H7 V2 H14" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M0 8 H7 V2 H14"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }
@@ -67,7 +76,9 @@ function ClassCell({
     }[key];
     return `${label} (${count})`;
   });
-  const excludedText = reasons.length ? `${t(S.assets.excludedBecause)} ${reasons.join(", ")}` : undefined;
+  const excludedText = reasons.length
+    ? `${t(S.assets.excludedBecause)} ${reasons.join(", ")}`
+    : undefined;
   const nLine = (
     <div className={styles.nLine} title={excludedText}>
       {t(S.assets.nOf)(cell.n, cell.n_requested)}
@@ -100,43 +111,70 @@ function ClassCell({
     <td className={styles.cell}>
       <div className={styles.median}>
         <Num value={percent(q.median)} decimals={1} unit="%" sign tone={tone} />
-        {klass.return_basis === "nominal_fx_return" && cell.n_pegged !== null && cell.n_pegged > 0 && (
-          <FxPictogram pegged={cell.n_pegged} n={cell.n} />
-        )}
+        {klass.return_basis === "nominal_fx_return" &&
+          cell.n_pegged !== null &&
+          cell.n_pegged > 0 && (
+            <FxPictogram pegged={cell.n_pegged} n={cell.n} />
+          )}
         {cell.n_extreme > 0 && (
-          <span className={styles.flag} title={t(S.assets.extreme)(cell.n_extreme)}>
+          <span
+            className={styles.flag}
+            title={t(S.assets.extreme)(cell.n_extreme)}
+          >
             ⚑
           </span>
         )}
         {cell.n_interpolated !== null && cell.n_interpolated > 0 && (
-          <span className={styles.flag} title={t(S.assets.interpolated)(cell.n_interpolated)}>
+          <span
+            className={styles.flag}
+            title={t(S.assets.interpolated)(cell.n_interpolated)}
+          >
             ~
           </span>
         )}
       </div>
       <div className={styles.iqr}>
-        {t(S.assets.iqr)} <Num value={percent(q.q1)} decimals={1} unit="%" sign /> {"→"}{" "}
-        <Num value={percent(q.q3)} decimals={1} unit="%" sign />
+        {t(S.assets.iqr)}{" "}
+        <Num value={percent(q.q1)} decimals={1} unit="%" sign size="meta" />{" "}
+        {"→"}{" "}
+        <Num value={percent(q.q3)} decimals={1} unit="%" sign size="meta" />
       </div>
       {nLine}
       {metric !== "drawdown" && positives !== null && (
-        <div className={styles.nLine}>{t(S.assets.positiveOf)(positives, cell.n)}</div>
+        <div className={styles.nLine}>
+          {t(S.assets.positiveOf)(positives, cell.n)}
+        </div>
       )}
       {excludedText && <div className={styles.reasons}>{excludedText}</div>}
     </td>
   );
 }
 
-function ClassRow({ klass, metric }: { klass: AssetClassOut; metric: AssetMetric }) {
+function ClassRow({
+  klass,
+  metric,
+}: {
+  klass: AssetClassOut;
+  metric: AssetMetric;
+}) {
   const { t, lang } = useLanguage();
   const label = CLASS_LABELS[klass.class_id]?.[lang] ?? klass.class_id;
-  const caveat = lang === "fr" ? klass.series.caveat_fr : klass.series.caveat_en;
-  const seriesLabel = lang === "fr" ? klass.series.label_fr : klass.series.label_en;
+  const caveat =
+    lang === "fr" ? klass.series.caveat_fr : klass.series.caveat_en;
+  const seriesLabel =
+    lang === "fr" ? klass.series.label_fr : klass.series.label_en;
   return (
     <tr>
-      <th scope="row" className={styles.rowLabel} title={[seriesLabel, caveat].filter(Boolean).join(". ")}>
+      <th
+        scope="row"
+        className={styles.rowLabel}
+        title={[seriesLabel, caveat].filter(Boolean).join(". ")}
+      >
         {label}
-        <span className={styles.tier} title={t(S.assets.tierTitle)(klass.series.tier)}>
+        <span
+          className={styles.tier}
+          title={t(S.assets.tierTitle)(klass.series.tier)}
+        >
           {t(S.assets.tierBadge)(klass.series.tier)}
         </span>
       </th>
@@ -157,7 +195,11 @@ function ClassRow({ klass, metric }: { klass: AssetClassOut; metric: AssetMetric
 /** Bloc Scénario (ADR 0015 à 0024) : ce que chaque classe d'actifs a réellement
  * donné après les précédents de la recherche. Toute défaillance reste confinée ici :
  * le tableau des analogues, l'éventail et la frise ne dépendent pas de ce bloc. */
-function AssetReturnsBlockInner({ analogs, anchor, onOpenAssetClasses }: AssetReturnsBlockProps) {
+function AssetReturnsBlockInner({
+  analogs,
+  anchor,
+  onOpenAssetClasses,
+}: AssetReturnsBlockProps) {
   const { t, lang } = useLanguage();
   const [metric, setMetric] = useState<AssetMetric>("cumulative");
   const { data, loading, error } = useAssetReturns(analogs);
@@ -167,7 +209,8 @@ function AssetReturnsBlockInner({ analogs, anchor, onOpenAssetClasses }: AssetRe
   const core = data?.classes.filter((c) => c.section === "core") ?? [];
   const housing = data?.classes.filter((c) => c.section === "housing") ?? [];
   const fx = data?.classes.filter((c) => c.section === "fx") ?? [];
-  const inflation = data?.classes.filter((c) => c.section === "inflation") ?? [];
+  const inflation =
+    data?.classes.filter((c) => c.section === "inflation") ?? [];
   const equities = data?.classes.find((c) => c.class_id === "equities");
   const housingCaveat = housing[0]
     ? lang === "fr"
@@ -175,17 +218,22 @@ function AssetReturnsBlockInner({ analogs, anchor, onOpenAssetClasses }: AssetRe
       : housing[0].series.caveat_en
     : null;
   const paths = data?.forward_paths ?? [];
-  const pathN = Math.max(0, ...paths.flatMap((p) => p.points.map((pt) => pt.n)));
+  const pathN = Math.max(
+    0,
+    ...paths.flatMap((p) => p.points.map((pt) => pt.n)),
+  );
 
   return (
-    <section className={styles.block} aria-label={t(S.assets.blockTitle)}>
-      <div className={styles.header}>
-        <div>
-          <div className={styles.title}>{t(S.assets.blockTitle)}</div>
-          <div className={styles.subtitle}>{t(S.assets.blockSubtitle)}</div>
-        </div>
-        <div className={styles.controls}>
-          <div className={styles.segmented} role="group" aria-label={t(S.assets.metricAria)}>
+    <Section
+      level="block"
+      title={t(S.assets.blockTitle)}
+      meta={
+        <span className={styles.controls}>
+          <span
+            className={styles.segmented}
+            role="group"
+            aria-label={t(S.assets.metricAria)}
+          >
             {METRICS.map((m) => (
               <button
                 key={m.id}
@@ -198,12 +246,18 @@ function AssetReturnsBlockInner({ analogs, anchor, onOpenAssetClasses }: AssetRe
                 {t(m.label)}
               </button>
             ))}
-          </div>
-          <button type="button" className={styles.linkBtn} onClick={() => onOpenAssetClasses(anchor)}>
+          </span>
+          <button
+            type="button"
+            className={styles.linkBtn}
+            onClick={() => onOpenAssetClasses(anchor)}
+          >
             {t(S.assets.openAssetClasses)}
           </button>
-        </div>
-      </div>
+        </span>
+      }
+    >
+      <p className={styles.sub}>{t(S.assets.blockSubtitle)}</p>
 
       {loading && <div className={styles.notice}>{t(S.assets.loading)}</div>}
       {error && (
@@ -213,82 +267,103 @@ function AssetReturnsBlockInner({ analogs, anchor, onOpenAssetClasses }: AssetRe
       )}
 
       {data && (
-        <>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th scope="col" className={styles.colHead}>
-                  {t(S.assets.classColumn)}
-                </th>
-                {COLUMNS.map((h) => (
-                  <th key={h} scope="col" className={styles.colHead}>
-                    {t(S.assets.horizonYears)(h)}
+        <div className={styles.body}>
+          <div>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th scope="col" className={styles.colHead}>
+                    {t(S.assets.classColumn)}
                   </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {core.map((c) => (
-                <ClassRow key={c.class_id} klass={c} metric={metric} />
-              ))}
-            </tbody>
-            {housing.length > 0 && (
-              <tbody className={styles.sectionHousing}>
-                <tr>
-                  <td colSpan={COLUMNS.length + 1} className={styles.sectionHead}>
-                    {t(S.assets.sectionHousing)}
-                    {housingCaveat && <div className={styles.sectionCaveat}>{housingCaveat}</div>}
-                  </td>
+                  {COLUMNS.map((h) => (
+                    <th key={h} scope="col" className={styles.colHead}>
+                      {t(S.assets.horizonYears)(h)}
+                    </th>
+                  ))}
                 </tr>
-                {housing.map((c) => (
+              </thead>
+              <tbody>
+                {core.map((c) => (
                   <ClassRow key={c.class_id} klass={c} metric={metric} />
                 ))}
               </tbody>
-            )}
-            {fx.length > 0 && (
-              <tbody className={styles.sectionOther}>
-                <tr>
-                  <td colSpan={COLUMNS.length + 1} className={styles.sectionHead}>
-                    {t(S.assets.sectionFx)}
-                  </td>
-                </tr>
-                {fx.map((c) => (
-                  <ClassRow key={c.class_id} klass={c} metric={metric} />
-                ))}
-              </tbody>
-            )}
-            {inflation.length > 0 && (
-              <tbody className={styles.sectionOther}>
-                <tr>
-                  <td colSpan={COLUMNS.length + 1} className={styles.sectionHead}>
-                    {t(S.assets.sectionInflation)}
-                  </td>
-                </tr>
-                {inflation.map((c) => (
-                  <ClassRow key={c.class_id} klass={c} metric={metric} />
-                ))}
-              </tbody>
-            )}
-          </table>
+              {housing.length > 0 && (
+                <tbody className={styles.sectionHousing}>
+                  <tr>
+                    <td
+                      colSpan={COLUMNS.length + 1}
+                      className={styles.sectionHead}
+                    >
+                      {t(S.assets.sectionHousing)}
+                      {housingCaveat && (
+                        <div className={styles.sectionCaveat}>
+                          {housingCaveat}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                  {housing.map((c) => (
+                    <ClassRow key={c.class_id} klass={c} metric={metric} />
+                  ))}
+                </tbody>
+              )}
+              {fx.length > 0 && (
+                <tbody className={styles.sectionOther}>
+                  <tr>
+                    <td
+                      colSpan={COLUMNS.length + 1}
+                      className={styles.sectionHead}
+                    >
+                      {t(S.assets.sectionFx)}
+                    </td>
+                  </tr>
+                  {fx.map((c) => (
+                    <ClassRow key={c.class_id} klass={c} metric={metric} />
+                  ))}
+                </tbody>
+              )}
+              {inflation.length > 0 && (
+                <tbody className={styles.sectionOther}>
+                  <tr>
+                    <td
+                      colSpan={COLUMNS.length + 1}
+                      className={styles.sectionHead}
+                    >
+                      {t(S.assets.sectionInflation)}
+                    </td>
+                  </tr>
+                  {inflation.map((c) => (
+                    <ClassRow key={c.class_id} klass={c} metric={metric} />
+                  ))}
+                </tbody>
+              )}
+            </table>
 
-          {metric === "drawdown" && <div className={styles.footnote}>{t(S.assets.drawdownNote)}</div>}
+            <div className={styles.footnote}>{t(S.assets.tierLegend)}</div>
+            {metric === "drawdown" && (
+              <div className={styles.footnote}>{t(S.assets.drawdownNote)}</div>
+            )}
+            {equities && (
+              <div className={styles.footnote}>
+                {t(S.assets.provenance)(
+                  equities.series.first_year ?? 0,
+                  equities.series.last_year ?? 0,
+                )}
+              </div>
+            )}
+          </div>
 
           {paths.length > 0 && pathN > 0 && (
-            <div className={styles.chartBlock}>
-              <div className={styles.chartTitle}>{t(S.assets.chartTitle)}</div>
+            <ChartFrame
+              title={t(S.assets.chartTitle)}
+              footnote={t(S.assets.chartNote)(pathN)}
+            >
               <AssetPathChart paths={paths} />
-              <div className={styles.footnote}>{t(S.assets.chartNote)(pathN)}</div>
-            </div>
+            </ChartFrame>
           )}
-
-          {equities && (
-            <div className={styles.footnote}>
-              {t(S.assets.provenance)(equities.series.first_year ?? 0, equities.series.last_year ?? 0)}
-            </div>
-          )}
-        </>
+        </div>
       )}
-    </section>
+    </Section>
   );
 }
 

@@ -1,0 +1,55 @@
+/* Deux niveaux d'en-tête, pas plus :
+   - groupe (région majeure) : titre de section, filet plein dessous, grand espace après ;
+   - bloc (sous-section)     : titre d'en-tête de colonne, simple espace. */
+.group {
+  margin: 0 0 var(--space-region);
+}
+
+.group:last-child {
+  margin-bottom: 0;
+}
+
+.groupHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sub);
+  padding-bottom: var(--sp-2);
+  margin-bottom: var(--space-sub);
+  border-bottom: var(--sep-rule);
+}
+
+.groupTitle {
+  composes: section from "../../styles/typography.module.css";
+  margin: 0;
+}
+
+.groupMeta {
+  composes: meta from "../../styles/typography.module.css";
+}
+
+.block {
+  margin: 0 0 var(--space-sub);
+  min-width: 0;
+}
+
+.block:last-child {
+  margin-bottom: 0;
+}
+
+.blockHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-inline);
+  margin-bottom: var(--space-row);
+}
+
+.blockTitle {
+  composes: colhead from "../../styles/typography.module.css";
+  margin: 0;
+}
+
+.blockMeta {
+  composes: meta from "../../styles/typography.module.css";
+}

@@ -1,60 +1,76 @@
 .wrapper {
   height: 100%;
   overflow: auto;
-  padding: 16px;
-  max-width: 900px;
+  padding: var(--space-sub) var(--space-sub) var(--space-region);
 }
 
-.section {
-  margin-bottom: 24px;
+.pageTitle {
+  composes: title from "../styles/typography.module.css";
+  margin: 0 0 var(--space-sub);
 }
 
-.sectionTitle {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--fg-secondary);
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 4px;
-  margin-bottom: 8px;
+/* Cartes de sources : trois niveaux de poids selon la priorité de résolution des conflits. */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  gap: var(--space-inline);
 }
 
 .card {
-  border: 1px solid var(--rule-light);
-  padding: 8px 12px;
-  margin-bottom: 8px;
+  border: var(--sep-hairline);
+  padding: var(--sp-2) var(--space-inset);
+  min-width: 0;
+}
+
+.card[data-tier="primary"] {
+  border-left: var(--callout-bar) solid var(--accent);
+}
+
+.card[data-tier="supporting"] {
+  background: var(--sep-tint);
 }
 
 .cardTitle {
-  font-size: 13px;
-  color: var(--fg);
-  margin-bottom: 2px;
+  composes: body from "../styles/typography.module.css";
+  font-weight: var(--weight-strong);
+  margin: 0 0 var(--sp-1);
+}
+
+.card[data-tier="primary"] .cardTitle {
+  font-size: var(--text-section);
 }
 
 .cardMeta {
-  font-size: 11px;
-  color: var(--fg-secondary);
-  margin-bottom: 4px;
+  composes: meta from "../styles/typography.module.css";
+  margin: 0 0 var(--sp-1);
+  overflow-wrap: anywhere;
+}
+
+.mono {
+  composes: num from "../styles/typography.module.css";
 }
 
 .cardCitation {
-  font-size: 11px;
-  color: var(--fg-muted);
+  composes: label from "../styles/typography.module.css";
+  margin: 0 0 var(--sp-1);
   white-space: pre-wrap;
 }
 
-.body {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 20px;
-  color: var(--fg);
+.cardLicence {
+  composes: meta from "../styles/typography.module.css";
+  margin: 0;
+  color: var(--fg-secondary);
+}
+
+.prose {
+  composes: prose from "../styles/typography.module.css";
+  margin: 0 0 var(--sp-3);
 }
 
 .formula {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  background: var(--bg-chrome);
-  padding: 6px 10px;
-  margin: 8px 0;
-  border-left: 2px solid var(--accent);
+  composes: calloutStatement from "../styles/surfaces.module.css";
+  composes: num from "../styles/typography.module.css";
+  font-size: var(--text-body);
+  max-width: var(--measure);
+  margin: var(--sp-2) 0;
 }

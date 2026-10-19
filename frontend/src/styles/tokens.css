@@ -1,34 +1,38 @@
-/* Jetons de conception (PLAN.md §11.1) — figés avant tout composant.
-   Fond blanc, densité maximale, structure portée par des filets 1px. */
+/* Jetons de conception : source unique (PLAN.md §11.1, ADR 0030).
+   Fond blanc, densité maximale, structure portée par des filets 1px.
+
+   Règle : aucun composant n'écrit de taille de police, de graisse, d'espacement ni de couleur en
+   dur. Il consomme un jeton d'ici, ou compose une classe de `typography.module.css` /
+   `surfaces.module.css`. tests/designSystem.test.ts le vérifie sur toutes les feuilles. */
 :root {
-  /* Surfaces */
-  --bg-app: #ffffff;
-  --bg-chrome: #f4f5f6;
-  --bg-row-alt: #fafbfc;
-  --bg-selected: #e4eef7;
+  /* ── SURFACES ─────────────────────────────────────────────────────────────────────────── */
+  --bg-app: #ffffff; /* surface de travail */
+  --bg-chrome: #f4f5f6; /* bandeaux, en-têtes, caveats : niveau « teinte » de la séparation */
+  --bg-row-alt: #fafbfc; /* rangée paire d'un tableau */
+  --bg-selected: #e4eef7; /* état actif / sélectionné */
   --bg-hover: #f0f4f8;
 
-  /* Filets */
-  --rule: #d2d6db;
-  --rule-light: #e6e9ec;
+  /* ── FILETS ───────────────────────────────────────────────────────────────────────────── */
+  --rule: #d2d6db; /* filet plein : entre sections */
+  --rule-light: #e6e9ec; /* filet fin : entre rangées */
   --grid-chart: #eaecef;
-  --axis: #8b9298;
+  --axis: #8b9298; /* graduations de graphique (non textuel, seuil 3:1) */
 
-  /* Texte */
-  --fg: #16191c;
-  --fg-secondary: #5a6169;
-  /* §11.8 : contraste AA (4.5:1) exigé même à 10px. #8B9298 du §11.1
-     donne 3.15:1 sur blanc — insuffisant pour du texte. Assombri à
-     #6B7278 (4.88:1) ; --axis garde la valeur d'origine (élément non
-     textuel, seuil 3:1 seulement). */
-  --fg-muted: #6b7278;
+  /* ── COULEUR = SENS (ne pas détourner) ────────────────────────────────────────────────── */
+  --fg: #16191c; /* texte principal */
+  --fg-secondary: #5a6169; /* libellés de champ, en-têtes de colonne */
+  /* Métadonnée et provenance : N, IQR, fenêtres de couverture, sources. §11.8 : AA 4,5:1 sur
+     TOUTES les surfaces ci-dessus (blanc, chrome, rangée paire, sélection, survol). #6B7278
+     tombait à 4,15:1 sur --bg-selected ; #646B71 donne 4,60:1 au pire. */
+  --fg-muted: #646b71;
 
-  /* Sémantique — bleu/rouge, jamais vert/rouge */
-  --pos: #0b5fa5;
-  --neg: #b3242b;
-  --accent: #0b5fa5;
-  --flag: #b26b00;
-  --crisis: #b3242b;
+  --pos: #0b5fa5; /* rendement / variation POSITIVE */
+  --accent: #0b5fa5; /* état ACTIF, lien, action */
+  --neg: #b3242b; /* valeur NÉGATIVE, erreur */
+  --crisis: #b3242b; /* crise bancaire, repère d'ancre : toujours doublé d'une forme ou d'un libellé */
+  /* Avertissement et caveat, EXCLUSIVEMENT. #B26B00 donnait 4,20:1 sur blanc et 3,58:1 sur
+     --bg-selected ; #9A5B00 donne 5,43:1 et 4,62:1 au pire. Même teinte, luminosité réduite. */
+  --flag: #9a5b00;
 
   /* Séries de graphiques — 8 teintes désaturées */
   --s1: #1f4e79;
@@ -40,29 +44,68 @@
   --s7: #5a6169;
   --s8: #8c3a6b;
 
-  /* Typographie */
-  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
-  --text-chrome: 12px;
-  --text-chrome-line: 16px;
-  --text-micro: 10px;
-  --text-num: 12px;
-  --text-body: 13px;
-  --text-body-line: 20px;
+  /* ── TYPOGRAPHIE : deux familles, six tailles ─────────────────────────────────────────── */
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif; /* prose, libellés, titres */
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace; /* TOUS les nombres, codes pays,
+                                                                       années, hachages, raccourcis */
+  --text-title: 16px; /* titre de page */
+  --text-section: 13px; /* en-tête de section */
+  --text-body: 12px; /* corps de texte et donnée */
+  --text-label: 11px; /* barre d'onglets, contrôles, libellés de champ */
+  --text-colhead: 10px; /* en-tête de colonne (majuscules, interlettrage) */
+  --text-meta: 10px; /* métadonnée : N, IQR, fenêtres, provenance (casse normale, gris) */
 
-  /* Grille et densité (§11.1) */
+  --weight-regular: 400;
+  --weight-medium: 500; /* libellé de rangée, nom de classe d'actifs */
+  --weight-strong: 600; /* titre, valeur dominante, en-tête */
+  --track-caps: 0.04em; /* interlettrage des majuscules */
+
+  --lh-ui: 16px; /* ligne unique de contrôle ou de cellule */
+  --lh-prose: 1.55; /* texte courant sur plusieurs lignes */
+  --measure: 72ch; /* longueur de ligne maximale de la prose ; tableaux et graphiques en sont exempts */
+
+  /* ── ESPACEMENT : base 4 px, rien hors échelle ────────────────────────────────────────── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  --space-cell-y: var(--sp-1); /* à l'intérieur d'une cellule, vertical */
+  --space-cell-x: var(--sp-2); /* à l'intérieur d'une cellule, horizontal */
+  --space-row: var(--sp-1); /* entre éléments empilés (libellé / valeur, ligne / ligne) */
+  --space-inline: var(--sp-2); /* entre contrôles ou éléments voisins sur une ligne */
+  --space-inset: var(--sp-3); /* marge intérieure d'un panneau ou d'une carte */
+  --space-sub: var(--sp-4); /* entre sous-sections d'une même région */
+  --space-region: var(--sp-8); /* entre régions majeures : nettement plus grand que --space-sub */
+
+  /* ── DIMENSIONS DES CONTRÔLES ET DES BANDEAUX (multiples de 4) ────────────────────────── */
   --unit: 4px;
   --row-h: 24px;
-  --table-header-h: 26px;
+  --table-header-h: 28px;
   --menubar-h: 28px;
   --toolbar-h: 32px;
-  --statusbar-h: 22px;
+  --statusbar-h: 24px;
   --panel-title-h: 24px;
-  --gutter: 1px;
-  --cell-pad-x: 6px;
-  --cell-pad-y: 3px;
-
-  /* Contrôles (§11.6) */
   --control-h: 24px;
+  --gutter: 1px;
   --focus-ring: 2px;
+  --cell-pad-x: var(--space-cell-x);
+  --cell-pad-y: var(--space-cell-y);
+
+  /* ── SÉPARATION : du plus faible au plus fort, UN niveau par profondeur ───────────────── */
+  /* espace  <  filet fin  <  filet plein  <  teinte de fond  <  panneau bordé */
+  --sep-hairline: 1px solid var(--rule-light); /* entre rangées d'un même groupe */
+  --sep-rule: 1px solid var(--rule); /* entre sections et sous les en-têtes */
+  --sep-tint: var(--bg-chrome); /* bandeaux, caveats, en-têtes de groupe */
+  --sep-panel: 1px solid var(--rule); /* uniquement colonnes de premier niveau et fenêtres flottantes */
+  --scrim: rgba(22, 25, 28, 0.3); /* voile derrière une fenêtre flottante */
+  --callout-bar: 2px; /* liseré gauche d'un encadré (avertissement, énoncé) */
+
+  /* ── MISE EN PAGE ─────────────────────────────────────────────────────────────────────── */
+  --w-sidebar: 320px; /* barre latérale d'avertissements et de provenance */
+  --w-state: 240px; /* colonne du vecteur d'état */
+  --w-controls: 296px; /* colonne de contrôles des pages Séries et Classes d'actifs */
+  --w-table-max: 1280px; /* plafond de largeur d'un tableau de lecture (Classes d'actifs) */
 }

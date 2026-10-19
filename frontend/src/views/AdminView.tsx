@@ -196,9 +196,9 @@ export function AdminView() {
                     <table className={styles.dailyTable}>
                       <thead>
                         <tr>
-                          <th>{t(S.admin.dailyDate)}</th>
-                          <th>{t(S.admin.dailyViews)}</th>
-                          <th>{t(S.admin.dailyUniqueDevices)}</th>
+                          <th className={styles.dailyTh}>{t(S.admin.dailyDate)}</th>
+                          <th className={styles.dailyTh}>{t(S.admin.dailyViews)}</th>
+                          <th className={styles.dailyTh}>{t(S.admin.dailyUniqueDevices)}</th>
                         </tr>
                       </thead>
                       <tbody>
